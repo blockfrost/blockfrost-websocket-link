@@ -1,13 +1,18 @@
 import * as Types from 'types';
+import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 
-export default (): Types.ServerInfo => {
+export default async (blockFrostApi: BlockFrostAPI): Promise<Types.ServerInfo> => {
+  const info = await blockFrostApi.root();
+  const latestBlock = await blockFrostApi.blocksLatest();
+
   return {
+    url: blockFrostApi.apiUrl,
     name: 'Cardano',
     shortcut: 'ada',
     testnet: false,
-    version: '1',
+    version: info.version.toString(),
     decimals: 6,
-    blockHash: 1,
-    blockHeight: 1,
+    blockHeight: latestBlock.height || 0,
+    blockHash: latestBlock.hash,
   };
 };
