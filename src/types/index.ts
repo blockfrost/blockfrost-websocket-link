@@ -4,6 +4,11 @@ export interface Ws extends WebSocket {
   isAlive: boolean;
 }
 
+export interface Balance {
+  unit: string;
+  quantity: string;
+}
+
 export interface ServerInfo {
   url: string;
   name: string;
@@ -17,8 +22,21 @@ export interface ServerInfo {
 
 export interface AccountInfo {
   balance: string;
+  descriptor: string;
 }
 
 export type Message =
-  | { name: 'GET_SERVER_INFO'; params: { descriptor: string } }
-  | { name: 'GET_SERVER_INFO'; params: null };
+  | {
+      command: 'GET_ACCOUNT_INFO';
+      params: {
+        descriptor: string;
+      };
+    }
+  | {
+      command: 'GET_SERVER_INFO';
+      params: null;
+    }
+  | {
+      command: 'ERROR';
+      params: null;
+    };
