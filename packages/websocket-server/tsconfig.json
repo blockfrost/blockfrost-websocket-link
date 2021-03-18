@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./packages/websocket-server",
+    "paths": {
+      "types/*": ["./src/types/*"],
+      "types": ["./src/types"],
+      "utils/*": ["./src/utils/*"],
+      "utils": ["./src/utils"],
+      "methods/*": ["./src/methods/*"],
+      "methods": ["./src/methods"]
+    }
+  }
+}
