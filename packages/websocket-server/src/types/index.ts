@@ -9,6 +9,8 @@ export interface Balance {
   quantity: string;
 }
 
+export type AddressType = 1 | 0;
+
 export interface ServerInfo {
   url: string;
   name: string;
@@ -23,6 +25,7 @@ export interface ServerInfo {
 export interface AccountInfo {
   balance: string;
   descriptor: string;
+  tokens: Balance[];
 }
 
 export type Message =
