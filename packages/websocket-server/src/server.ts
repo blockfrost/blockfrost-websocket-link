@@ -72,7 +72,8 @@ wss.on('connection', (ws: Ws) => {
       }
     }
   });
-  ws.send('Connected to server');
+  const message = prepareMessage(MESSAGES.CONNECT, 'Connected to server');
+  ws.send(message);
 });
 
 const interval = setInterval(() => {

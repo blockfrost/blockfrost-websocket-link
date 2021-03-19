@@ -1,5 +1,7 @@
 import Bottleneck from 'bottleneck';
 import { ADDRESS_GAP_LIMIT } from '../constants';
+import * as Types from '../types';
+import BigNumber from 'bignumber.js';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import {
   Bip32PublicKey,
@@ -31,7 +33,7 @@ export const deriveBatchOfAddresses = (
   publicKey: string,
   start: number,
   end: number,
-  type: 1 | 0,
+  type: Types.AddressType,
 ): string[] => {
   const addresses = [];
 
@@ -46,7 +48,7 @@ export const deriveBatchOfAddresses = (
 export const getAddresses = async (
   publicKey: string,
   blockFrostApi: BlockFrostAPI,
-  type: 1 | 0,
+  type: Types.AddressType,
 ): Promise<Responses['address_content'][]> => {
   const nonEmptyAddresses: Responses['address_content'][] = [];
   let discoveryActive = true;
@@ -96,4 +98,33 @@ export const getAccountAddresses = async (
   const internalAddresses = await getAddresses(publicKey, blockFrostApi, 1);
 
   return [...externalAddresses, ...internalAddresses];
+};
+
+export const getBalances = async (
+  blockfrostApi: BlockFrostAPI,
+  publicKey: string,
+): Promise<Types.Balance[]> => {
+  const addresses = await getAccountAddresses(publicKey, blockfrostApi);
+  const balances: Types.Balance[] = [];
+
+  addresses.map(address => {
+    address.amount.map(amountItem => {
+      if (amountItem.quantity && amountItem.unit) {
+        const balanceRow = balances.find(balanceResult => balanceResult.unit === amountItem.unit);
+
+        if (!balanceRow) {
+          balances.push({
+            unit: amountItem.unit,
+            quantity: amountItem.quantity,
+          });
+        } else {
+          balanceRow.quantity = new BigNumber(balanceRow.quantity)
+            .plus(amountItem.quantity)
+            .toString();
+        }
+      }
+    });
+  });
+
+  return balances;
 };

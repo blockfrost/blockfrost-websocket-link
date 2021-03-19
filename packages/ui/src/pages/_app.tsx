@@ -8,7 +8,7 @@ function App({ Component, pageProps }: AppContext & AppInitialProps): ReactEleme
     <>
       <Head>
         <meta charSet="UTF-8" />
-        <title>websocket link ui</title>
+        <title>Websocket link ui</title>
       </Head>
       <Component {...pageProps} />
     </>
