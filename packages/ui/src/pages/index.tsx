@@ -1,7 +1,13 @@
 import React, { ReactElement } from 'react';
 
+import Navigation from '../components/Navigation';
+
 function Index(): ReactElement {
-  return <div>ahojda</div>;
+  return (
+    <div>
+      <Navigation />
+    </div>
+  );
 }
 
 export default Index;
