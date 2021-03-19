@@ -3,7 +3,6 @@
     "target": "ES2019",
     "module": "commonjs",
     "declaration": true,
-    "outDir": "dist",
     "isolatedModules": true,
     "strict": true,
     "noImplicitAny": true,
@@ -18,17 +17,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": "./",
-    "paths": {
-      "types/*": ["./src/types/*"],
-      "types": ["./src/types"],
-      "utils/*": ["./src/utils/*"],
-      "utils": ["./src/utils"],
-      "methods/*": ["./src/methods/*"],
-      "methods": ["./src/methods"]
-    },
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

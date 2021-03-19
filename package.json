@@ -1,29 +1,16 @@
 {
-  "name": "@blockfrost/websocket-link",
+  "name": "@blockfrost/websocket-link-monorepo",
   "scripts": {
-    "clean": "rimraf dist",
-    "build": "yarn clean && babel ./src --out-dir dist --copy-files --extensions '.ts'",
-    "dev": "ts-node-dev src/server.ts",
-    "lint": "eslint ./src/**/*.ts",
-    "type-check": "tsc --project tsconfig.json"
+    "dev": "yarn workspaces foreach -pvi run dev"
   },
   "dependencies": {
-    "express": "^4.17.1",
     "rimraf": "^3.0.2",
     "ws": "^7.4.4"
   },
   "devDependencies": {
-    "@babel/cli": "^7.12.10",
-    "@babel/core": "^7.12.10",
-    "@babel/plugin-transform-runtime": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-typescript": "^7.12.7",
-    "@types/express": "^4.17.11",
-    "@types/node": "^14.14.34",
     "@types/ws": "^7.4.0",
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.17.0",
-    "babel-plugin-module-resolver": "^4.1.0",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-import-resolver-babel-module": "^5.2.0",
@@ -32,5 +19,11 @@
     "prettier": "^2.2.1",
     "ts-node-dev": "^1.1.6",
     "typescript": "^4.2.3"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "resolutions": {
+    "@blockfrost/blockfrost-js": "portal:/Users/vladimirvolek/blockfrost/blockfrost-js"
   }
 }
