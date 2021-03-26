@@ -1,7 +1,9 @@
 {
   "name": "@blockfrost/websocket-link-monorepo",
+  "license": "Apache-2.0",
   "scripts": {
-    "dev": "yarn workspaces foreach -pvi run dev"
+    "dev": "yarn workspaces foreach -pvi run dev",
+    "lint": "yarn workspaces foreach -pvi run lint"
   },
   "dependencies": {
     "rimraf": "^3.0.2",
