@@ -1,12 +1,15 @@
 {
   "name": "@blockfrost/blockfrost-websocket-link-ui",
   "scripts": {
-    "dev": "next"
+    "dev": "next",
+    "prebuild": "yarn clean",
+    "build": "next build && next export -o build/"
   },
   "dependencies": {
     "next": "^10.0.9",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-hook-form": "^6.15.5",
     "react-select": "^4.2.1",
     "react-use-websocket": "^2.5.0"
   },

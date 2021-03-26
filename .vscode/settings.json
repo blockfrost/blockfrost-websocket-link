@@ -6,6 +6,7 @@
         "from",
         "keyhash",
         "tailwindcss",
-        "to"
+        "to",
+        "uninstantiated"
     ]
 }

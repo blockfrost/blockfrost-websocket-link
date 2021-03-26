@@ -2,11 +2,12 @@
   "name": "@blockfrost/blockfrost-websocket-link",
   "scripts": {
     "clean": "rimraf dist",
+    "prebuild": "yarn clean",
     "build": "yarn clean && babel ./src --out-dir dist --copy-files --extensions '.ts'",
+    "start": "yarn build && node dist/server.js",
     "dev": "ts-node-dev src/server.ts",
     "lint": "eslint ./src/**/*.ts",
-    "type-check": "tsc --project tsconfig.json",
-    "test": "ava"
+    "type-check": "tsc --project tsconfig.json"
   },
   "dependencies": {
     "@blockfrost/blockfrost-js": "/Users/vladimirvolek/blockfrost/blockfrost-js",
@@ -17,5 +18,12 @@
     "express": "^4.17.1",
     "rimraf": "^3.0.2",
     "ts-node-dev": "^1.1.6"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/plugin-transform-runtime": "^7.13.10",
+    "@babel/preset-env": "^7.13.12",
+    "@babel/preset-typescript": "^7.13.0"
   }
 }

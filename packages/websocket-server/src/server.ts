@@ -15,7 +15,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const welcomeMessage =
-  'Hello there! I am a websocket-link server see: <a href="https://github.com/blockfrost/websocket-link">https://github.com/blockfrost/websocket-link</a>';
+  'Hello there! see: <a href="https://github.com/blockfrost/websocket-link">https://github.com/blockfrost/websocket-link</a>';
 
 app.get('/', (_req, res) => {
   res.send(welcomeMessage);
@@ -72,6 +72,7 @@ wss.on('connection', (ws: Ws) => {
       }
     }
   });
+
   const message = prepareMessage(MESSAGES.CONNECT, 'Connected to server');
   ws.send(message);
 });
