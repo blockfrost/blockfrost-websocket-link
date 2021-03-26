@@ -10,14 +10,13 @@
     "type-check": "tsc --project tsconfig.json"
   },
   "dependencies": {
-    "@blockfrost/blockfrost-js": "/Users/vladimirvolek/blockfrost/blockfrost-js",
+    "@blockfrost/blockfrost-js": "0.0.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^6.0.0",
     "@types/express": "^4.17.11",
     "bignumber.js": "9.0.1",
     "bottleneck": "^2.19.5",
     "express": "^4.17.1",
-    "rimraf": "^3.0.2",
-    "ts-node-dev": "^1.1.6"
+    "rimraf": "^3.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.10",
