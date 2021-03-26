@@ -24,8 +24,5 @@
   },
   "workspaces": [
     "packages/*"
-  ],
-  "resolutions": {
-    "@blockfrost/blockfrost-js": "portal:/Users/vladimirvolek/blockfrost/blockfrost-js"
-  }
+  ]
 }
