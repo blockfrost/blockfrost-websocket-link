@@ -1,3 +1,6 @@
+import { messages } from '../constants';
+import { Option } from '../types';
+
 export const getStatusColor = (status: string): string => {
   switch (status) {
     case 'OPEN':
@@ -9,4 +12,10 @@ export const getStatusColor = (status: string): string => {
     case 'CLOSED':
       return 'bg-red-500';
   }
+};
+
+export const getMessagesList = (): Option[] => {
+  const options = [];
+  messages.map(message => options.push({ value: message, label: message }));
+  return options;
 };
