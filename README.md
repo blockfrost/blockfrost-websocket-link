@@ -6,7 +6,7 @@
 #### production
 
 ##### UI
-`yarn workspace @blockfrost/blockfrost-websocket-link build`
+`yarn workspace @blockfrost/blockfrost-websocket-link-ui build`
 
 ##### SERVER
 `yarn workspace @blockfrost/blockfrost-websocket-link start`
