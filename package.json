@@ -1,7 +1,10 @@
 {
   "name": "@blockfrost/websocket-link-monorepo",
+  "license": "Apache-2.0",
   "scripts": {
-    "dev": "yarn workspaces foreach -pvi run dev"
+    "dev": "yarn workspaces foreach -pvi run dev",
+    "lint": "yarn workspaces foreach -pvi run lint",
+    "build": "yarn workspaces foreach -pvi run build"
   },
   "dependencies": {
     "rimraf": "^3.0.2",
@@ -13,7 +16,6 @@
     "@typescript-eslint/parser": "^4.17.0",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "8.1.0",
-    "eslint-import-resolver-babel-module": "^5.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "3.3.1",
     "prettier": "^2.2.1",
@@ -22,8 +24,5 @@
   },
   "workspaces": [
     "packages/*"
-  ],
-  "resolutions": {
-    "@blockfrost/blockfrost-js": "portal:/Users/vladimirvolek/blockfrost/blockfrost-js"
-  }
+  ]
 }
