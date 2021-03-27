@@ -168,4 +168,7 @@ documentation/website/build
 # storybook build folder
 .storybookout
 
+# nix-build
+result
+
 # End of https://www.gitignore.io/api/vim,node,macos
