@@ -15,7 +15,7 @@ const limiter = new Bottleneck({
   minTime: 30,
 });
 
-const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): string => {
+export const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): string => {
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const utxoPubKey = accountKey.derive(type).derive(addressIndex);
   const stakeKey = accountKey.derive(2).derive(0);
@@ -70,8 +70,7 @@ export const getAddresses = async (
           if (err.statusCode === 404) {
             return undefined;
           } else {
-            console.log(err);
-            return undefined;
+            throw Error(err);
           }
         }
       });
@@ -90,21 +89,9 @@ export const getAddresses = async (
   return nonEmptyAddresses;
 };
 
-export const getAccountAddresses = async (
-  publicKey: string,
-  blockFrostApi: BlockFrostAPI,
-): Promise<Responses['address_content'][]> => {
-  const externalAddresses = await getAddresses(publicKey, blockFrostApi, 0);
-  const internalAddresses = await getAddresses(publicKey, blockFrostApi, 1);
-
-  return [...externalAddresses, ...internalAddresses];
-};
-
 export const getBalances = async (
-  blockfrostApi: BlockFrostAPI,
-  publicKey: string,
+  addresses: Responses['address_content'][],
 ): Promise<Types.Balance[]> => {
-  const addresses = await getAccountAddresses(publicKey, blockfrostApi);
   const balances: Types.Balance[] = [];
 
   addresses.map(address => {

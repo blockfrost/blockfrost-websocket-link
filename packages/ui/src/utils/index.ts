@@ -16,6 +16,6 @@ export const getStatusColor = (status: string): string => {
 
 export const getMessagesList = (): Option[] => {
   const options = [];
-  messages.map(message => options.push({ value: message, label: message }));
+  messages.map(message => options.push({ value: message.name, label: message.name }));
   return options;
 };
