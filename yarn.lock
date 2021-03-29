@@ -1282,6 +1282,7 @@ __metadata:
   dependencies:
     "@types/node": ^14.14.35
     "@types/react": ^17.0.3
+    "@types/react-select": ^4.0.13
     autoprefixer: latest
     next: ^10.0.9
     postcss: latest
@@ -1693,7 +1694,37 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^17.0.3":
+"@types/react-dom@npm:*":
+  version: 17.0.3
+  resolution: "@types/react-dom@npm:17.0.3"
+  dependencies:
+    "@types/react": "*"
+  checksum: 9314c91a985f153591e1e74aef3d63d8b22e098069773f32745bf0733740a49802731761a46da8788a7d3dd2c21346036f12c2c24627630e5a6210b120a650e6
+  languageName: node
+  linkType: hard
+
+"@types/react-select@npm:^4.0.13":
+  version: 4.0.13
+  resolution: "@types/react-select@npm:4.0.13"
+  dependencies:
+    "@emotion/serialize": ^1.0.0
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    "@types/react-transition-group": "*"
+  checksum: 1ec421aecdb9f07416c00fba060e562838d9138574b6bbb2c06f4b7b23c89e8293835b1cf3ba4d92cc1dc4bf2757faa71e4b77eec45575e617245ba4b092b9de
+  languageName: node
+  linkType: hard
+
+"@types/react-transition-group@npm:*":
+  version: 4.4.1
+  resolution: "@types/react-transition-group@npm:4.4.1"
+  dependencies:
+    "@types/react": "*"
+  checksum: 7d9d9ecf8187902c129c4bf99ee911658f5cf97ffe56f31703be06df70b5209d49515386e26be540508436c8383d2cb1cdc287777103c5eb5106a1027281e8ec
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:*, @types/react@npm:^17.0.3":
   version: 17.0.3
   resolution: "@types/react@npm:17.0.3"
   dependencies:

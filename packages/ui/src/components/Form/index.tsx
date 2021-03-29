@@ -2,20 +2,19 @@ import React, { ReactElement, useState, useRef, useMemo } from 'react';
 import Select from 'react-select';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import AccountInfoOptions from '../AccountInfoOptions';
-import { getStatusColor, getMessagesList } from '../../utils';
-import { useFormContext, Controller } from 'react-hook-form';
-
-const getMessage = (command: string) => {
-  return { command };
-};
+import { getStatusColor, getMessagesList, getParams } from '../../utils';
+import { MESSAGES } from '../../constants';
+import { useFormContext } from 'react-hook-form';
 
 const Index = (): ReactElement => {
   const [socketUrl] = useState('ws://localhost:3005');
-  const [command, setCommand] = useState('GET_SERVER_INFO');
+  const [command, setCommand] = useState<keyof typeof MESSAGES>('GET_SERVER_INFO');
   const messageHistory = useRef([]);
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl);
-  const { register, control } = useFormContext();
   const options = getMessagesList();
+  const { register, getValues } = useFormContext();
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    getValues('socketUrl') || socketUrl,
+  );
 
   messageHistory.current = useMemo(() => messageHistory.current.concat(lastMessage), [lastMessage]);
 
@@ -33,11 +32,10 @@ const Index = (): ReactElement => {
       <div className="flex flex-row mt-5">
         <input
           className="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline max-w-sm"
-          id="socketUrl"
           name="socketUrl"
           type="text"
           ref={register}
-          value={socketUrl}
+          defaultValue={socketUrl}
           onChange={e => console.log(e.target.value)}
         />
         <div
@@ -50,28 +48,21 @@ const Index = (): ReactElement => {
       </div>
       <div className="mt-5 flex flex-row">
         <div className="max-w-sm" style={{ width: 384 }}>
-          <Controller
-            name="messageName"
-            control={control}
-            options={[
-              { value: 'chocolate', label: 'Chocolate' },
-              { value: 'strawberry', label: 'Strawberry' },
-              { value: 'vanilla', label: 'Vanilla' },
-            ]}
-            as={Select}
-          />
           <Select
-            onChange={option => {
-              setCommand(option.value);
-            }}
-            defaultValue={options[0]}
             options={options}
+            defaultValue={{ label: 'GET_SERVER_INFO', value: 'GET_SERVER_INFO' }}
+            onChange={({ value }) => {
+              setCommand(value as keyof typeof MESSAGES);
+            }}
           />
         </div>
         <button
           style={{ minWidth: 187 }}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-          onClick={() => sendMessage(JSON.stringify(getMessage(command)))}
+          onClick={() => {
+            const params = getParams(command, getValues);
+            sendMessage(JSON.stringify({ command, params }));
+          }}
         >
           SEND MESSAGE
         </button>
