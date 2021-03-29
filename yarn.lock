@@ -1283,6 +1283,7 @@ __metadata:
     "@types/node": ^14.14.35
     "@types/react": ^17.0.3
     "@types/react-select": ^4.0.13
+    "@types/valid-url": ^1.0.3
     autoprefixer: latest
     next: ^10.0.9
     postcss: latest
@@ -1293,6 +1294,7 @@ __metadata:
     react-use-websocket: ^2.5.0
     tailwindcss: latest
     typescript: ^4.2.3
+    valid-url: ^1.0.9
   languageName: unknown
   linkType: soft
 
@@ -1763,6 +1765,13 @@ __metadata:
   version: 0.0.30
   resolution: "@types/strip-json-comments@npm:0.0.30"
   checksum: 2b9eff26906f14903835a3ecd316e7df130bdfbbd0b784fba15b9ff99ac1ef041aeb7a37c9535dfc0e733211ef3cb881cc91940a52aa9076982ea0cbca50e088
+  languageName: node
+  linkType: hard
+
+"@types/valid-url@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@types/valid-url@npm:1.0.3"
+  checksum: d9916177319efaec1091486bf6b4068c38096ef52bcb00a9cd5103435b9388128eb838d0066fb6df0769305c7d960805c3489937142d3bb6c0f6a9ceaf802405
   languageName: node
   linkType: hard
 
@@ -8188,6 +8197,13 @@ typescript@^4.2.3:
   version: 2.3.0
   resolution: "v8-compile-cache@npm:2.3.0"
   checksum: b56f83d9ff14187562badc4955dadeef53ff3abde478ce60759539dd8d5472a91fce9db6083fc2450e54cef6f2110c1a28d8c12162dbf575a6cfcb846986904b
+  languageName: node
+  linkType: hard
+
+"valid-url@npm:^1.0.9":
+  version: 1.0.9
+  resolution: "valid-url@npm:1.0.9"
+  checksum: 988964543cb297c1d953dbf665de06cc8c46791eaf5ef3bb32b03b103c53dced7dfaa8f19863255126cbd75049a67f19415d9e647b603b759922284ccc48e776
   languageName: node
   linkType: hard
 

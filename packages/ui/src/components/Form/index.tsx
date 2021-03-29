@@ -4,10 +4,11 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import AccountInfoOptions from '../AccountInfoOptions';
 import { getStatusColor, getMessagesList, getParams } from '../../utils';
 import { MESSAGES } from '../../constants';
+import { isUri } from 'valid-url';
 import { useFormContext } from 'react-hook-form';
 
 const Index = (): ReactElement => {
-  const [socketUrl] = useState('ws://localhost:3005');
+  const [socketUrl, setSocketUrl] = useState('ws://localhost:3005');
   const [command, setCommand] = useState<keyof typeof MESSAGES>('GET_SERVER_INFO');
   const messageHistory = useRef([]);
   const options = getMessagesList();
@@ -36,7 +37,12 @@ const Index = (): ReactElement => {
           type="text"
           ref={register}
           defaultValue={socketUrl}
-          onChange={e => console.log(e.target.value)}
+          onChange={e => {
+            const url = e.target.value;
+            if (url !== '' && isUri(url)) {
+              setSocketUrl(e.target.value);
+            }
+          }}
         />
         <div
           className={`${getStatusColor(
@@ -67,7 +73,6 @@ const Index = (): ReactElement => {
           SEND MESSAGE
         </button>
       </div>
-
       {command === 'GET_ACCOUNT_INFO' && <AccountInfoOptions />}
       {lastMessage && connectionStatus === 'OPEN' && (
         <div className="mt-10">

@@ -45,7 +45,7 @@ wss.on('connection', (ws: Ws) => {
     }
 
     const blockFrostApi = new BlockFrostAPI({
-      projectId: process.env.PROJECT_ID || '0',
+      projectId: process.env.PROJECT_ID,
     });
 
     ws.on('error', error => {

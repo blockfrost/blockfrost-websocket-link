@@ -11,8 +11,8 @@ import {
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
 const limiter = new Bottleneck({
-  maxConcurrent: 200,
-  minTime: 30,
+  maxConcurrent: 100,
+  minTime: 10,
 });
 
 export const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): string => {
@@ -67,10 +67,11 @@ export const getAddresses = async (
           }
           return response;
         } catch (err) {
-          if (err.statusCode === 404) {
+          if (err.status === 404) {
             return undefined;
           } else {
-            throw Error(err);
+            console.log(err.status);
+            return err;
           }
         }
       });
