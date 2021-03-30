@@ -1,5 +1,6 @@
-import { messages } from '../constants';
+import { MESSAGES_PARAMS, MESSAGES } from '../constants';
 import { Option } from '../types';
+import { UseFormMethods } from 'react-hook-form';
 
 export const getStatusColor = (status: string): string => {
   switch (status) {
@@ -16,6 +17,23 @@ export const getStatusColor = (status: string): string => {
 
 export const getMessagesList = (): Option[] => {
   const options = [];
-  messages.map(message => options.push({ value: message, label: message }));
+  MESSAGES_PARAMS.map(message => options.push({ value: message.name, label: message.name }));
   return options;
+};
+
+export const getParams = (
+  command: keyof typeof MESSAGES,
+  getValues: UseFormMethods['getValues'],
+): any => {
+  switch (command) {
+    case 'GET_ACCOUNT_INFO': {
+      const accountInfoKey = getValues('accountInfoKey');
+      return { descriptor: accountInfoKey };
+    }
+    case 'GET_SERVER_INFO': {
+      return {};
+    }
+    default:
+      return {};
+  }
 };

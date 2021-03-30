@@ -1282,6 +1282,8 @@ __metadata:
   dependencies:
     "@types/node": ^14.14.35
     "@types/react": ^17.0.3
+    "@types/react-select": ^4.0.13
+    "@types/valid-url": ^1.0.3
     autoprefixer: latest
     next: ^10.0.9
     postcss: latest
@@ -1292,6 +1294,7 @@ __metadata:
     react-use-websocket: ^2.5.0
     tailwindcss: latest
     typescript: ^4.2.3
+    valid-url: ^1.0.9
   languageName: unknown
   linkType: soft
 
@@ -1309,6 +1312,7 @@ __metadata:
     "@types/express": ^4.17.11
     bignumber.js: 9.0.1
     bottleneck: ^2.19.5
+    dotenv: ^8.2.0
     express: ^4.17.1
     rimraf: ^3.0.2
   languageName: unknown
@@ -1692,7 +1696,37 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^17.0.3":
+"@types/react-dom@npm:*":
+  version: 17.0.3
+  resolution: "@types/react-dom@npm:17.0.3"
+  dependencies:
+    "@types/react": "*"
+  checksum: 9314c91a985f153591e1e74aef3d63d8b22e098069773f32745bf0733740a49802731761a46da8788a7d3dd2c21346036f12c2c24627630e5a6210b120a650e6
+  languageName: node
+  linkType: hard
+
+"@types/react-select@npm:^4.0.13":
+  version: 4.0.13
+  resolution: "@types/react-select@npm:4.0.13"
+  dependencies:
+    "@emotion/serialize": ^1.0.0
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    "@types/react-transition-group": "*"
+  checksum: 1ec421aecdb9f07416c00fba060e562838d9138574b6bbb2c06f4b7b23c89e8293835b1cf3ba4d92cc1dc4bf2757faa71e4b77eec45575e617245ba4b092b9de
+  languageName: node
+  linkType: hard
+
+"@types/react-transition-group@npm:*":
+  version: 4.4.1
+  resolution: "@types/react-transition-group@npm:4.4.1"
+  dependencies:
+    "@types/react": "*"
+  checksum: 7d9d9ecf8187902c129c4bf99ee911658f5cf97ffe56f31703be06df70b5209d49515386e26be540508436c8383d2cb1cdc287777103c5eb5106a1027281e8ec
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:*, @types/react@npm:^17.0.3":
   version: 17.0.3
   resolution: "@types/react@npm:17.0.3"
   dependencies:
@@ -1731,6 +1765,13 @@ __metadata:
   version: 0.0.30
   resolution: "@types/strip-json-comments@npm:0.0.30"
   checksum: 2b9eff26906f14903835a3ecd316e7df130bdfbbd0b784fba15b9ff99ac1ef041aeb7a37c9535dfc0e733211ef3cb881cc91940a52aa9076982ea0cbca50e088
+  languageName: node
+  linkType: hard
+
+"@types/valid-url@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@types/valid-url@npm:1.0.3"
+  checksum: d9916177319efaec1091486bf6b4068c38096ef52bcb00a9cd5103435b9388128eb838d0066fb6df0769305c7d960805c3489937142d3bb6c0f6a9ceaf802405
   languageName: node
   linkType: hard
 
@@ -3316,6 +3357,13 @@ __metadata:
   version: 1.2.0
   resolution: "domain-browser@npm:1.2.0"
   checksum: 39a1156552d162c33e0edff62b0f9ae64609d4ffa85ecaccfad2416ee34e4b6c78aea53c30ce167a04421144963a674e8471eba2b6272b4760e020149b9bafbb
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "dotenv@npm:8.2.0"
+  checksum: 16cb89cbd7b98b053899b8aba8c5044c8fb61a2db8a81fe70360b75035fce5fed53bd7a34d772be717d0880c0321122a4c09423f518025e1b52d96791521b1a7
   languageName: node
   linkType: hard
 
@@ -8149,6 +8197,13 @@ typescript@^4.2.3:
   version: 2.3.0
   resolution: "v8-compile-cache@npm:2.3.0"
   checksum: b56f83d9ff14187562badc4955dadeef53ff3abde478ce60759539dd8d5472a91fce9db6083fc2450e54cef6f2110c1a28d8c12162dbf575a6cfcb846986904b
+  languageName: node
+  linkType: hard
+
+"valid-url@npm:^1.0.9":
+  version: 1.0.9
+  resolution: "valid-url@npm:1.0.9"
+  checksum: 988964543cb297c1d953dbf665de06cc8c46791eaf5ef3bb32b03b103c53dced7dfaa8f19863255126cbd75049a67f19415d9e647b603b759922284ccc48e776
   languageName: node
   linkType: hard
 

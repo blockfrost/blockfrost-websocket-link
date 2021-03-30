@@ -1,24 +1,23 @@
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
+import dotenv from 'dotenv';
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { Ws } from './types';
-import { MESSAGES } from './constants';
+import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getParams, prepareMessage } from './utils';
 
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
 
+dotenv.config();
 const app = express();
 const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const welcomeMessage =
-  'Hello there! see: <a href="https://github.com/blockfrost/websocket-link">https://github.com/blockfrost/websocket-link</a>';
-
 app.get('/', (_req, res) => {
-  res.send(welcomeMessage);
+  res.send(WELCOME_MESSAGE);
 });
 
 const heartbeat = (ws: Ws) => {
@@ -35,43 +34,62 @@ wss.on('connection', (ws: Ws) => {
     heartbeat(ws);
   });
 
-  const blockFrostApi = new BlockFrostAPI({ projectId: 'cIeLBZLcKvpDwGNX3Sa6BFtjrRHSwAl1' });
+  try {
+    if (!process.env.PROJECT_ID) {
+      const message = prepareMessage(
+        MESSAGES.ERROR,
+        `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
+      );
+      ws.send(message);
+      return;
+    }
 
-  ws.on('error', error => {
-    const message = prepareMessage(MESSAGES.ERROR, error);
-    ws.send(message);
-  });
+    const blockFrostApi = new BlockFrostAPI({
+      projectId: process.env.PROJECT_ID,
+    });
 
-  ws.on('message', async (message: string) => {
-    const { command, params } = getParams(message);
+    ws.on('error', error => {
+      const message = prepareMessage(MESSAGES.ERROR, error);
+      ws.send(message);
+    });
 
-    switch (command) {
-      case MESSAGES.GET_SERVER_INFO: {
-        const serverInfo = await getServerInfo(blockFrostApi);
-        const message = prepareMessage(MESSAGES.GET_SERVER_INFO, serverInfo);
-        ws.send(message);
-        break;
-      }
+    ws.on('message', async (message: string) => {
+      const { command, params } = getParams(message);
 
-      case MESSAGES.GET_ACCOUNT_INFO: {
-        if (!params || !params.descriptor) {
-          const message = prepareMessage(MESSAGES.GET_ACCOUNT_INFO, 'Missing param descriptor');
+      switch (command) {
+        case MESSAGES.GET_SERVER_INFO: {
+          const serverInfo = await getServerInfo(blockFrostApi);
+          const message = prepareMessage(MESSAGES.GET_SERVER_INFO, serverInfo);
           ws.send(message);
           break;
         }
 
-        const accountInfo = await getAccountInfo(blockFrostApi, params.descriptor);
-        const message = prepareMessage(MESSAGES.GET_ACCOUNT_INFO, accountInfo);
-        ws.send(message);
-        break;
-      }
+        case MESSAGES.GET_ACCOUNT_INFO: {
+          if (!params || !params.descriptor) {
+            const message = prepareMessage(MESSAGES.GET_ACCOUNT_INFO, 'Missing param descriptor');
+            ws.send(message);
+            break;
+          }
 
-      default: {
-        const message = prepareMessage(MESSAGES.ERROR, `Unknown message ID ${command}`);
-        ws.send(message);
+          try {
+            const accountInfo = await getAccountInfo(blockFrostApi, params.descriptor);
+            const message = prepareMessage(MESSAGES.GET_ACCOUNT_INFO, accountInfo);
+            ws.send(message);
+          } catch (err) {
+            const message = prepareMessage(MESSAGES.GET_ACCOUNT_INFO, 'Error');
+            ws.send(message);
+          }
+          break;
+        }
+        default: {
+          const message = prepareMessage(MESSAGES.ERROR, `Unknown message ID ${command}`);
+          ws.send(message);
+        }
       }
-    }
-  });
+    });
+  } catch (err) {
+    console.log(err);
+  }
 
   const message = prepareMessage(MESSAGES.CONNECT, 'Connected to server');
   ws.send(message);
