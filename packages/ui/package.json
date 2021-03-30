@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "next",
     "prebuild": "yarn clean",
-    "build": "next build && next export -o dist/"
+    "build": "next build"
   },
   "dependencies": {
     "@types/react-select": "^4.0.13",
