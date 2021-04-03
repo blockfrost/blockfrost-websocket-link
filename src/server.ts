@@ -37,6 +37,7 @@ wss.on('connection', (ws: Ws) => {
   try {
     if (!process.env.PROJECT_ID) {
       const message = prepareMessage(
+        0,
         MESSAGES.ERROR,
         `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
       );
@@ -46,43 +47,49 @@ wss.on('connection', (ws: Ws) => {
 
     const blockFrostApi = new BlockFrostAPI({
       projectId: process.env.PROJECT_ID,
+      customBackend: process.env.BACKEND_URL,
     });
 
     ws.on('error', error => {
-      const message = prepareMessage(MESSAGES.ERROR, error);
+      const message = prepareMessage(1, MESSAGES.ERROR, error);
       ws.send(message);
     });
 
     ws.on('message', async (message: string) => {
-      const { command, params } = getParams(message);
+      const data = getParams(message);
 
-      switch (command) {
+      switch (data.command) {
         case MESSAGES.GET_SERVER_INFO: {
           const serverInfo = await getServerInfo(blockFrostApi);
-          const message = prepareMessage(MESSAGES.GET_SERVER_INFO, serverInfo);
+          const message = prepareMessage(data.id, MESSAGES.GET_SERVER_INFO, serverInfo);
+
           ws.send(message);
           break;
         }
 
         case MESSAGES.GET_ACCOUNT_INFO: {
-          if (!params || !params.descriptor) {
-            const message = prepareMessage(MESSAGES.GET_ACCOUNT_INFO, 'Missing param descriptor');
+          if (!data.params.descriptor) {
+            const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_INFO, 'Missing param descriptor');
+
             ws.send(message);
             break;
           }
 
           try {
-            const accountInfo = await getAccountInfo(blockFrostApi, params.descriptor);
-            const message = prepareMessage(MESSAGES.GET_ACCOUNT_INFO, accountInfo);
+            const accountInfo = await getAccountInfo(blockFrostApi, data.params.descriptor);
+            const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_INFO, accountInfo);
+
             ws.send(message);
           } catch (err) {
-            const message = prepareMessage(MESSAGES.GET_ACCOUNT_INFO, 'Error');
+            const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_INFO, 'Error');
+
             ws.send(message);
           }
           break;
         }
         default: {
-          const message = prepareMessage(MESSAGES.ERROR, `Unknown message ID ${command}`);
+          const message = prepareMessage(data.id, MESSAGES.ERROR, `Unknown message ID ${data.command}`);
+          
           ws.send(message);
         }
       }
@@ -91,7 +98,7 @@ wss.on('connection', (ws: Ws) => {
     console.log(err);
   }
 
-  const message = prepareMessage(MESSAGES.CONNECT, 'Connected to server');
+  const message = prepareMessage(2, MESSAGES.CONNECT, 'Connected to server');
   ws.send(message);
 });
 

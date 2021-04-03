@@ -1,7 +1,7 @@
 import * as Types from '../types';
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 
-export default async (blockFrostApi: BlockFrostAPI): Promise<Types.ServerInfo> => {
+export default async (blockFrostApi: BlockFrostAPI): Promise<Types.ResponseServerInfo> => {
   const info = await blockFrostApi.root();
   const latestBlock = await blockFrostApi.blocksLatest();
 

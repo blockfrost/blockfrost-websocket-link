@@ -15,7 +15,7 @@ const limiter = new Bottleneck({
   minTime: 10,
 });
 
-export const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): string => {
+const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): string => {
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const utxoPubKey = accountKey.derive(type).derive(addressIndex);
   const stakeKey = accountKey.derive(2).derive(0);
@@ -29,7 +29,7 @@ export const deriveAddress = (publicKey: string, addressIndex: number, type = 1 
   return baseAddr.to_address().to_bech32();
 };
 
-export const deriveBatchOfAddresses = (
+const deriveBatchOfAddresses = (
   publicKey: string,
   start: number,
   end: number,

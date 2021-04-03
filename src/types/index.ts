@@ -11,7 +11,7 @@ export interface Balance {
 
 export type AddressType = 1 | 0;
 
-export interface ServerInfo {
+export interface ResponseServerInfo {
   url: string;
   name: string;
   shortcut: string;
@@ -22,24 +22,36 @@ export interface ServerInfo {
   blockHash: string;
 }
 
-export interface AccountInfo {
+export type ResponseBlockHash = string;
+
+export interface ResponseAccountInfo {
   balance: string;
   descriptor: string;
   tokens: Balance[];
 }
 
 export type Message =
-  | {
+  | { 
+    id: number,
       command: 'GET_ACCOUNT_INFO';
       params: {
         descriptor: string;
       };
     }
   | {
+    id: number,
       command: 'GET_SERVER_INFO';
-      params: null;
+      params: null
     }
   | {
+    id: number,
+      command: 'GET_BLOCK_HASH';
+      params: {
+        hashOrNumber: string | number
+      };
+    }
+  | {
+    id: number,
       command: 'ERROR';
-      params: null;
+      params: null
     };

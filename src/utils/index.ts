@@ -1,4 +1,4 @@
-import { AccountInfo, Message, ServerInfo } from '../types';
+import { ResponseAccountInfo, Message, ResponseServerInfo } from '../types';
 
 export const getParams = (message: string): Message => {
   try {
@@ -6,15 +6,17 @@ export const getParams = (message: string): Message => {
     return parsedMessage;
   } catch (err) {
     return {
+      id: 0,
       command: 'ERROR',
-      params: null,
+      params: null
     };
   }
 };
 
 export const prepareMessage = (
+  id: number,
   message: string,
-  payload: Error | ServerInfo | AccountInfo | string,
+  data: Error | ResponseServerInfo | ResponseAccountInfo | string,
 ): string => {
-  return JSON.stringify({ message, payload });
+  return JSON.stringify({ id, message, data });
 };

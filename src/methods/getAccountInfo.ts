@@ -5,7 +5,7 @@ import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 export default async (
   blockFrostApi: BlockFrostAPI,
   publicKey: string,
-): Promise<Types.AccountInfo> => {
+): Promise<Types.ResponseAccountInfo> => {
   const externalAddresses = await getAddresses(publicKey, blockFrostApi, 0);
   const internalAddresses = await getAddresses(publicKey, blockFrostApi, 1);
 

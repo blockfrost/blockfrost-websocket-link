@@ -5,6 +5,6 @@ export const MESSAGES = {
   GET_ACCOUNT_INFO: 'GET_ACCOUNT_INFO',
   ERROR: 'ERROR',
   CONNECT: 'CONNECT',
-};
+} as const;
 export const ADDRESS_GAP_LIMIT = 20;
 export const WELCOME_MESSAGE = `Hello there! see: <a href="${REPOSITORY_URL}">${REPOSITORY_URL}</a>`;
