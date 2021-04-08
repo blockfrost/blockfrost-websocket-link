@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "addresses",
         "bech",
         "blockfrost",
         "emurgo",
@@ -7,6 +8,7 @@
         "keyhash",
         "tailwindcss",
         "to",
-        "uninstantiated"
+        "uninstantiated",
+        "utxos"
     ]
 }

@@ -1,57 +1,64 @@
 import WebSocket from 'ws';
 
 export interface Ws extends WebSocket {
-    isAlive: boolean;
+  isAlive: boolean;
 }
 
 export interface Balance {
-    unit: string;
-    quantity: string;
+  unit: string;
+  quantity: string;
 }
 
 export type AddressType = 1 | 0;
 
 export interface ResponseServerInfo {
-    url: string;
-    name: string;
-    shortcut: string;
-    testnet: boolean;
-    version: string;
-    decimals: number;
-    blockHeight: number;
-    blockHash: string;
+  url: string;
+  name: string;
+  shortcut: string;
+  testnet: boolean;
+  version: string;
+  decimals: number;
+  blockHeight: number;
+  blockHash: string;
 }
 
 export type ResponseBlockHash = string;
 
 export interface ResponseAccountInfo {
-    balance: string;
-    descriptor: string;
-    tokens: Balance[];
+  balance: string;
+  descriptor: string;
+  tokens: Balance[];
 }
 
 export type Message =
-    | {
-          id: number;
-          command: 'GET_ACCOUNT_INFO';
-          params: {
-              descriptor: string;
-          };
-      }
-    | {
-          id: number;
-          command: 'GET_SERVER_INFO';
-          params: null;
-      }
-    | {
-          id: number;
-          command: 'GET_BLOCK_HASH';
-          params: {
-              hashOrNumber: string | number;
-          };
-      }
-    | {
-          id: number;
-          command: 'ERROR';
-          params: null;
+  | {
+      id: number;
+      command: 'GET_ACCOUNT_INFO';
+      params: {
+        descriptor: string;
       };
+    }
+  | {
+      id: number;
+      command: 'GET_ACCOUNT_UTXO';
+      params: {
+        descriptor: string;
+      };
+    }
+  | {
+      id: number;
+      command: 'GET_SERVER_INFO';
+      params: null;
+    }
+  | {
+      id: number;
+      command: 'GET_BLOCK_HASH';
+      params: {
+        hashOrNumber: string | number;
+      };
+    }
+  | {
+      id: number;
+      command: 'ERROR';
+      params: null;
+    };
