@@ -1418,9 +1418,6 @@ __metadata:
     ts-node-dev: ^1.1.6
     typescript: ^4.2.3
     ws: ^7.4.4
-  dependenciesMeta:
-    "@blockfrost/blockfrost-js@0.1.0":
-      unplugged: true
   languageName: unknown
   linkType: soft
 

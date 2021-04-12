@@ -2460,7 +2460,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ]],
       ["@blockfrost/blockfrost-js", [
         ["npm:0.1.0", {
-          "packageLocation": "./.yarn/unplugged/@blockfrost-blockfrost-js-npm-0.1.0-72f59b2f86/node_modules/@blockfrost/blockfrost-js/",
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-0.1.0-72f59b2f86-2655192a71.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
             ["@blockfrost/blockfrost-js", "npm:0.1.0"],
             ["@blockfrost/openapi", "npm:0.1.9"],
