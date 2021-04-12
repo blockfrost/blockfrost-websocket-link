@@ -16,7 +16,7 @@ export interface ResponseServerInfo {
   name: string;
   shortcut: string;
   testnet: boolean;
-  version: string;
+  version: number;
   decimals: number;
   blockHeight: number;
   blockHash: string;
@@ -24,10 +24,12 @@ export interface ResponseServerInfo {
 
 export type ResponseBlockHash = string;
 
+export type Details = 'basic' | 'tokens' | 'tokenBalances' | 'txids' | 'txs';
+
 export interface ResponseAccountInfo {
   balance: string;
   descriptor: string;
-  tokens: Balance[];
+  tokens?: Balance[];
 }
 
 export type Message =
@@ -36,6 +38,7 @@ export type Message =
       command: 'GET_ACCOUNT_INFO';
       params: {
         descriptor: string;
+        details: Details;
       };
     }
   | {

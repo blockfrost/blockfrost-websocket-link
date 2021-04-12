@@ -5,6 +5,7 @@ import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 export default async (
   blockFrostApi: BlockFrostAPI,
   publicKey: string,
+  details: Types.Details,
 ): Promise<Types.ResponseAccountInfo> => {
   const externalAddresses = await getAddresses(publicKey, blockFrostApi, 0);
   const internalAddresses = await getAddresses(publicKey, blockFrostApi, 1);
@@ -13,11 +14,16 @@ export default async (
   const balances = await getBalances(addresses);
 
   const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
-  const tokens = balances.filter(b => b.unit !== 'lovelace');
+  const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
 
-  return {
+  const response: Types.ResponseAccountInfo = {
     descriptor: publicKey,
     balance: lovelaceBalance?.quantity || '0',
-    tokens,
   };
+
+  if (details !== 'basic') {
+    response.tokens = tokensBalances;
+  }
+
+  return response;
 };

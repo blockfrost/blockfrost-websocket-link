@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { Ws } from './types';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
-import { getParams, prepareMessage } from './utils';
+import { getMessage, prepareMessage } from './utils';
 
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
@@ -57,7 +57,13 @@ wss.on('connection', (ws: Ws) => {
     });
 
     ws.on('message', async (message: string) => {
-      const data = getParams(message);
+      const data = getMessage(message);
+
+      if (!data) {
+        const message = prepareMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
+        ws.send(message);
+        return;
+      }
 
       switch (data.command) {
         case MESSAGES.GET_SERVER_INFO: {
@@ -106,7 +112,11 @@ wss.on('connection', (ws: Ws) => {
           }
 
           try {
-            const accountInfo = await getAccountInfo(blockFrostApi, data.params.descriptor);
+            const accountInfo = await getAccountInfo(
+              blockFrostApi,
+              data.params.descriptor,
+              data.params.details,
+            );
             const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_INFO, accountInfo);
 
             ws.send(message);

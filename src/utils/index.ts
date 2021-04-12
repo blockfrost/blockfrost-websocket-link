@@ -1,15 +1,11 @@
 import { ResponseAccountInfo, Message, ResponseServerInfo } from '../types';
 
-export const getParams = (message: string): Message => {
+export const getMessage = (message: string): Message | null => {
   try {
     const parsedMessage: Message = JSON.parse(message);
     return parsedMessage;
   } catch (err) {
-    return {
-      id: 0,
-      command: 'ERROR',
-      params: null,
-    };
+    return null;
   }
 };
 
