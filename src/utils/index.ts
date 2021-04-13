@@ -1,22 +1,25 @@
-import { ResponseAccountInfo, Message, ResponseServerInfo } from '../types';
+import { ResponseAccountInfo, ResponseServerInfo, IncomingMessage } from '../types';
+import { Responses } from '@blockfrost/blockfrost-js';
 
-export const getParams = (message: string): Message => {
-    try {
-        const parsedMessage: Message = JSON.parse(message);
-        return parsedMessage;
-    } catch (err) {
-        return {
-            id: 0,
-            command: 'ERROR',
-            params: null,
-        };
-    }
+export const getMessage = (message: string): IncomingMessage | null => {
+  try {
+    const parsedMessage: IncomingMessage = JSON.parse(message);
+    return parsedMessage;
+  } catch (err) {
+    return null;
+  }
 };
 
 export const prepareMessage = (
-    id: number,
-    message: string,
-    data: Error | ResponseServerInfo | ResponseAccountInfo | string,
+  id: number,
+  message: string,
+  data:
+    | Error
+    | ResponseServerInfo
+    | ResponseAccountInfo
+    | string
+    | Responses['block_content']
+    | Responses['tx_content'],
 ): string => {
-    return JSON.stringify({ id, message, data });
+  return JSON.stringify({ id, message, data });
 };
