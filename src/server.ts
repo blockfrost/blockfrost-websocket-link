@@ -9,13 +9,14 @@ import { getMessage, prepareMessage } from './utils';
 
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
-import getAccountUtxo from './methods/getAccountUtxo';
+import getTransaction from './methods/getTransaction';
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+let subscribeBlockInterval: any;
 
 app.get('/', (_req, res) => {
   res.send(WELCOME_MESSAGE);
@@ -38,7 +39,7 @@ wss.on('connection', (ws: Ws) => {
   try {
     if (!process.env.PROJECT_ID) {
       const message = prepareMessage(
-        0,
+        Math.floor(Math.random() * 10),
         MESSAGES.ERROR,
         `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
       );
@@ -46,7 +47,7 @@ wss.on('connection', (ws: Ws) => {
       return;
     }
 
-    const blockFrostApi = new BlockFrostAPI({
+    const api = new BlockFrostAPI({
       projectId: process.env.PROJECT_ID,
       customBackend: process.env.BACKEND_URL,
     });
@@ -67,10 +68,40 @@ wss.on('connection', (ws: Ws) => {
 
       switch (data.command) {
         case MESSAGES.GET_SERVER_INFO: {
-          const serverInfo = await getServerInfo(blockFrostApi);
+          const serverInfo = await getServerInfo(api);
           const message = prepareMessage(data.id, MESSAGES.GET_SERVER_INFO, serverInfo);
 
           ws.send(message);
+          break;
+        }
+
+        case MESSAGES.SUBSCRIBE_BLOCK: {
+          let latestSentBlock = await api.blocksLatest();
+          const message = prepareMessage(data.id, MESSAGES.LATEST_BLOCK, latestSentBlock);
+          ws.send(message);
+
+          subscribeBlockInterval = setInterval(async () => {
+            const latestBlock = await api.blocksLatest();
+            if (latestBlock.hash !== latestSentBlock.hash) {
+              latestSentBlock = latestBlock;
+              const message = prepareMessage(data.id, MESSAGES.LATEST_BLOCK, latestSentBlock);
+              ws.send(message);
+            }
+          }, 1000);
+
+          break;
+        }
+
+        case MESSAGES.GET_TRANSACTION: {
+          const tx = await getTransaction(api, data.params.txId);
+          const message = prepareMessage(data.id, MESSAGES.GET_TRANSACTION, tx);
+
+          ws.send(message);
+          break;
+        }
+
+        case MESSAGES.UNSUBSCRIBE_BLOCK: {
+          clearInterval(subscribeBlockInterval);
           break;
         }
 
@@ -87,10 +118,7 @@ wss.on('connection', (ws: Ws) => {
           }
 
           try {
-            const accountUtxo = await getAccountUtxo(blockFrostApi, data.params.descriptor);
-            const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_UTXO, accountUtxo);
-
-            ws.send(message);
+            ws.send('aaaa');
           } catch (err) {
             const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_UTXO, 'Error');
 
@@ -113,7 +141,7 @@ wss.on('connection', (ws: Ws) => {
 
           try {
             const accountInfo = await getAccountInfo(
-              blockFrostApi,
+              api,
               data.params.descriptor,
               data.params.details,
             );
@@ -131,7 +159,7 @@ wss.on('connection', (ws: Ws) => {
           const message = prepareMessage(
             data.id,
             MESSAGES.ERROR,
-            `Unknown message ID ${data.command}`,
+            `Unknown message id: ${data.command}`,
           );
 
           ws.send(message);
@@ -162,6 +190,7 @@ const interval = setInterval(() => {
 
 wss.on('close', function close() {
   clearInterval(interval);
+  clearInterval(subscribeBlockInterval);
 });
 
 server.listen(port, () => {

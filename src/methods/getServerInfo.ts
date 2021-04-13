@@ -5,13 +5,11 @@ export default async (blockFrostApi: BlockFrostAPI): Promise<Types.ResponseServe
   const info = await blockFrostApi.root();
   const latestBlock = await blockFrostApi.blocksLatest();
 
-
-  
   return {
     url: blockFrostApi.apiUrl,
     name: 'Cardano',
     shortcut: 'ada',
-    testnet: false,
+    testnet: blockFrostApi.apiUrl.includes('testnet'),
     version: info.version,
     decimals: 6,
     blockHeight: latestBlock.height || 0,

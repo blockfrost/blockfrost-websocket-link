@@ -32,7 +32,7 @@ export interface ResponseAccountInfo {
   tokens?: Balance[];
 }
 
-export type Message =
+export type IncomingMessage =
   | {
       id: number;
       command: 'GET_ACCOUNT_INFO';
@@ -50,6 +50,13 @@ export type Message =
     }
   | {
       id: number;
+      command: 'GET_TRANSACTION';
+      params: {
+        txId: string;
+      };
+    }
+  | {
+      id: number;
       command: 'GET_SERVER_INFO';
       params: null;
     }
@@ -59,6 +66,16 @@ export type Message =
       params: {
         hashOrNumber: string | number;
       };
+    }
+  | {
+      id: number;
+      command: 'SUBSCRIBE_BLOCK';
+      params: null;
+    }
+  | {
+      id: number;
+      command: 'UNSUBSCRIBE_BLOCK';
+      params: null;
     }
   | {
       id: number;
