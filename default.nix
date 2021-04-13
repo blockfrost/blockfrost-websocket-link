@@ -9,6 +9,8 @@ in project.overrideAttrs (oldAttrs: rec {
 
   name = "blockfrost-websocket-link";
 
+  HOME = "/build";
+
   buildPhase = ''
     yarn build
 
@@ -18,9 +20,6 @@ in project.overrideAttrs (oldAttrs: rec {
     ${pkgs.nodejs}/bin/node $out/libexec/source/packages/websocket-server/dist/server.js
     EOF
     chmod +x $out/bin/${name}
-
-    mkdir -p $out/share/${name}
-    cp -rv packages/ui/dist/* $out/share/${name}
   '';
 
 })
