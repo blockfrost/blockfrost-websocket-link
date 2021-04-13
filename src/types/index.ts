@@ -74,6 +74,11 @@ export type IncomingMessage =
     }
   | {
       id: number;
+      command: 'GET_LATEST_BLOCK';
+      params: null;
+    }
+  | {
+      id: number;
       command: 'UNSUBSCRIBE_BLOCK';
       params: null;
     }
