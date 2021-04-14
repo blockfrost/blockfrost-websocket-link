@@ -13,17 +13,13 @@ rec {
 
     HOME = "/build";
 
-
-    buildInputs = oldAttrs.buildInputs ++ [ (pkgs.yarn.override { nodejs = pkgs.nodejs-14_x; }) ];
-
-
     buildPhase = ''
       yarn build
 
       mkdir -p $out/bin
       cat <<EOF > $out/bin/${name}
       #!${pkgs.runtimeShell}
-      ${pkgs.yarn}/bin/yarn ${pkgs.nodejs}/bin/node $out/libexec/source/dist/src/server.js
+      $out/libexec/source/.yarn/releases/yarn-sources.cjs ${pkgs.nodejs}/bin/node $out/libexec/source/dist/src/server.js
       EOF
       chmod +x $out/bin/${name}
     '';
