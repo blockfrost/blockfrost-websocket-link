@@ -43,99 +43,102 @@ const heartbeat = (ws: Ws) => {
 const ping = () => {};
 
 wss.on('connection', (ws: Ws) => {
+  let subscriptionBlockActive = false;
   ws.isAlive = true;
 
   ws.on('pong', () => {
     heartbeat(ws);
   });
 
-  try {
-    if (!process.env.PROJECT_ID) {
-      const message = prepareMessage(
-        0,
-        MESSAGES.ERROR,
-        `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
-      );
+  if (!process.env.PROJECT_ID) {
+    const message = prepareMessage(
+      0,
+      MESSAGES.ERROR,
+      `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
+    );
+    ws.send(message);
+    return;
+  }
+
+  ws.on('error', error => {
+    const message = prepareMessage(1, MESSAGES.ERROR, error);
+    ws.send(message);
+  });
+
+  ws.on('message', async (message: string) => {
+    const data = getMessage(message);
+
+    if (!data) {
+      const message = prepareMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
       ws.send(message);
       return;
     }
 
-    ws.on('error', error => {
-      const message = prepareMessage(1, MESSAGES.ERROR, error);
-      ws.send(message);
-    });
+    switch (data.command) {
+      case MESSAGES.GET_SERVER_INFO: {
+        const serverInfoMessage = await getServerInfo(data.id);
+        ws.send(serverInfoMessage);
+        break;
+      }
 
-    ws.on('message', async (message: string) => {
-      const data = getMessage(message);
+      case MESSAGES.GET_TRANSACTION: {
+        const txMessage = await getTransaction(data.id, data.params.txId);
+        ws.send(txMessage);
+        break;
+      }
 
-      if (!data) {
-        const message = prepareMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
+      case MESSAGES.GET_ACCOUNT_UTXO: {
+        const accountUtxoMessage = await getAccountUtxo(data.id, data.params.descriptor);
+        ws.send(accountUtxoMessage);
+        break;
+      }
+
+      case MESSAGES.GET_ACCOUNT_INFO: {
+        const accountInfoMessage = await getAccountInfo(
+          data.id,
+          data.params.descriptor,
+          data.params.details,
+        );
+        ws.send(accountInfoMessage);
+        break;
+      }
+
+      case MESSAGES.SUBSCRIBE_BLOCK: {
+        if (subscriptionBlockActive) break;
+
+        let latestSentBlock: null | Responses['block_content'] = null;
+        subscribeBlockInterval = setInterval(async () => {
+          subscriptionBlockActive = true;
+          const latestBlock = await blockfrost.blocksLatest();
+
+          if (!latestSentBlock || latestBlock.hash !== latestSentBlock.hash) {
+            latestSentBlock = latestBlock;
+            const message = prepareMessage(data.id, MESSAGES.LATEST_BLOCK, latestSentBlock);
+            ws.send(message);
+          }
+        }, 1000);
+
+        break;
+      }
+
+      case MESSAGES.UNSUBSCRIBE_BLOCK: {
+        if (!subscriptionBlockActive) break;
+
+        subscriptionBlockActive = false;
+        clearInterval(subscribeBlockInterval);
+        break;
+      }
+
+      default: {
+        const message = prepareMessage(
+          data.id,
+          MESSAGES.ERROR,
+          `Unknown message id: ${data.command}`,
+        );
         ws.send(message);
-        return;
       }
-
-      switch (data.command) {
-        case MESSAGES.GET_SERVER_INFO: {
-          const serverInfoMessage = await getServerInfo(data.id);
-          ws.send(serverInfoMessage);
-          break;
-        }
-
-        case MESSAGES.GET_TRANSACTION: {
-          const txMessage = await getTransaction(data.id, data.params.txId);
-          ws.send(txMessage);
-          break;
-        }
-
-        case MESSAGES.GET_ACCOUNT_UTXO: {
-          const accountUtxoMessage = await getAccountUtxo(data.id, data.params.descriptor);
-          ws.send(accountUtxoMessage);
-          break;
-        }
-
-        case MESSAGES.GET_ACCOUNT_INFO: {
-          const accountInfoMessage = await getAccountInfo(
-            data.id,
-            data.params.descriptor,
-            data.params.details,
-          );
-          ws.send(accountInfoMessage);
-          break;
-        }
-
-        case MESSAGES.SUBSCRIBE_BLOCK: {
-          let latestSentBlock: null | Responses['block_content'] = null;
-          subscribeBlockInterval = setInterval(async () => {
-            const latestBlock = await blockfrost.blocksLatest();
-
-            if (!latestSentBlock || latestBlock.hash !== latestSentBlock.hash) {
-              latestSentBlock = latestBlock;
-              const message = prepareMessage(data.id, MESSAGES.LATEST_BLOCK, latestSentBlock);
-              ws.send(message);
-            }
-          }, 1000);
-
-          break;
-        }
-
-        case MESSAGES.UNSUBSCRIBE_BLOCK: {
-          clearInterval(subscribeBlockInterval);
-          break;
-        }
-
-        default: {
-          const message = prepareMessage(
-            data.id,
-            MESSAGES.ERROR,
-            `Unknown message id: ${data.command}`,
-          );
-          ws.send(message);
-        }
-      }
-    });
-  } catch (err) {
-    console.log(err);
-  }
+    }
+  });
 
   const message = prepareMessage(1, MESSAGES.CONNECT, 'Connected to server');
   ws.send(message);
