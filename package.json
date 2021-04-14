@@ -1,10 +1,11 @@
 {
   "name": "@blockfrost/blockfrost-websocket-link",
+  "version": "0.0.1",
   "scripts": {
     "clean": "rimraf dist",
     "prebuild": "yarn clean",
-    "build": "yarn clean && babel ./src --out-dir dist --copy-files --extensions '.ts'",
-    "start": "yarn build && node dist/server.js",
+    "build": "yarn clean && tsc",
+    "start": "yarn build && yarn node ./dist/src/server.js",
     "dev": "ts-node-dev ./src/server.ts",
     "lint": "eslint ./src/**/*.ts",
     "type-check": "tsc --project tsconfig.json",

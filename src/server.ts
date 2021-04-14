@@ -1,7 +1,9 @@
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
+import childProcess from 'child_process';
 import dotenv from 'dotenv';
+import packageJson from '../package.json';
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { Ws } from './types';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
@@ -20,6 +22,14 @@ let subscribeBlockInterval: any;
 
 app.get('/', (_req, res) => {
   res.send(WELCOME_MESSAGE);
+});
+
+app.get('/status', (_req, res) => {
+  res.send({
+    status: 'ok',
+    version: packageJson.version,
+    commit: childProcess.execSync('git rev-parse HEAD').toString().trim(),
+  });
 });
 
 const heartbeat = (ws: Ws) => {
