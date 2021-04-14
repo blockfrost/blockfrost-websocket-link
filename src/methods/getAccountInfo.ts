@@ -1,29 +1,38 @@
 import * as Types from '../types';
 import { getBalances, getAddresses } from '../utils/address';
-import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
+import { blockfrost } from '../utils/blockfrostAPI';
+import { prepareMessage } from '../utils/messages';
+import { MESSAGES } from '../constants';
 
-export default async (
-  blockFrostApi: BlockFrostAPI,
-  publicKey: string,
-  details: Types.Details,
-): Promise<Types.ResponseAccountInfo> => {
-  const externalAddresses = await getAddresses(publicKey, blockFrostApi, 0);
-  const internalAddresses = await getAddresses(publicKey, blockFrostApi, 1);
-
-  const addresses = [...externalAddresses, ...internalAddresses];
-  const balances = await getBalances(addresses);
-
-  const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
-  const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
-
-  const response: Types.ResponseAccountInfo = {
-    descriptor: publicKey,
-    balance: lovelaceBalance?.quantity || '0',
-  };
-
-  if (details !== 'basic') {
-    response.tokens = tokensBalances;
+export default async (id: number, publicKey: string, details: Types.Details): Promise<string> => {
+  if (!publicKey) {
+    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, 'Missing parameter descriptor');
+    return message;
   }
 
-  return response;
+  try {
+    const externalAddresses = await getAddresses(publicKey, blockfrost, 0);
+    const internalAddresses = await getAddresses(publicKey, blockfrost, 1);
+
+    const addresses = [...externalAddresses, ...internalAddresses];
+    const balances = await getBalances(addresses);
+
+    const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
+    const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
+
+    const accountInfo: Types.ResponseAccountInfo = {
+      descriptor: publicKey,
+      balance: lovelaceBalance?.quantity || '0',
+    };
+
+    if (details !== 'basic') {
+      accountInfo.tokens = tokensBalances;
+    }
+
+    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, accountInfo);
+    return message;
+  } catch (err) {
+    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, 'Error');
+    return message;
+  }
 };

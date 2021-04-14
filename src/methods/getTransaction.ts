@@ -1,6 +1,16 @@
-import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
+import { MESSAGES } from '../constants';
+import { prepareMessage } from '../utils/messages';
+import { blockfrost } from '../utils/blockfrostAPI';
 
-export default async (blockFrostApi: BlockFrostAPI, txId: string): Promise<any> => {
-  const tx = await blockFrostApi.txs(txId);
-  return tx;
+export default async (id: number, txId: string): Promise<string> => {
+  try {
+    const tx = await blockfrost.txs(txId);
+    const message = prepareMessage(id, MESSAGES.GET_TRANSACTION, tx);
+
+    return message;
+  } catch (err) {
+    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, 'Error');
+
+    return message;
+  }
 };

@@ -3,22 +3,25 @@ import http from 'http';
 import WebSocket from 'ws';
 import childProcess from 'child_process';
 import dotenv from 'dotenv';
+import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
-import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { Ws } from './types';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
-import { getMessage, prepareMessage } from './utils';
+import { getMessage, prepareMessage } from './utils/messages';
+import { blockfrost } from './utils/blockfrostAPI';
 
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
+import getAccountUtxo from './methods/getAccountUtxo';
 import getTransaction from './methods/getTransaction';
 
 dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
-let subscribeBlockInterval: any;
+let subscribeBlockInterval: NodeJS.Timeout;
 
 app.get('/', (_req, res) => {
   res.send(WELCOME_MESSAGE);
@@ -40,147 +43,104 @@ const heartbeat = (ws: Ws) => {
 const ping = () => {};
 
 wss.on('connection', (ws: Ws) => {
+  let subscriptionBlockActive = false;
   ws.isAlive = true;
 
   ws.on('pong', () => {
     heartbeat(ws);
   });
 
-  try {
-    if (!process.env.PROJECT_ID) {
-      const message = prepareMessage(
-        Math.floor(Math.random() * 10),
-        MESSAGES.ERROR,
-        `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
-      );
+  if (!process.env.PROJECT_ID) {
+    const message = prepareMessage(
+      0,
+      MESSAGES.ERROR,
+      `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
+    );
+    ws.send(message);
+    return;
+  }
+
+  ws.on('error', error => {
+    const message = prepareMessage(1, MESSAGES.ERROR, error);
+    ws.send(message);
+  });
+
+  ws.on('message', async (message: string) => {
+    const data = getMessage(message);
+
+    if (!data) {
+      const message = prepareMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
       ws.send(message);
       return;
     }
 
-    const api = new BlockFrostAPI({
-      projectId: process.env.PROJECT_ID,
-      customBackend: process.env.BACKEND_URL,
-    });
+    switch (data.command) {
+      case MESSAGES.GET_SERVER_INFO: {
+        const serverInfoMessage = await getServerInfo(data.id);
+        ws.send(serverInfoMessage);
+        break;
+      }
 
-    ws.on('error', error => {
-      const message = prepareMessage(1, MESSAGES.ERROR, error);
-      ws.send(message);
-    });
+      case MESSAGES.GET_TRANSACTION: {
+        const txMessage = await getTransaction(data.id, data.params.txId);
+        ws.send(txMessage);
+        break;
+      }
 
-    ws.on('message', async (message: string) => {
-      const data = getMessage(message);
+      case MESSAGES.GET_ACCOUNT_UTXO: {
+        const accountUtxoMessage = await getAccountUtxo(data.id, data.params.descriptor);
+        ws.send(accountUtxoMessage);
+        break;
+      }
 
-      if (!data) {
-        const message = prepareMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
+      case MESSAGES.GET_ACCOUNT_INFO: {
+        const accountInfoMessage = await getAccountInfo(
+          data.id,
+          data.params.descriptor,
+          data.params.details,
+        );
+        ws.send(accountInfoMessage);
+        break;
+      }
+
+      case MESSAGES.SUBSCRIBE_BLOCK: {
+        if (subscriptionBlockActive) break;
+
+        let latestSentBlock: null | Responses['block_content'] = null;
+        subscribeBlockInterval = setInterval(async () => {
+          subscriptionBlockActive = true;
+          const latestBlock = await blockfrost.blocksLatest();
+
+          if (!latestSentBlock || latestBlock.hash !== latestSentBlock.hash) {
+            latestSentBlock = latestBlock;
+            const message = prepareMessage(data.id, MESSAGES.LATEST_BLOCK, latestSentBlock);
+            ws.send(message);
+          }
+        }, 1000);
+
+        break;
+      }
+
+      case MESSAGES.UNSUBSCRIBE_BLOCK: {
+        if (!subscriptionBlockActive) break;
+
+        subscriptionBlockActive = false;
+        clearInterval(subscribeBlockInterval);
+        break;
+      }
+
+      default: {
+        const message = prepareMessage(
+          data.id,
+          MESSAGES.ERROR,
+          `Unknown message id: ${data.command}`,
+        );
         ws.send(message);
-        return;
       }
+    }
+  });
 
-      switch (data.command) {
-        case MESSAGES.GET_SERVER_INFO: {
-          const serverInfo = await getServerInfo(api);
-          const message = prepareMessage(data.id, MESSAGES.GET_SERVER_INFO, serverInfo);
-
-          ws.send(message);
-          break;
-        }
-
-        case MESSAGES.SUBSCRIBE_BLOCK: {
-          let latestSentBlock = await api.blocksLatest();
-          const message = prepareMessage(data.id, MESSAGES.LATEST_BLOCK, latestSentBlock);
-          ws.send(message);
-
-          subscribeBlockInterval = setInterval(async () => {
-            const latestBlock = await api.blocksLatest();
-            if (latestBlock.hash !== latestSentBlock.hash) {
-              latestSentBlock = latestBlock;
-              const message = prepareMessage(data.id, MESSAGES.LATEST_BLOCK, latestSentBlock);
-              ws.send(message);
-            }
-          }, 1000);
-
-          break;
-        }
-
-        case MESSAGES.GET_TRANSACTION: {
-          const tx = await getTransaction(api, data.params.txId);
-          const message = prepareMessage(data.id, MESSAGES.GET_TRANSACTION, tx);
-
-          ws.send(message);
-          break;
-        }
-
-        case MESSAGES.UNSUBSCRIBE_BLOCK: {
-          clearInterval(subscribeBlockInterval);
-          break;
-        }
-
-        case MESSAGES.GET_ACCOUNT_UTXO: {
-          if (!data.params.descriptor) {
-            const message = prepareMessage(
-              data.id,
-              MESSAGES.GET_ACCOUNT_UTXO,
-              'Missing param descriptor',
-            );
-
-            ws.send(message);
-            break;
-          }
-
-          try {
-            ws.send('aaaa');
-          } catch (err) {
-            const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_UTXO, 'Error');
-
-            ws.send(message);
-          }
-          break;
-        }
-
-        case MESSAGES.GET_ACCOUNT_INFO: {
-          if (!data.params.descriptor) {
-            const message = prepareMessage(
-              data.id,
-              MESSAGES.GET_ACCOUNT_INFO,
-              'Missing param descriptor',
-            );
-
-            ws.send(message);
-            break;
-          }
-
-          try {
-            const accountInfo = await getAccountInfo(
-              api,
-              data.params.descriptor,
-              data.params.details,
-            );
-            const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_INFO, accountInfo);
-
-            ws.send(message);
-          } catch (err) {
-            const message = prepareMessage(data.id, MESSAGES.GET_ACCOUNT_INFO, 'Error');
-
-            ws.send(message);
-          }
-          break;
-        }
-        default: {
-          const message = prepareMessage(
-            data.id,
-            MESSAGES.ERROR,
-            `Unknown message id: ${data.command}`,
-          );
-
-          ws.send(message);
-        }
-      }
-    });
-  } catch (err) {
-    console.log(err);
-  }
-
-  const message = prepareMessage(2, MESSAGES.CONNECT, 'Connected to server');
+  const message = prepareMessage(1, MESSAGES.CONNECT, 'Connected to server');
   ws.send(message);
 });
 
@@ -198,7 +158,7 @@ const interval = setInterval(() => {
   });
 }, 30000);
 
-wss.on('close', function close() {
+wss.on('close', () => {
   clearInterval(interval);
   clearInterval(subscribeBlockInterval);
 });
