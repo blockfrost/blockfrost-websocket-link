@@ -62,7 +62,14 @@ export type IncomingMessage =
     }
   | {
       id: number;
-      command: 'GET_BLOCK_HASH';
+      command: 'GET_BLOCK';
+      params: {
+        hashOrNumber: string | number;
+      };
+    }
+  | {
+      id: number;
+      command: 'ESTIMATE_FEE';
       params: {
         hashOrNumber: string | number;
       };
