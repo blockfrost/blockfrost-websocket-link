@@ -13,7 +13,9 @@ import { blockfrost } from './utils/blockfrostAPI';
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
 import getAccountUtxo from './methods/getAccountUtxo';
+import getBlock from './methods/getBlock';
 import getTransaction from './methods/getTransaction';
+import estimateFee from './methods/estimateFee';
 
 dotenv.config();
 
@@ -84,6 +86,18 @@ wss.on('connection', (ws: Ws) => {
       case MESSAGES.GET_TRANSACTION: {
         const txMessage = await getTransaction(data.id, data.params.txId);
         ws.send(txMessage);
+        break;
+      }
+
+      case MESSAGES.GET_BLOCK: {
+        const blockHashMessage = await getBlock(data.id, data.params.hashOrNumber);
+        ws.send(blockHashMessage);
+        break;
+      }
+
+      case MESSAGES.ESTIMATE_FEE: {
+        const estimateFeeMessage = await estimateFee(data.id, data.params.hashOrNumber);
+        ws.send(estimateFeeMessage);
         break;
       }
 
