@@ -23,64 +23,56 @@ const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): s
   return baseAddr.to_address().to_bech32();
 };
 
-const deriveBatchOfAddresses = (
-  publicKey: string,
-  start: number,
-  end: number,
-  type: Types.AddressType,
-): string[] => {
-  const addresses = [];
+// const deriveBatchOfAddresses = (
+//   publicKey: string,
+//   start: number,
+//   end: number,
+//   type: Types.AddressType,
+// ): string[] => {
+//   const addresses = [];
 
-  for (let i = start; i < end; i++) {
-    const address = deriveAddress(publicKey, i, type);
-    addresses.push(address);
-  }
+//   for (let i = start; i < end; i++) {
+//     const address = deriveAddress(publicKey, i, type);
+//     addresses.push(address);
+//   }
 
-  return addresses;
-};
+//   return addresses;
+// };
 
 export const getAddresses = async (
   publicKey: string,
   blockFrostApi: BlockFrostAPI,
   type: Types.AddressType,
 ): Promise<Responses['address_content'][]> => {
-  const nonEmptyAddresses: Responses['address_content'][] = [];
-  let discoveryActive = true;
-  let start = 0;
-  let end = ADDRESS_GAP_LIMIT;
+  let addressDiscoveredCount = 0;
+  const addresses: Responses['address_content'][] = [];
+  let isError = false;
+  let lastEmptyCount = 0;
 
-  while (discoveryActive) {
-    const addresses = deriveBatchOfAddresses(publicKey, start, end, type);
-    const addressRequests = addresses.map(async address => {
-      try {
-        const response = await blockFrostApi.addresses(address);
-        if (response) {
-          nonEmptyAddresses.push(response);
-        }
+  while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
+    const address = deriveAddress(publicKey, addressDiscoveredCount, type);
+    addressDiscoveredCount++;
 
-        return response;
-      } catch (err) {
-        if (err.status === 404) {
-          return undefined;
-        } else {
-          console.log(err.status);
-          return err;
-        }
+    try {
+      const response = await blockFrostApi.addresses(address);
+      if (response) {
+        addresses.push(response);
       }
-    });
-
-    const batchResult = await Promise.all(addressRequests);
-
-    discoveryActive = !batchResult.every(
-      (currentValue: Responses['address_content'] | undefined) =>
-        typeof currentValue === 'undefined',
-    );
-
-    start += ADDRESS_GAP_LIMIT;
-    end += ADDRESS_GAP_LIMIT;
+      lastEmptyCount = 0;
+    } catch (err) {
+      if (err.status === 404) {
+        lastEmptyCount++;
+      } else {
+        isError = true;
+      }
+    }
   }
 
-  return nonEmptyAddresses;
+  if (isError) {
+    return [];
+  }
+
+  return addresses;
 };
 
 export const getBalances = async (

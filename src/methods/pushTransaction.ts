@@ -4,11 +4,13 @@ import { blockfrost } from '../utils/blockfrostAPI';
 
 export default async (id: number, hashOrNumber: string | number): Promise<string> => {
   try {
-    const block = await blockfrost.blocks(hashOrNumber);
-    const message = prepareMessage(id, MESSAGES.ESTIMATE_FEE, block);
+    // @ts-ignore
+    const block = await blockfrost.txSubmit(hashOrNumber);
+    const message = prepareMessage(id, MESSAGES.PUSH_TRANSACTION, block);
     return message;
   } catch (err) {
-    const message = prepareMessage(id, MESSAGES.ESTIMATE_FEE, 'Error');
+    console.log(err);
+    const message = prepareMessage(id, MESSAGES.PUSH_TRANSACTION, 'Error');
     return message;
   }
 };

@@ -1,5 +1,5 @@
 import * as Types from '../types';
-import { getBalances, getAddresses } from '../utils/address';
+import { getAddresses, getBalances } from '../utils/address';
 import { blockfrost } from '../utils/blockfrostAPI';
 import { prepareMessage } from '../utils/messages';
 import { MESSAGES } from '../constants';
@@ -32,6 +32,7 @@ export default async (id: number, publicKey: string, details: Types.Details): Pr
     const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, accountInfo);
     return message;
   } catch (err) {
+    console.log(err);
     const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, 'Error');
     return message;
   }

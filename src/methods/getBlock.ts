@@ -8,7 +8,8 @@ export default async (id: number, hashOrNumber: string | number): Promise<string
     const message = prepareMessage(id, MESSAGES.GET_BLOCK, block);
     return message;
   } catch (err) {
-    const message = prepareMessage(id, MESSAGES.GET_SERVER_INFO, 'Error');
+    console.log(err);
+    const message = prepareMessage(id, MESSAGES.GET_BLOCK, 'Error');
     return message;
   }
 };

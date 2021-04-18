@@ -6,6 +6,7 @@ export default async (id: number): Promise<string> => {
   try {
     const info = await blockfrost.root();
     const latestBlock = await blockfrost.blocksLatest();
+
     const serverInfo = {
       url: blockfrost.apiUrl,
       name: 'Cardano',
@@ -20,6 +21,7 @@ export default async (id: number): Promise<string> => {
     const message = prepareMessage(id, MESSAGES.GET_SERVER_INFO, serverInfo);
     return message;
   } catch (err) {
+    console.log(err);
     const message = prepareMessage(id, MESSAGES.GET_SERVER_INFO, 'Error');
     return message;
   }

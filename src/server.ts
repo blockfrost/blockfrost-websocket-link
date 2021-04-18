@@ -8,14 +8,13 @@ import packageJson from '../package.json';
 import { Ws } from './types';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareMessage } from './utils/messages';
-import { blockfrost } from './utils/blockfrostAPI';
 
+import { events } from './events';
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
 import getAccountUtxo from './methods/getAccountUtxo';
 import getBlock from './methods/getBlock';
 import getTransaction from './methods/getTransaction';
-import estimateFee from './methods/estimateFee';
 
 dotenv.config();
 
@@ -46,6 +45,9 @@ const ping = () => {};
 
 wss.on('connection', (ws: Ws) => {
   let subscriptionBlockActive = false;
+  let subscriptionAddressActive = false;
+  let subscriptionAccountActive = false;
+
   ws.isAlive = true;
 
   ws.on('pong', () => {
@@ -65,6 +67,21 @@ wss.on('connection', (ws: Ws) => {
   ws.on('error', error => {
     const message = prepareMessage(1, MESSAGES.ERROR, error);
     ws.send(message);
+  });
+
+  events.on('NEW_BLOCK', (block: Responses['block_content']) => {
+    if (subscriptionBlockActive) {
+      const message = prepareMessage(1, MESSAGES.LATEST_BLOCK, block);
+      ws.send(message);
+    }
+
+    if (subscriptionAccountActive) {
+      console.log('subscriptionAccountActive');
+    }
+
+    if (subscriptionAddressActive) {
+      console.log('subscriptionAddressActive');
+    }
   });
 
   ws.on('message', async (message: string) => {
@@ -89,15 +106,15 @@ wss.on('connection', (ws: Ws) => {
         break;
       }
 
-      case MESSAGES.GET_BLOCK: {
-        const blockHashMessage = await getBlock(data.id, data.params.hashOrNumber);
-        ws.send(blockHashMessage);
+      case MESSAGES.SEND_TRANSACTION: {
+        const pushTxMessage = await getTransaction(data.id, data.params.txData);
+        ws.send(pushTxMessage);
         break;
       }
 
-      case MESSAGES.ESTIMATE_FEE: {
-        const estimateFeeMessage = await estimateFee(data.id, data.params.hashOrNumber);
-        ws.send(estimateFeeMessage);
+      case MESSAGES.GET_BLOCK: {
+        const blockHashMessage = await getBlock(data.id, data.params.hashOrNumber);
+        ws.send(blockHashMessage);
         break;
       }
 
@@ -118,28 +135,30 @@ wss.on('connection', (ws: Ws) => {
       }
 
       case MESSAGES.SUBSCRIBE_BLOCK: {
-        if (subscriptionBlockActive) break;
+        subscriptionBlockActive = true;
+        break;
+      }
 
-        let latestSentBlock: null | Responses['block_content'] = null;
-        subscribeBlockInterval = setInterval(async () => {
-          subscriptionBlockActive = true;
-          const latestBlock = await blockfrost.blocksLatest();
+      case MESSAGES.SUBSCRIBE_ADDRESS: {
+        subscriptionAddressActive = true;
+        break;
+      }
 
-          if (!latestSentBlock || latestBlock.hash !== latestSentBlock.hash) {
-            latestSentBlock = latestBlock;
-            const message = prepareMessage(data.id, MESSAGES.LATEST_BLOCK, latestSentBlock);
-            ws.send(message);
-          }
-        }, 1000);
-
+      case MESSAGES.SUBSCRIBE_ACCOUNT: {
+        subscriptionAccountActive = true;
         break;
       }
 
       case MESSAGES.UNSUBSCRIBE_BLOCK: {
-        if (!subscriptionBlockActive) break;
-
         subscriptionBlockActive = false;
-        clearInterval(subscribeBlockInterval);
+        break;
+      }
+      case MESSAGES.UNSUBSCRIBE_ADDRESS: {
+        subscriptionAddressActive = false;
+        break;
+      }
+      case MESSAGES.UNSUBSCRIBE_ACCOUNT: {
+        subscriptionAccountActive = false;
         break;
       }
 
@@ -153,9 +172,6 @@ wss.on('connection', (ws: Ws) => {
       }
     }
   });
-
-  const message = prepareMessage(1, MESSAGES.CONNECT, 'Connected to server');
-  ws.send(message);
 });
 
 const interval = setInterval(() => {

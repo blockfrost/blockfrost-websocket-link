@@ -8,6 +8,7 @@ export default async (id: number): Promise<string> => {
     const message = prepareMessage(id, MESSAGES.GET_LATEST_BLOCK, latestBlock);
     return message;
   } catch (err) {
+    console.log(err);
     const message = prepareMessage(id, MESSAGES.GET_LATEST_BLOCK, 'Error');
     return message;
   }

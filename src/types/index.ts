@@ -81,12 +81,44 @@ export type IncomingMessage =
     }
   | {
       id: number;
+      command: 'SEND_TRANSACTION';
+      params: {
+        txData: string;
+      };
+    }
+  | {
+      id: number;
       command: 'GET_LATEST_BLOCK';
       params: null;
     }
   | {
       id: number;
+      command: 'SUBSCRIBE_BLOCK';
+      params: null;
+    }
+  | {
+      id: number;
+      command: 'SUBSCRIBE_ADDRESS';
+      params: null;
+    }
+  | {
+      id: number;
+      command: 'SUBSCRIBE_ACCOUNT';
+      params: null;
+    }
+  | {
+      id: number;
       command: 'UNSUBSCRIBE_BLOCK';
+      params: null;
+    }
+  | {
+      id: number;
+      command: 'UNSUBSCRIBE_ADDRESS';
+      params: null;
+    }
+  | {
+      id: number;
+      command: 'UNSUBSCRIBE_ACCOUNT';
       params: null;
     }
   | {

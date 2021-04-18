@@ -9,9 +9,10 @@ export default async (id: number, publicKey: string): Promise<string> => {
 
   try {
     const accountUtxo = 'a';
-    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, accountUtxo);
+    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_UTXO, accountUtxo);
     return message;
   } catch (err) {
+    console.log(err);
     const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_UTXO, 'Error');
     return message;
   }
