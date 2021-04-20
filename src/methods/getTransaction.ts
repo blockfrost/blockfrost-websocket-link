@@ -9,7 +9,8 @@ export default async (id: number, txId: string): Promise<string> => {
 
     return message;
   } catch (err) {
-    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, 'Error');
+    console.log(err);
+    const message = prepareMessage(id, MESSAGES.GET_TRANSACTION, 'Error');
 
     return message;
   }

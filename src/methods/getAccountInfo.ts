@@ -1,6 +1,5 @@
 import * as Types from '../types';
-import { getBalances, getAddresses } from '../utils/address';
-import { blockfrost } from '../utils/blockfrostAPI';
+import { getAddresses, getBalances } from '../utils/address';
 import { prepareMessage } from '../utils/messages';
 import { MESSAGES } from '../constants';
 
@@ -11,8 +10,8 @@ export default async (id: number, publicKey: string, details: Types.Details): Pr
   }
 
   try {
-    const externalAddresses = await getAddresses(publicKey, blockfrost, 0);
-    const internalAddresses = await getAddresses(publicKey, blockfrost, 1);
+    const externalAddresses = await getAddresses(publicKey, 0);
+    const internalAddresses = await getAddresses(publicKey, 1);
 
     const addresses = [...externalAddresses, ...internalAddresses];
     const balances = await getBalances(addresses);
@@ -32,6 +31,7 @@ export default async (id: number, publicKey: string, details: Types.Details): Pr
     const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, accountInfo);
     return message;
   } catch (err) {
+    console.log(err);
     const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_INFO, 'Error');
     return message;
   }

@@ -1355,9 +1355,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:0.1.0":
-  version: 0.1.0
-  resolution: "@blockfrost/blockfrost-js@npm:0.1.0"
+"@blockfrost/blockfrost-js@npm:0.1.1":
+  version: 0.1.1
+  resolution: "@blockfrost/blockfrost-js@npm:0.1.1"
   dependencies:
     "@blockfrost/openapi": 0.1.9
     "@yarnpkg/pnpify": ^2.4.0
@@ -1366,7 +1366,7 @@ __metadata:
     dotenv: ^8.2.0
     rimraf: ^3.0.2
     url-join: ^4.0.1
-  checksum: 2655192a71fde55a309a406f818b2b12f950d4852c7888b5b914656b6e74e90f163e7d76adb19164e2c5564131d064655c908c23a200546b5f15ed6839328c15
+  checksum: cd8e5a72c46769fcd54101c872de553e709abcdd6c27d3106a3e86d8718492a18c5c8f0af9b7d63abb7b20a8d966cf5f934a223884fe1393d16ca77bdc33b59c
   languageName: node
   linkType: hard
 
@@ -1378,7 +1378,7 @@ __metadata:
     "@babel/core": ^7.13.10
     "@babel/preset-env": ^7.13.12
     "@babel/preset-typescript": ^7.13.0
-    "@blockfrost/blockfrost-js": 0.1.0
+    "@blockfrost/blockfrost-js": 0.1.1
     "@emurgo/cardano-serialization-lib-nodejs": ^6.0.0
     "@types/express": ^4.17.11
     "@types/jest": ^26.0.22
