@@ -31,7 +31,10 @@ export const getAddresses = async (
   let addressDiscoveredCount = 0;
   let lastEmptyCount = 0;
   let addressCount = 0;
-  const result: { address: string; data: Responses['address_content'] | 'error' | 'empty' }[] = [];
+  const result: {
+    address: string;
+    data: Responses['address_content'] | 'error' | 'empty';
+  }[] = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
     const promisesBundle: {
@@ -96,4 +99,35 @@ export const addressesToBalances = async (
   });
 
   return balances;
+};
+
+export const addressesToUtxos = async (
+  addresses: { address: string; data: Responses['address_content'] | 'error' | 'empty' }[],
+): Promise<any> => {
+  const promisesBundle: {
+    address: string;
+    promise: Promise<Responses['address_utxo_content']>;
+  }[] = [];
+  const utxos: any = [];
+
+  addresses.map(item => {
+    if (item.data === 'empty' || item.data === 'error') return;
+
+    const promise = blockfrost.addressesUtxos(item.address);
+    promisesBundle.push({ address: item.address, promise });
+  });
+
+  await Promise.all(
+    promisesBundle.map(p =>
+      p.promise
+        .then(data => {
+          utxos.push({ address: p.address, data });
+        })
+        .catch(() => {
+          utxos.push({ address: p.address, data: 'error' });
+        }),
+    ),
+  );
+
+  return utxos;
 };
