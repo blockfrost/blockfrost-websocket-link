@@ -15,6 +15,7 @@ import getAccountInfo from './methods/getAccountInfo';
 import getAccountUtxo from './methods/getAccountUtxo';
 import getBlock from './methods/getBlock';
 import getTransaction from './methods/getTransaction';
+import submitTransaction from './methods/submitTransaction';
 
 dotenv.config();
 
@@ -106,12 +107,6 @@ wss.on('connection', (ws: Ws) => {
         break;
       }
 
-      case MESSAGES.SEND_TRANSACTION: {
-        const pushTxMessage = await getTransaction(data.id, data.params.txData);
-        ws.send(pushTxMessage);
-        break;
-      }
-
       case MESSAGES.GET_BLOCK: {
         const blockHashMessage = await getBlock(data.id, data.params.hashOrNumber);
         ws.send(blockHashMessage);
@@ -159,6 +154,12 @@ wss.on('connection', (ws: Ws) => {
       }
       case MESSAGES.UNSUBSCRIBE_ACCOUNT: {
         subscriptionAccountActive = false;
+        break;
+      }
+
+      case MESSAGES.SUBMIT_TRANSACTION: {
+        const submitTransactionMessage = await submitTransaction(data.id, data.params.txData);
+        ws.send(submitTransactionMessage);
         break;
       }
 

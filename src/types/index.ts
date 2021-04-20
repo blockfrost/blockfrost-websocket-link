@@ -19,7 +19,7 @@ export interface ResponseServerInfo {
   name: string;
   shortcut: string;
   testnet: boolean;
-  version: number;
+  version: string;
   decimals: number;
   blockHeight: number;
   blockHash: string;
@@ -84,9 +84,9 @@ export type IncomingMessage =
     }
   | {
       id: number;
-      command: 'SEND_TRANSACTION';
+      command: 'SUBMIT_TRANSACTION';
       params: {
-        txData: string;
+        txData: Uint8Array;
       };
     }
   | {
