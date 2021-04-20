@@ -5,7 +5,7 @@ import childProcess from 'child_process';
 import dotenv from 'dotenv';
 import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
-import { Ws } from './types';
+import * as Server from './types/server';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareMessage } from './utils/messages';
 
@@ -37,14 +37,14 @@ app.get('/status', (_req, res) => {
   });
 });
 
-const heartbeat = (ws: Ws) => {
+const heartbeat = (ws: Server.Ws) => {
   ws.isAlive = true;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const ping = () => {};
 
-wss.on('connection', (ws: Ws) => {
+wss.on('connection', (ws: Server.Ws) => {
   let subscriptionBlockActive = false;
   let subscriptionAddressActive = false;
   let subscriptionAccountActive = false;
@@ -177,7 +177,7 @@ wss.on('connection', (ws: Ws) => {
 
 const interval = setInterval(() => {
   wss.clients.forEach(w => {
-    const ws = w as Ws;
+    const ws = w as Server.Ws;
     if (ws.isAlive === false) {
       return ws.terminate();
     }
