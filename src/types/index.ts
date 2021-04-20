@@ -1,4 +1,5 @@
 import WebSocket from 'ws';
+import { Responses } from '@blockfrost/blockfrost-js';
 
 export interface Ws extends WebSocket {
   isAlive: boolean;
@@ -10,6 +11,8 @@ export interface Balance {
 }
 
 export type AddressType = 1 | 0;
+
+export type AddressArray = (Responses['address_content'] | 'empty' | 'error')[];
 
 export interface ResponseServerInfo {
   url: string;

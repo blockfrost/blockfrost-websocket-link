@@ -1,7 +1,7 @@
 import { ADDRESS_GAP_LIMIT } from '../constants';
 import * as Types from '../types';
+import { blockfrost } from '../utils/blockfrostAPI';
 import BigNumber from 'bignumber.js';
-import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import {
   Bip32PublicKey,
   BaseAddress,
@@ -23,64 +23,54 @@ const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): s
   return baseAddr.to_address().to_bech32();
 };
 
-// const deriveBatchOfAddresses = (
-//   publicKey: string,
-//   start: number,
-//   end: number,
-//   type: Types.AddressType,
-// ): string[] => {
-//   const addresses = [];
-
-//   for (let i = start; i < end; i++) {
-//     const address = deriveAddress(publicKey, i, type);
-//     addresses.push(address);
-//   }
-
-//   return addresses;
-// };
-
 export const getAddresses = async (
   publicKey: string,
-  blockFrostApi: BlockFrostAPI,
   type: Types.AddressType,
-): Promise<Responses['address_content'][]> => {
+): Promise<Types.AddressArray> => {
   let addressDiscoveredCount = 0;
-  const addresses: Responses['address_content'][] = [];
-  let isError = false;
   let lastEmptyCount = 0;
+  let addressCount = 0;
+  const result: Types.AddressArray = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
-    const address = deriveAddress(publicKey, addressDiscoveredCount, type);
-    addressDiscoveredCount++;
+    const promises = [];
 
-    try {
-      const response = await blockFrostApi.addresses(address);
-      if (response) {
-        addresses.push(response);
-      }
-      lastEmptyCount = 0;
-    } catch (err) {
-      if (err.status === 404) {
-        lastEmptyCount++;
-      } else {
-        isError = true;
-      }
+    for (let i = addressDiscoveredCount; i < addressDiscoveredCount + ADDRESS_GAP_LIMIT; i++) {
+      const address = deriveAddress(publicKey, addressCount, type);
+      addressCount++;
+      const promise = blockfrost.addresses(address);
+      promises.push(promise);
     }
+
+    await Promise.all(
+      promises.map(p =>
+        p
+          .then(data => {
+            result.push(data);
+            lastEmptyCount = 0;
+          })
+          .catch(error => {
+            lastEmptyCount++;
+            if (error.status === 404) {
+              result.push('empty');
+            } else {
+              result.push('error');
+            }
+          }),
+      ),
+    );
+
+    addressDiscoveredCount++;
   }
 
-  if (isError) {
-    return [];
-  }
-
-  return addresses;
+  return result;
 };
 
-export const getBalances = async (
-  addresses: Responses['address_content'][],
-): Promise<Types.Balance[]> => {
+export const getBalances = async (addresses: Types.AddressArray): Promise<Types.Balance[]> => {
   const balances: Types.Balance[] = [];
 
   addresses.map(address => {
+    if (address === 'empty' || address === 'error') return;
     address.amount.map(amountItem => {
       if (amountItem.quantity && amountItem.unit) {
         const balanceRow = balances.find(balanceResult => balanceResult.unit === amountItem.unit);
