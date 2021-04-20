@@ -1,6 +1,7 @@
 import { ADDRESS_GAP_LIMIT } from '../constants';
-import * as Types from '../types';
+import * as Addresses from '../types/addresses';
 import { blockfrost } from '../utils/blockfrostAPI';
+import { Responses } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import {
   Bip32PublicKey,
@@ -25,36 +26,42 @@ const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): s
 
 export const getAddresses = async (
   publicKey: string,
-  type: Types.AddressType,
-): Promise<Types.AddressArray> => {
+  type: Addresses.Type,
+): Promise<{ address: string; data: Responses['address_content'] | 'error' | 'empty' }[]> => {
   let addressDiscoveredCount = 0;
   let lastEmptyCount = 0;
   let addressCount = 0;
-  const result: Types.AddressArray = [];
+  const result: {
+    address: string;
+    data: Responses['address_content'] | 'error' | 'empty';
+  }[] = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
-    const promises = [];
+    const promisesBundle: {
+      address: string;
+      promise: Promise<Responses['address_content']>;
+    }[] = [];
 
     for (let i = addressDiscoveredCount; i < addressDiscoveredCount + ADDRESS_GAP_LIMIT; i++) {
       const address = deriveAddress(publicKey, addressCount, type);
       addressCount++;
       const promise = blockfrost.addresses(address);
-      promises.push(promise);
+      promisesBundle.push({ address, promise });
     }
 
     await Promise.all(
-      promises.map(p =>
-        p
+      promisesBundle.map(p =>
+        p.promise
           .then(data => {
-            result.push(data);
+            result.push({ address: p.address, data });
             lastEmptyCount = 0;
           })
           .catch(error => {
             lastEmptyCount++;
             if (error.status === 404) {
-              result.push('empty');
+              result.push({ address: p.address, data: 'empty' });
             } else {
-              result.push('error');
+              result.push({ address: p.address, data: 'error' });
             }
           }),
       ),
@@ -66,12 +73,14 @@ export const getAddresses = async (
   return result;
 };
 
-export const getBalances = async (addresses: Types.AddressArray): Promise<Types.Balance[]> => {
-  const balances: Types.Balance[] = [];
+export const addressesToBalances = async (
+  addresses: { address: string; data: Responses['address_content'] | 'error' | 'empty' }[],
+): Promise<Addresses.Balance[]> => {
+  const balances: Addresses.Balance[] = [];
 
   addresses.map(address => {
-    if (address === 'empty' || address === 'error') return;
-    address.amount.map(amountItem => {
+    if (address.data === 'empty' || address.data === 'error') return;
+    address.data.amount.map(amountItem => {
       if (amountItem.quantity && amountItem.unit) {
         const balanceRow = balances.find(balanceResult => balanceResult.unit === amountItem.unit);
 
@@ -90,4 +99,35 @@ export const getBalances = async (addresses: Types.AddressArray): Promise<Types.
   });
 
   return balances;
+};
+
+export const addressesToUtxos = async (
+  addresses: { address: string; data: Responses['address_content'] | 'error' | 'empty' }[],
+): Promise<any> => {
+  const promisesBundle: {
+    address: string;
+    promise: Promise<Responses['address_utxo_content']>;
+  }[] = [];
+  const utxos: any = [];
+
+  addresses.map(item => {
+    if (item.data === 'empty' || item.data === 'error') return;
+
+    const promise = blockfrost.addressesUtxos(item.address);
+    promisesBundle.push({ address: item.address, promise });
+  });
+
+  await Promise.all(
+    promisesBundle.map(p =>
+      p.promise
+        .then(data => {
+          utxos.push({ address: p.address, data });
+        })
+        .catch(() => {
+          utxos.push({ address: p.address, data: 'error' });
+        }),
+    ),
+  );
+
+  return utxos;
 };
