@@ -7,11 +7,15 @@ const events = new EventEmitter();
 let previousBlock: null | Responses['block_content'] = null;
 
 setInterval(async () => {
-  const latestBlock = await blockfrost.blocksLatest();
+  try {
+    const latestBlock = await blockfrost.blocksLatest();
 
-  if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
-    previousBlock = latestBlock;
-    events.emit('NEW_BLOCK', latestBlock);
+    if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
+      previousBlock = latestBlock;
+      events.emit('NEW_BLOCK', latestBlock);
+    }
+  } catch (err) {
+    console.log(err);
   }
 }, 1000);
 
