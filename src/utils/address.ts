@@ -37,10 +37,7 @@ export const getAddresses = async (
   }[] = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
-    const promisesBundle: {
-      address: string;
-      promise: Promise<Responses['address_content']>;
-    }[] = [];
+    const promisesBundle: Addresses.Bundle = [];
 
     for (let i = addressDiscoveredCount; i < addressDiscoveredCount + ADDRESS_GAP_LIMIT; i++) {
       const address = deriveAddress(publicKey, addressCount, type);
