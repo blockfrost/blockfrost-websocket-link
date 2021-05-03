@@ -1,4 +1,5 @@
-import { Balance } from './addresses';
+import { Balance } from './address';
+import { Responses } from '@blockfrost/blockfrost-js';
 
 export interface ServerInfo {
   url: string;
@@ -13,8 +14,20 @@ export interface ServerInfo {
 
 export type BlockHash = string;
 
+type Transactions =
+  | {
+      address: string;
+      data: string[];
+    }[]
+  | {
+      address: string;
+      data: Responses['tx_content'];
+    }[];
+
 export interface AccountInfo {
   balance: string;
   descriptor: string;
   tokens?: Balance[];
+  transactions?: Transactions;
+  totalPages?: number;
 }

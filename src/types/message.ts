@@ -1,12 +1,14 @@
 export type Details = 'basic' | 'tokens' | 'tokenBalances' | 'txids' | 'txs';
 
-export type Incoming =
+export type Messages =
   | {
       id: number;
       command: 'GET_ACCOUNT_INFO';
       params: {
         descriptor: string;
         details: Details;
+        page?: number;
+        pageSize?: number;
       };
     }
   | {
@@ -37,27 +39,10 @@ export type Incoming =
     }
   | {
       id: number;
-      command: 'ESTIMATE_FEE';
-      params: {
-        hashOrNumber: string | number;
-      };
-    }
-  | {
-      id: number;
-      command: 'SUBSCRIBE_BLOCK';
-      params: null;
-    }
-  | {
-      id: number;
-      command: 'SUBMIT_TRANSACTION';
+      command: 'SEND_TRANSACTION';
       params: {
         txData: Uint8Array;
       };
-    }
-  | {
-      id: number;
-      command: 'GET_LATEST_BLOCK';
-      params: null;
     }
   | {
       id: number;

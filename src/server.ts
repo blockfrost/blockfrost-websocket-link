@@ -6,8 +6,8 @@ import dotenv from 'dotenv';
 import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
 import * as Server from './types/server';
-import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
-import { getMessage, prepareMessage } from './utils/messages';
+import { MESSAGES, MESSAGES_RESPONSE, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
+import { getMessage, prepareMessage, prepareErrorMessage } from './utils/message';
 
 import { events } from './events';
 import getServerInfo from './methods/getServerInfo';
@@ -56,23 +56,24 @@ wss.on('connection', (ws: Server.Ws) => {
   });
 
   if (!process.env.PROJECT_ID) {
-    const message = prepareMessage(
+    const message = prepareErrorMessage(
       0,
-      MESSAGES.ERROR,
+      'server',
       `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
     );
+
     ws.send(message);
     return;
   }
 
   ws.on('error', error => {
-    const message = prepareMessage(1, MESSAGES.ERROR, error);
+    const message = prepareErrorMessage(1, MESSAGES.ERROR, error);
     ws.send(message);
   });
 
   events.on('NEW_BLOCK', (block: Responses['block_content']) => {
     if (subscriptionBlockActive) {
-      const message = prepareMessage(1, MESSAGES.LATEST_BLOCK, block);
+      const message = prepareMessage(1, MESSAGES_RESPONSE.BLOCK, block);
       ws.send(message);
     }
 
@@ -89,7 +90,7 @@ wss.on('connection', (ws: Server.Ws) => {
     const data = getMessage(message);
 
     if (!data) {
-      const message = prepareMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
+      const message = prepareErrorMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
       ws.send(message);
       return;
     }
@@ -148,23 +149,25 @@ wss.on('connection', (ws: Server.Ws) => {
         subscriptionBlockActive = false;
         break;
       }
+
       case MESSAGES.UNSUBSCRIBE_ADDRESS: {
         subscriptionAddressActive = false;
         break;
       }
+
       case MESSAGES.UNSUBSCRIBE_ACCOUNT: {
         subscriptionAccountActive = false;
         break;
       }
 
-      case MESSAGES.SUBMIT_TRANSACTION: {
+      case MESSAGES.SEND_TRANSACTION: {
         const submitTransactionMessage = await submitTransaction(data.id, data.params.txData);
         ws.send(submitTransactionMessage);
         break;
       }
 
       default: {
-        const message = prepareMessage(
+        const message = prepareErrorMessage(
           data.id,
           MESSAGES.ERROR,
           `Unknown message id: ${data.command}`,
