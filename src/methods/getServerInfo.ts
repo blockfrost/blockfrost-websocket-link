@@ -1,4 +1,4 @@
-import { MESSAGES } from '../constants';
+import { MESSAGES_RESPONSE } from '../constants';
 import { prepareMessage } from '../utils/message';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 
@@ -17,11 +17,11 @@ export default async (id: number): Promise<string> => {
       blockHash: latestBlock.hash,
     };
 
-    const message = prepareMessage(id, MESSAGES.SERVER_INFO, serverInfo);
+    const message = prepareMessage(id, MESSAGES_RESPONSE.SERVER_INFO, serverInfo);
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, MESSAGES.SERVER_INFO, 'Error');
+    const message = prepareMessage(id, MESSAGES_RESPONSE.SERVER_INFO, 'Error');
     return message;
   }
 };

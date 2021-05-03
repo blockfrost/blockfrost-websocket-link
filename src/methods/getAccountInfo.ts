@@ -4,7 +4,7 @@ import { discoverAddresses, addressesToBalances, addressesToTxIds } from '../uti
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage } from '../utils/message';
 import { paginate } from '../utils/common';
-import { MESSAGES } from '../constants';
+import { MESSAGES_RESPONSE } from '../constants';
 
 export default async (
   id: number,
@@ -14,7 +14,11 @@ export default async (
   pageSize = 25,
 ): Promise<string> => {
   if (!publicKey) {
-    const message = prepareMessage(id, MESSAGES.ACCOUNT_INFO, 'Missing parameter descriptor');
+    const message = prepareMessage(
+      id,
+      MESSAGES_RESPONSE.ACCOUNT_INFO,
+      'Missing parameter descriptor',
+    );
     return message;
   }
 
@@ -43,7 +47,7 @@ export default async (
         // @ts-ignore
         accountInfo.transactions = transactionsIds;
       } catch (err) {
-        const message = prepareMessage(id, MESSAGES.ACCOUNT_INFO, accountInfo);
+        const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
         return message;
       }
     }
@@ -57,16 +61,16 @@ export default async (
         accountInfo.transactions = paginatedTxs[page];
         accountInfo.totalPages = paginatedTxs.length;
       } catch (err) {
-        const message = prepareMessage(id, MESSAGES.ACCOUNT_INFO, accountInfo);
+        const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
         return message;
       }
     }
 
-    const message = prepareMessage(id, MESSAGES.ACCOUNT_INFO, accountInfo);
+    const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, MESSAGES.ACCOUNT_INFO, 'Error');
+    const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, 'Error');
     return message;
   }
 };

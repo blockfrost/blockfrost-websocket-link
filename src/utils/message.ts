@@ -1,10 +1,10 @@
 import { Responses } from '@blockfrost/blockfrost-js';
-import { Incoming } from '../types/message';
+import { Messages } from '../types/message';
 import { AccountInfo, ServerInfo } from '../types/response';
 
-export const getMessage = (message: string): Incoming | null => {
+export const getMessage = (message: string): Messages | null => {
   try {
-    const parsedMessage: Incoming = JSON.parse(message);
+    const parsedMessage: Messages = JSON.parse(message);
     return parsedMessage;
   } catch (err) {
     return null;

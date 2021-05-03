@@ -1,9 +1,9 @@
 export type Details = 'basic' | 'tokens' | 'tokenBalances' | 'txids' | 'txs';
 
-export type Incoming =
+export type Messages =
   | {
       id: number;
-      command: 'ACCOUNT_INFO';
+      command: 'GET_ACCOUNT_INFO';
       params: {
         descriptor: string;
         details: Details;
@@ -13,41 +13,29 @@ export type Incoming =
     }
   | {
       id: number;
-      command: 'ACCOUNT_UTXO';
+      command: 'GET_ACCOUNT_UTXO';
       params: {
         descriptor: string;
       };
     }
   | {
       id: number;
-      command: 'TRANSACTION';
+      command: 'GET_TRANSACTION';
       params: {
         txId: string;
       };
     }
   | {
       id: number;
-      command: 'SERVER_INFO';
+      command: 'GET_SERVER_INFO';
       params: null;
     }
   | {
       id: number;
-      command: 'BLOCK';
+      command: 'GET_BLOCK';
       params: {
         hashOrNumber: string | number;
       };
-    }
-  | {
-      id: number;
-      command: 'ESTIMATE_FEE';
-      params: {
-        hashOrNumber: string | number;
-      };
-    }
-  | {
-      id: number;
-      command: 'SUBSCRIBE_BLOCK';
-      params: null;
     }
   | {
       id: number;
@@ -55,11 +43,6 @@ export type Incoming =
       params: {
         txData: Uint8Array;
       };
-    }
-  | {
-      id: number;
-      command: 'LATEST_BLOCK';
-      params: null;
     }
   | {
       id: number;
