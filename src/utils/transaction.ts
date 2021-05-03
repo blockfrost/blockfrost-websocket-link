@@ -2,7 +2,10 @@ import { Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export const txIdsToTransactions = async (
-  addresses: { address: string; data: Responses['address_content'] | 'empty' }[],
+  addresses: {
+    address: string;
+    data: string[];
+  }[],
 ): Promise<{ address: string; data: Responses['tx_content'] | 'empty' }[]> => {
   const promisesBundle: {
     address: string;
@@ -15,10 +18,10 @@ export const txIdsToTransactions = async (
   }[] = [];
 
   addresses.map(item => {
-    if (item.data === 'empty') return;
-
-    const promise = blockfrostAPI.txs(item.address);
-    promisesBundle.push({ address: item.address, promise });
+    item.data.map(hash => {
+      const promise = blockfrostAPI.txs(hash);
+      promisesBundle.push({ address: item.address, promise });
+    });
   });
 
   await Promise.all(
@@ -28,6 +31,9 @@ export const txIdsToTransactions = async (
           result.push({ address: p.address, data });
         })
         .catch(err => {
+          if (err.status === 404) {
+            return;
+          }
           throw Error(err);
         }),
     ),

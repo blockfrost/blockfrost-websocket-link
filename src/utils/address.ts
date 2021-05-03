@@ -135,7 +135,9 @@ export const addressesToUtxos = async (
   return result;
 };
 
-export const addressesToTxIds = async (addresses: Addresses.Result): Promise<string[]> => {
+export const addressesToTxIds = async (
+  addresses: Addresses.Result,
+): Promise<{ address: string; data: string[] }[]> => {
   const promisesBundle: {
     address: string;
     promise: Promise<string[]>;
@@ -148,16 +150,16 @@ export const addressesToTxIds = async (addresses: Addresses.Result): Promise<str
     promisesBundle.push({ address: item.address, promise });
   });
 
-  const result: string[] = [];
+  const result: { address: string; data: string[] }[] = [];
 
   await Promise.all(
     promisesBundle.map(p =>
       p.promise
         .then(data => {
-          result.concat(data);
+          result.push({ address: p.address, data });
         })
-        .catch(() => {
-          throw Error('a');
+        .catch(error => {
+          throw Error(error);
         }),
     ),
   );

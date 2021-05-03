@@ -44,7 +44,6 @@ export default async (
     if (details === 'txids') {
       try {
         const transactionsIds = await addressesToTxIds(addresses);
-        // @ts-ignore
         accountInfo.transactions = transactionsIds;
       } catch (err) {
         const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
@@ -55,10 +54,9 @@ export default async (
     if (details === 'txs') {
       try {
         const transactionsIds = await addressesToTxIds(addresses);
-        // @ts-ignore
         const txs = await txIdsToTransactions(transactionsIds);
         const paginatedTxs = paginate(txs, pageSize);
-        accountInfo.transactions = paginatedTxs[page];
+        accountInfo.transactions = paginatedTxs[page - 1];
         accountInfo.totalPages = paginatedTxs.length;
       } catch (err) {
         const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);

@@ -17,10 +17,8 @@ export type BlockHash = string;
 type Transactions =
   | {
       address: string;
-      data: {
-        txIds: string[];
-      };
-    }
+      data: string[];
+    }[]
   | {
       address: string;
       data: Responses['tx_content'];
