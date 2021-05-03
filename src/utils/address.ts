@@ -100,7 +100,7 @@ export const addressesToBalances = async (
   return balances;
 };
 
-export const addressesUtxos = async (
+export const addressesToUtxos = async (
   addresses: { address: string; data: Responses['address_content'] | 'empty' }[],
 ): Promise<{ address: string; data: Responses['address_utxo_content'] | 'empty' }[]> => {
   const promisesBundle: {

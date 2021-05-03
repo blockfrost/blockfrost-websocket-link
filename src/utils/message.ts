@@ -11,15 +11,17 @@ export const getMessage = (message: string): Messages | null => {
   }
 };
 
+export const prepareErrorMessage = (id: number, message: string, error: Error | string): string =>
+  JSON.stringify({ id, message, type: 'error', error });
+
 export const prepareMessage = (
   id: number,
   message: string,
   data:
-    | Error
     | ServerInfo
     | AccountInfo
     | string
     | Responses['block_content']
     | Responses['tx_content']
     | Responses['address_utxo_content'],
-): string => JSON.stringify({ id, message, data });
+): string => JSON.stringify({ id, type: 'message', message, data });

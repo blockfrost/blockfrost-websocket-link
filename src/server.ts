@@ -7,7 +7,7 @@ import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
 import * as Server from './types/server';
 import { MESSAGES, MESSAGES_RESPONSE, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
-import { getMessage, prepareMessage } from './utils/message';
+import { getMessage, prepareMessage, prepareErrorMessage } from './utils/message';
 
 import { events } from './events';
 import getServerInfo from './methods/getServerInfo';
@@ -56,17 +56,18 @@ wss.on('connection', (ws: Server.Ws) => {
   });
 
   if (!process.env.PROJECT_ID) {
-    const message = prepareMessage(
+    const message = prepareErrorMessage(
       0,
-      MESSAGES.ERROR,
+      'server',
       `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
     );
+
     ws.send(message);
     return;
   }
 
   ws.on('error', error => {
-    const message = prepareMessage(1, MESSAGES.ERROR, error);
+    const message = prepareErrorMessage(1, MESSAGES.ERROR, error);
     ws.send(message);
   });
 
@@ -89,7 +90,7 @@ wss.on('connection', (ws: Server.Ws) => {
     const data = getMessage(message);
 
     if (!data) {
-      const message = prepareMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
+      const message = prepareErrorMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
       ws.send(message);
       return;
     }
@@ -148,10 +149,12 @@ wss.on('connection', (ws: Server.Ws) => {
         subscriptionBlockActive = false;
         break;
       }
+
       case MESSAGES.UNSUBSCRIBE_ADDRESS: {
         subscriptionAddressActive = false;
         break;
       }
+
       case MESSAGES.UNSUBSCRIBE_ACCOUNT: {
         subscriptionAccountActive = false;
         break;
@@ -164,7 +167,7 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       default: {
-        const message = prepareMessage(
+        const message = prepareErrorMessage(
           data.id,
           MESSAGES.ERROR,
           `Unknown message id: ${data.command}`,

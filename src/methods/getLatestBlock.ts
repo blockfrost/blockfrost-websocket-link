@@ -1,5 +1,5 @@
 import { MESSAGES_RESPONSE } from '../constants';
-import { prepareMessage } from '../utils/message';
+import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export default async (id: number): Promise<string> => {
@@ -9,7 +9,7 @@ export default async (id: number): Promise<string> => {
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, MESSAGES_RESPONSE.BLOCK, 'Error');
+    const message = prepareErrorMessage(id, MESSAGES_RESPONSE.BLOCK, err.data);
     return message;
   }
 };

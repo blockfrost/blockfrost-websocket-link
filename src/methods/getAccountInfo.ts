@@ -70,7 +70,7 @@ export default async (
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, 'Error');
+    const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, err.data);
     return message;
   }
 };

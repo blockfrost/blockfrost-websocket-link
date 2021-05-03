@@ -1,7 +1,7 @@
-import { prepareMessage } from '../utils/message';
+import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { MESSAGES_RESPONSE } from '../constants';
 import { Responses } from '@blockfrost/blockfrost-js';
-import { discoverAddresses, addressesUtxos } from '../utils/address';
+import { discoverAddresses, addressesToUtxos } from '../utils/address';
 
 export default async (id: number, publicKey: string): Promise<string> => {
   if (!publicKey) {
@@ -18,7 +18,7 @@ export default async (id: number, publicKey: string): Promise<string> => {
     const internalAddresses = await discoverAddresses(publicKey, 1);
     const addresses = [...externalAddresses, ...internalAddresses];
     let result: Responses['address_utxo_content'] = [];
-    const utxosResult = await addressesUtxos(addresses);
+    const utxosResult = await addressesToUtxos(addresses);
 
     utxosResult.map(utxoRow => {
       const data = utxoRow.data;
@@ -30,7 +30,7 @@ export default async (id: number, publicKey: string): Promise<string> => {
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_UTXO, 'Error');
+    const message = prepareErrorMessage(id, MESSAGES_RESPONSE.ACCOUNT_UTXO, err.data);
     return message;
   }
 };
