@@ -3,34 +3,36 @@ export type Details = 'basic' | 'tokens' | 'tokenBalances' | 'txids' | 'txs';
 export type Incoming =
   | {
       id: number;
-      command: 'GET_ACCOUNT_INFO';
+      command: 'ACCOUNT_INFO';
       params: {
         descriptor: string;
         details: Details;
+        page?: number;
+        pageSize?: number;
       };
     }
   | {
       id: number;
-      command: 'GET_ACCOUNT_UTXO';
+      command: 'ACCOUNT_UTXO';
       params: {
         descriptor: string;
       };
     }
   | {
       id: number;
-      command: 'GET_TRANSACTION';
+      command: 'TRANSACTION';
       params: {
         txId: string;
       };
     }
   | {
       id: number;
-      command: 'GET_SERVER_INFO';
+      command: 'SERVER_INFO';
       params: null;
     }
   | {
       id: number;
-      command: 'GET_BLOCK';
+      command: 'BLOCK';
       params: {
         hashOrNumber: string | number;
       };
@@ -49,14 +51,14 @@ export type Incoming =
     }
   | {
       id: number;
-      command: 'SUBMIT_TRANSACTION';
+      command: 'SEND_TRANSACTION';
       params: {
         txData: Uint8Array;
       };
     }
   | {
       id: number;
-      command: 'GET_LATEST_BLOCK';
+      command: 'LATEST_BLOCK';
       params: null;
     }
   | {

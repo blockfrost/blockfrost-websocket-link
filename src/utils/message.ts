@@ -1,6 +1,6 @@
 import { Responses } from '@blockfrost/blockfrost-js';
-import { Incoming } from '../types/messages';
-import { AccountInfo, ServerInfo } from '../types/responses';
+import { Incoming } from '../types/message';
+import { AccountInfo, ServerInfo } from '../types/response';
 
 export const getMessage = (message: string): Incoming | null => {
   try {
@@ -20,5 +20,6 @@ export const prepareMessage = (
     | AccountInfo
     | string
     | Responses['block_content']
-    | Responses['tx_content'],
+    | Responses['tx_content']
+    | Responses['address_utxo_content'],
 ): string => JSON.stringify({ id, message, data });

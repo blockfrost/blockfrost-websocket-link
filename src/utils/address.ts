@@ -1,6 +1,6 @@
 import { ADDRESS_GAP_LIMIT } from '../constants';
-import * as Addresses from '../types/addresses';
-import { blockfrost } from '../utils/blockfrostAPI';
+import * as Addresses from '../types/address';
+import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { Responses } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import {
@@ -24,16 +24,16 @@ const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): s
   return baseAddr.to_address().to_bech32();
 };
 
-export const getAddresses = async (
+export const discoverAddresses = async (
   publicKey: string,
   type: Addresses.Type,
-): Promise<{ address: string; data: Responses['address_content'] | 'error' | 'empty' }[]> => {
+): Promise<Addresses.Result> => {
   let addressDiscoveredCount = 0;
   let lastEmptyCount = 0;
   let addressCount = 0;
   const result: {
     address: string;
-    data: Responses['address_content'] | 'error' | 'empty';
+    data: Responses['address_content'] | 'empty';
   }[] = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
@@ -42,7 +42,7 @@ export const getAddresses = async (
     for (let i = addressDiscoveredCount; i < addressDiscoveredCount + ADDRESS_GAP_LIMIT; i++) {
       const address = deriveAddress(publicKey, addressCount, type);
       addressCount++;
-      const promise = blockfrost.addresses(address);
+      const promise = blockfrostAPI.addresses(address);
       promisesBundle.push({ address, promise });
     }
 
@@ -58,7 +58,7 @@ export const getAddresses = async (
             if (error.status === 404) {
               result.push({ address: p.address, data: 'empty' });
             } else {
-              result.push({ address: p.address, data: 'error' });
+              throw Error(error);
             }
           }),
       ),
@@ -71,13 +71,15 @@ export const getAddresses = async (
 };
 
 export const addressesToBalances = async (
-  addresses: { address: string; data: Responses['address_content'] | 'error' | 'empty' }[],
+  addresses: { address: string; data: Responses['address_content'] | 'empty' }[],
 ): Promise<Addresses.Balance[]> => {
   const balances: Addresses.Balance[] = [];
 
   addresses.map(address => {
-    if (address.data === 'empty' || address.data === 'error') return;
-    address.data.amount.map(amountItem => {
+    const addressData = address.data;
+    if (addressData === 'empty') return;
+
+    addressData.amount.map(amountItem => {
       if (amountItem.quantity && amountItem.unit) {
         const balanceRow = balances.find(balanceResult => balanceResult.unit === amountItem.unit);
 
@@ -98,19 +100,23 @@ export const addressesToBalances = async (
   return balances;
 };
 
-export const addressesToUtxos = async (
-  addresses: { address: string; data: Responses['address_content'] | 'error' | 'empty' }[],
-): Promise<any> => {
+export const addressesUtxos = async (
+  addresses: { address: string; data: Responses['address_content'] | 'empty' }[],
+): Promise<{ address: string; data: Responses['address_utxo_content'] | 'empty' }[]> => {
   const promisesBundle: {
     address: string;
     promise: Promise<Responses['address_utxo_content']>;
   }[] = [];
-  const utxos: any = [];
+
+  const result: {
+    address: string;
+    data: Responses['address_utxo_content'] | 'empty';
+  }[] = [];
 
   addresses.map(item => {
-    if (item.data === 'empty' || item.data === 'error') return;
+    if (item.data === 'empty') return;
 
-    const promise = blockfrost.addressesUtxos(item.address);
+    const promise = blockfrostAPI.addressesUtxosAll(item.address);
     promisesBundle.push({ address: item.address, promise });
   });
 
@@ -118,13 +124,43 @@ export const addressesToUtxos = async (
     promisesBundle.map(p =>
       p.promise
         .then(data => {
-          utxos.push({ address: p.address, data });
+          result.push({ address: p.address, data });
         })
         .catch(() => {
-          utxos.push({ address: p.address, data: 'error' });
+          throw Error('a');
         }),
     ),
   );
 
-  return utxos;
+  return result;
+};
+
+export const addressesToTxIds = async (addresses: Addresses.Result): Promise<string[]> => {
+  const promisesBundle: {
+    address: string;
+    promise: Promise<string[]>;
+  }[] = [];
+
+  addresses.map(item => {
+    if (item.data === 'empty') return;
+
+    const promise = blockfrostAPI.addressesTxsAll(item.address);
+    promisesBundle.push({ address: item.address, promise });
+  });
+
+  const result: string[] = [];
+
+  await Promise.all(
+    promisesBundle.map(p =>
+      p.promise
+        .then(data => {
+          result.concat(data);
+        })
+        .catch(() => {
+          throw Error('a');
+        }),
+    ),
+  );
+
+  return result;
 };

@@ -1,24 +1,32 @@
-import { prepareMessage } from '../utils/messages';
+import { prepareMessage } from '../utils/message';
 import { MESSAGES } from '../constants';
-import { addressesToUtxos, getAddresses } from '../utils/address';
+import { Responses } from '@blockfrost/blockfrost-js';
+import { discoverAddresses, addressesUtxos } from '../utils/address';
 
 export default async (id: number, publicKey: string): Promise<string> => {
   if (!publicKey) {
-    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_UTXO, 'Missing parameter descriptor');
+    const message = prepareMessage(id, MESSAGES.ACCOUNT_INFO, 'Missing parameter descriptor');
     return message;
   }
 
   try {
-    const externalAddresses = await getAddresses(publicKey, 0);
-    const internalAddresses = await getAddresses(publicKey, 1);
-
+    const externalAddresses = await discoverAddresses(publicKey, 0);
+    const internalAddresses = await discoverAddresses(publicKey, 1);
     const addresses = [...externalAddresses, ...internalAddresses];
-    const utxos = await addressesToUtxos(addresses);
-    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_UTXO, utxos);
+    const result: Responses['address_utxo_content'] = [];
+    const utxosResult = await addressesUtxos(addresses);
+
+    utxosResult.map(utxoRow => {
+      const data = utxoRow.data;
+      if (data === 'empty') return;
+      result.concat(data);
+    });
+
+    const message = prepareMessage(id, MESSAGES.ACCOUNT_INFO, result);
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, MESSAGES.GET_ACCOUNT_UTXO, 'Error');
+    const message = prepareMessage(id, MESSAGES.ACCOUNT_INFO, 'Error');
     return message;
   }
 };

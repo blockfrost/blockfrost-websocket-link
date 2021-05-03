@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import { blockfrost } from './utils/blockfrostAPI';
+import { blockfrostAPI } from './utils/blockfrostAPI';
 import { Responses } from '@blockfrost/blockfrost-js';
 
 const events = new EventEmitter();
@@ -8,7 +8,7 @@ let previousBlock: null | Responses['block_content'] = null;
 
 setInterval(async () => {
   try {
-    const latestBlock = await blockfrost.blocksLatest();
+    const latestBlock = await blockfrostAPI.blocksLatest();
 
     if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
       previousBlock = latestBlock;

@@ -7,7 +7,7 @@ import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
 import * as Server from './types/server';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
-import { getMessage, prepareMessage } from './utils/messages';
+import { getMessage, prepareMessage } from './utils/message';
 
 import { events } from './events';
 import getServerInfo from './methods/getServerInfo';
@@ -72,7 +72,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
   events.on('NEW_BLOCK', (block: Responses['block_content']) => {
     if (subscriptionBlockActive) {
-      const message = prepareMessage(1, MESSAGES.LATEST_BLOCK, block);
+      const message = prepareMessage(1, MESSAGES.BLOCK, block);
       ws.send(message);
     }
 
@@ -95,31 +95,31 @@ wss.on('connection', (ws: Server.Ws) => {
     }
 
     switch (data.command) {
-      case MESSAGES.GET_SERVER_INFO: {
+      case MESSAGES.SERVER_INFO: {
         const serverInfoMessage = await getServerInfo(data.id);
         ws.send(serverInfoMessage);
         break;
       }
 
-      case MESSAGES.GET_TRANSACTION: {
+      case MESSAGES.TRANSACTION: {
         const txMessage = await getTransaction(data.id, data.params.txId);
         ws.send(txMessage);
         break;
       }
 
-      case MESSAGES.GET_BLOCK: {
+      case MESSAGES.BLOCK: {
         const blockHashMessage = await getBlock(data.id, data.params.hashOrNumber);
         ws.send(blockHashMessage);
         break;
       }
 
-      case MESSAGES.GET_ACCOUNT_UTXO: {
+      case MESSAGES.ACCOUNT_UTXO: {
         const accountUtxoMessage = await getAccountUtxo(data.id, data.params.descriptor);
         ws.send(accountUtxoMessage);
         break;
       }
 
-      case MESSAGES.GET_ACCOUNT_INFO: {
+      case MESSAGES.ACCOUNT_INFO: {
         const accountInfoMessage = await getAccountInfo(
           data.id,
           data.params.descriptor,
@@ -157,7 +157,7 @@ wss.on('connection', (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.SUBMIT_TRANSACTION: {
+      case MESSAGES.SEND_TRANSACTION: {
         const submitTransactionMessage = await submitTransaction(data.id, data.params.txData);
         ws.send(submitTransactionMessage);
         break;
