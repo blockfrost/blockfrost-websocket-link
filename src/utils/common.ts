@@ -6,3 +6,7 @@ export const paginate = (input: any[], size: number): any[][] => {
     return ac;
   }, []);
 };
+
+export const isValidNumber = (s: any) => {
+  return s >>> 0 === parseFloat(s);
+};
