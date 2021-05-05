@@ -125,6 +125,8 @@ wss.on('connection', (ws: Server.Ws) => {
           data.id,
           data.params.descriptor,
           data.params.details,
+          data.params.page,
+          data.params.pageSize,
         );
         ws.send(accountInfoMessage);
         break;

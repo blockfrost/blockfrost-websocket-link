@@ -6,7 +6,7 @@ export const txIdsToTransactions = async (
     address: string;
     data: string[];
   }[],
-): Promise<{ address: string; data: Responses['tx_content'] | 'empty' }[]> => {
+): Promise<{ address: string; data: Responses['tx_content'] }[]> => {
   const promisesBundle: {
     address: string;
     promise: Promise<Responses['tx_content']>;
@@ -14,7 +14,7 @@ export const txIdsToTransactions = async (
 
   const result: {
     address: string;
-    data: Responses['tx_content'] | 'empty';
+    data: Responses['tx_content'];
   }[] = [];
 
   addresses.map(item => {
@@ -39,5 +39,9 @@ export const txIdsToTransactions = async (
     ),
   );
 
-  return result;
+  const sortedTxs = result.sort(
+    (first, second) => first.data.block_height - second.data.block_height,
+  );
+
+  return sortedTxs;
 };

@@ -2,7 +2,7 @@ import * as Responses from '../types/response';
 import * as Messages from '../types/message';
 import { discoverAddresses, addressesToBalances, addressesToTxIds } from '../utils/address';
 import { txIdsToTransactions } from '../utils/transaction';
-import { prepareMessage } from '../utils/message';
+import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
 import { MESSAGES_RESPONSE } from '../constants';
 
@@ -13,8 +13,11 @@ export default async (
   page = 1,
   pageSize = 25,
 ): Promise<string> => {
+  const pageSizeNumber = Number(pageSize);
+  const pageNumber = Number(page);
+
   if (!publicKey) {
-    const message = prepareMessage(
+    const message = prepareErrorMessage(
       id,
       MESSAGES_RESPONSE.ACCOUNT_INFO,
       'Missing parameter descriptor',
@@ -55,8 +58,8 @@ export default async (
       try {
         const transactionsIds = await addressesToTxIds(addresses);
         const txs = await txIdsToTransactions(transactionsIds);
-        const paginatedTxs = paginate(txs, pageSize);
-        accountInfo.transactions = paginatedTxs[page - 1];
+        const paginatedTxs = paginate(txs, pageSizeNumber);
+        accountInfo.transactions = paginatedTxs[pageNumber - 1];
         accountInfo.totalPages = paginatedTxs.length;
       } catch (err) {
         const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);

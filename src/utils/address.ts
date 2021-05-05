@@ -14,7 +14,6 @@ const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): s
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const utxoPubKey = accountKey.derive(type).derive(addressIndex);
   const stakeKey = accountKey.derive(2).derive(0);
-
   const baseAddr = BaseAddress.new(
     NetworkInfo.mainnet().network_id(),
     StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
