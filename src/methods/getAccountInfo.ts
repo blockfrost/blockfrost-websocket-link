@@ -59,7 +59,13 @@ export default async (
         const transactionsIds = await addressesToTxIds(addresses);
         const txs = await txIdsToTransactions(transactionsIds);
         const paginatedTxs = paginate(txs, pageSizeNumber);
-        accountInfo.transactions = paginatedTxs[pageNumber - 1];
+
+        if (paginatedTxs.length < page) {
+          accountInfo.transactions = [];
+        } else {
+          accountInfo.transactions = paginatedTxs[pageNumber - 1];
+        }
+
         accountInfo.totalPages = paginatedTxs.length;
       } catch (err) {
         const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
