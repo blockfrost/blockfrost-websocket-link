@@ -10,6 +10,7 @@ export default async (id: number, publicKey: string): Promise<string> => {
       MESSAGES_RESPONSE.ACCOUNT_UTXO,
       'Missing parameter descriptor',
     );
+
     return message;
   }
 
@@ -23,6 +24,7 @@ export default async (id: number, publicKey: string): Promise<string> => {
     utxosResult.map(utxoRow => {
       const data = utxoRow.data;
       if (data === 'empty') return;
+
       result = result.concat(data);
     });
 

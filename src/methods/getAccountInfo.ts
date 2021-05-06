@@ -10,7 +10,7 @@ export default async (
   id: number,
   publicKey: string,
   details: Messages.Details,
-  page = 1,
+  page = 0,
   pageSize = 25,
 ): Promise<string> => {
   const pageSizeNumber = Number(pageSize);
@@ -63,7 +63,7 @@ export default async (
         if (paginatedTxs.length < page) {
           accountInfo.transactions = [];
         } else {
-          accountInfo.transactions = paginatedTxs[pageNumber - 1];
+          accountInfo.transactions = paginatedTxs[pageNumber];
         }
 
         accountInfo.totalPages = paginatedTxs.length;
