@@ -26,8 +26,18 @@ type Transactions =
 
 export interface AccountInfo {
   balance: string;
+  availableBalance: string;
   descriptor: string;
   tokens?: Balance[];
-  transactions?: Transactions;
-  totalPages?: number;
+  history: {
+    total: number; // total transactions
+    tokens?: number; // tokens transactions
+    unconfirmed: number; // unconfirmed transactions
+    transactions?: Transactions; // list of transactions
+  };
+  page: {
+    size: number;
+    total: number;
+    index: number;
+  };
 }

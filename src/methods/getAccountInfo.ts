@@ -22,6 +22,7 @@ export default async (
       MESSAGES_RESPONSE.ACCOUNT_INFO,
       'Missing parameter descriptor',
     );
+
     return message;
   }
 
@@ -38,35 +39,36 @@ export default async (
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
       balance: lovelaceBalance?.quantity || '0',
+      availableBalance: lovelaceBalance?.quantity || '0',
+      history: {
+        total: 0,
+        unconfirmed: 0,
+        transactions: [],
+      },
+      page: {
+        index: page,
+        size: pageSize,
+        total: 0,
+      },
     };
 
     if (details !== 'basic') {
       accountInfo.tokens = tokensBalances;
     }
 
-    if (details === 'txids') {
-      try {
-        const transactionsIds = await addressesToTxIds(addresses);
-        accountInfo.transactions = transactionsIds;
-      } catch (err) {
-        const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
-        return message;
-      }
-    }
-
-    if (details === 'txs') {
+    if (details === 'txs' || details === 'txids') {
       try {
         const transactionsIds = await addressesToTxIds(addresses);
         const txs = await txIdsToTransactions(transactionsIds);
         const paginatedTxs = paginate(txs, pageSizeNumber);
+        const paginatedTxsCount = paginatedTxs.length;
 
-        if (paginatedTxs.length < page) {
-          accountInfo.transactions = [];
-        } else {
-          accountInfo.transactions = paginatedTxs[pageNumber];
+        if (paginatedTxsCount > page) {
+          accountInfo.history.transactions = paginatedTxs[pageNumber];
+          accountInfo.history.total = paginatedTxs.length;
         }
 
-        accountInfo.totalPages = paginatedTxs.length;
+        accountInfo.page.total = paginatedTxs.length;
       } catch (err) {
         const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
         return message;

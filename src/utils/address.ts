@@ -30,10 +30,8 @@ export const discoverAddresses = async (
   let addressDiscoveredCount = 0;
   let lastEmptyCount = 0;
   let addressCount = 0;
-  const result: {
-    address: string;
-    data: Responses['address_content'] | 'empty';
-  }[] = [];
+
+  const result: Addresses.Result = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
     const promisesBundle: Addresses.Bundle = [];
@@ -127,6 +125,40 @@ export const addressesToUtxos = async (
         })
         .catch(() => {
           throw Error('a');
+        }),
+    ),
+  );
+
+  return result;
+};
+
+export const utxosWithBlocks = async (
+  utxos: Addresses.UtxosWithBlocksParams,
+): Promise<Addresses.UtxosWithBlockResponse[]> => {
+  const promisesBundle: Addresses.UtxosWithBlocksBundle[] = [];
+  const result: Addresses.UtxosWithBlockResponse[] = [];
+
+  utxos.map(utxo => {
+    if (utxo.data === 'empty') return;
+
+    utxo.data.map(utxoData => {
+      const promise = blockfrostAPI.blocks(utxoData.block);
+      promisesBundle.push({ address: utxo.address, utxoData, promise });
+    });
+  });
+
+  await Promise.all(
+    promisesBundle.map(p =>
+      p.promise
+        .then(data => {
+          result.push({
+            address: p.address,
+            utxoData: p.utxoData,
+            blockInfo: data,
+          });
+        })
+        .catch(err => {
+          throw Error(err);
         }),
     ),
   );
