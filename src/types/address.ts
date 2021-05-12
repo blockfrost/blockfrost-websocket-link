@@ -16,3 +16,37 @@ export type Bundle = {
   address: string;
   promise: Promise<Responses['address_content']>;
 }[];
+
+type UtxoContent = Responses['address_utxo_content'];
+
+export interface UtxosData extends UtxoContent {
+  blockInformation: Responses['block_content'];
+}
+
+export interface Utxo {
+  tx_hash: string;
+  tx_index: number;
+  output_index: number;
+  amount: {
+    unit: string;
+    quantity: string;
+  }[];
+  block: string;
+}
+
+export interface UtxosWithBlockResponse {
+  address: string;
+  utxoData: Utxo;
+  blockInfo: Responses['block_content'];
+}
+
+export interface UtxosWithBlocksBundle {
+  address: string;
+  utxoData: Utxo;
+  promise: Promise<Responses['block_content']>;
+}
+
+export type UtxosWithBlocksParams = {
+  address: string;
+  data: Responses['address_utxo_content'] | 'empty';
+}[];

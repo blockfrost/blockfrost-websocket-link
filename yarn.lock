@@ -1468,6 +1468,7 @@ __metadata:
     eslint-config-prettier: 8.1.0
     eslint-plugin-import: ^2.22.1
     eslint-plugin-prettier: 3.3.1
+    eslint-plugin-promise: ^5.1.0
     eslint-plugin-react: ^7.23.1
     express: ^4.17.1
     jest: ^26.6.3
@@ -4127,6 +4128,15 @@ __metadata:
     eslint-config-prettier:
       optional: true
   checksum: 217253dd2dea0c1aee6a7bf82e729236874807bc160c9481be38453c1f5b6f38050c8f1d4db8495c87c1edcbcbed70ce289b80c65fe3ad992df748e56fc5f44d
+  languageName: node
+  linkType: hard
+
+"eslint-plugin-promise@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "eslint-plugin-promise@npm:5.1.0"
+  peerDependencies:
+    eslint: ^7.0.0
+  checksum: e62947aaea6882951a1a9f5fe3e3c7925b8dcc222338f7979bd1495ba0f0dc701820116b108be1e801f6e5156eb9a928142f29c659fd21a5d65a4be495bb327d
   languageName: node
   linkType: hard
 

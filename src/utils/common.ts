@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const paginate = (input: any[], size: number): any[][] => {
   return input.reduce((ac, val, i) => {
     const id = Math.floor(i / size);
