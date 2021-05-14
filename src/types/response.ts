@@ -2,7 +2,6 @@ import { Balance } from './address';
 import { Responses } from '@blockfrost/blockfrost-js';
 
 export interface ServerInfo {
-  url: string;
   name: string;
   shortcut: string;
   testnet: boolean;

@@ -7,7 +7,6 @@ export default async (id: number): Promise<string> => {
     const info = await blockfrostAPI.root();
     const latestBlock = await blockfrostAPI.blocksLatest();
     const serverInfo = {
-      url: blockfrostAPI.apiUrl,
       name: 'Cardano',
       shortcut: 'ada',
       testnet: blockfrostAPI.apiUrl.includes('testnet'),
