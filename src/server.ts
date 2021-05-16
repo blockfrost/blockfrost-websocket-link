@@ -15,7 +15,7 @@ import getAccountInfo from './methods/getAccountInfo';
 import getAccountUtxo from './methods/getAccountUtxo';
 import getBlock from './methods/getBlock';
 import getTransaction from './methods/getTransaction';
-import submitTransaction from './methods/submitTransaction';
+import submitTransaction from './methods/pushTransaction';
 
 dotenv.config();
 
@@ -162,7 +162,7 @@ wss.on('connection', (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.SEND_TRANSACTION: {
+      case MESSAGES.PUSH_TRANSACTION: {
         const submitTransactionMessage = await submitTransaction(data.id, data.params.txData);
         ws.send(submitTransactionMessage);
         break;
