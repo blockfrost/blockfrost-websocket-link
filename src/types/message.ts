@@ -39,7 +39,7 @@ export type Messages =
     }
   | {
       id: number;
-      command: 'SEND_TRANSACTION';
+      command: 'PUSH_TRANSACTION';
       params: {
         txData: Uint8Array;
       };
