@@ -1,4 +1,4 @@
-import { Responses } from '@blockfrost/blockfrost-js';
+import * as Types from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export const txIdsToTransactions = async (
@@ -6,48 +6,31 @@ export const txIdsToTransactions = async (
     address: string;
     data: string[];
   }[],
-): Promise<
-  {
-    address: string;
-    txHash: string;
-    txData: Responses['tx_content'];
-    blockInfo: Responses['block_content'];
-  }[]
-> => {
-  const promisesBundle: {
-    address: string;
-    txHash: string;
-    promise: Promise<{
-      txData: Responses['tx_content'];
-      blockInfo: Responses['block_content'];
-    }>;
-  }[] = [];
-
-  const result: {
-    address: string;
-    txHash: string;
-    txData: Responses['tx_content'];
-    blockInfo: Responses['block_content'];
-  }[] = [];
+): Promise<Types.TxIdsToTransactionsResponse[]> => {
+  const promisesBundle: Types.TxIdsToTransactionsPromises[] = [];
+  const result: Types.TxIdsToTransactionsResponse[] = [];
 
   addresses.map(item => {
     item.data.map(hash => {
-      const promise = new Promise<{
-        txData: Responses['tx_content'];
-        blockInfo: Responses['block_content'];
-      }>((resolve, reject) => {
+      const promise = new Promise<Types.Data>((resolve, reject) => {
         (async () => {
           try {
             const tx = await blockfrostAPI.txs(hash);
             const blockInfo = await blockfrostAPI.blocks(tx.block);
-            return resolve({ txData: tx, blockInfo });
+            const txUtxos = await blockfrostAPI.txsUtxos(hash);
+
+            return resolve({ txData: tx, txUtxos, blockInfo });
           } catch (err) {
             return reject(err);
           }
         })();
       });
 
-      promisesBundle.push({ address: item.address, promise, txHash: hash });
+      promisesBundle.push({
+        address: item.address,
+        promise,
+        txHash: hash,
+      });
     });
   });
 
@@ -58,6 +41,7 @@ export const txIdsToTransactions = async (
           result.push({
             address: p.address,
             txData: data.txData,
+            txUtxos: data.txUtxos,
             blockInfo: data.blockInfo,
             txHash: p.txHash,
           });
@@ -66,6 +50,7 @@ export const txIdsToTransactions = async (
           if (err.status === 404) {
             return;
           }
+
           throw Error(err);
         }),
     ),
