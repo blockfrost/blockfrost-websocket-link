@@ -1,6 +1,11 @@
 import * as Responses from '../types/response';
 import * as Messages from '../types/message';
-import { discoverAddresses, addressesToBalances, addressesToTxIds } from '../utils/address';
+import {
+  discoverAddresses,
+  addressesToBalances,
+  addressesToTxIds,
+  isAccountEmpty,
+} from '../utils/address';
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
@@ -31,6 +36,7 @@ export default async (
     const internalAddresses = await discoverAddresses(publicKey, 1);
 
     const addresses = [...externalAddresses, ...internalAddresses];
+    const empty = await isAccountEmpty(addresses);
     const balances = await addressesToBalances(addresses);
 
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
@@ -39,6 +45,7 @@ export default async (
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
+      empty,
       addresses: accountAddresses,
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',
