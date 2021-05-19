@@ -12,7 +12,7 @@ setInterval(async () => {
 
     if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
       previousBlock = latestBlock;
-      events.emit('NEW_BLOCK', latestBlock);
+      events.emit('LATEST_BLOCK', latestBlock);
     }
   } catch (err) {
     throw Error(err);

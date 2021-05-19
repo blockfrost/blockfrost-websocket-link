@@ -71,9 +71,9 @@ wss.on('connection', (ws: Server.Ws) => {
     ws.send(message);
   });
 
-  events.on('NEW_BLOCK', (block: Responses['block_content']) => {
+  events.on('LATEST_BLOCK', (block: Responses['block_content']) => {
     if (subscriptionBlockActive) {
-      const message = prepareMessage(1, MESSAGES_RESPONSE.BLOCK, block);
+      const message = prepareMessage(1, MESSAGES_RESPONSE.LATEST_BLOCK, block);
       ws.send(message);
     }
 
