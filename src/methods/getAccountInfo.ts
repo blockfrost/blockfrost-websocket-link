@@ -41,12 +41,19 @@ export default async (
 
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
-    const accountAddresses = addresses.map(a => a.address);
+    const internalAccountAddresses = internalAddresses.map(a => a.address);
+
+    const usedExternalAddresses = externalAddresses.filter(a => a.data !== 'empty');
+    const unusedExternalAddresses = externalAddresses.filter(a => a.data === 'empty');
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
       empty,
-      addresses: accountAddresses,
+      addresses: {
+        change: internalAccountAddresses,
+        used: usedExternalAddresses.map(a => a.address),
+        unused: unusedExternalAddresses.map(a => a.address),
+      },
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',
       history: {
