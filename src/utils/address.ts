@@ -123,13 +123,43 @@ export const addressesToUtxos = async (
         .then(data => {
           result.push({ address: p.address, data });
         })
-        .catch(() => {
-          throw Error('a');
+        .catch(error => {
+          throw Error(error);
         }),
     ),
   );
 
   return result;
+};
+
+export const isAccountEmpty = async (
+  addresses: { address: string; data: Responses['address_content'] | 'empty' }[],
+): Promise<boolean> => {
+  const promisesBundle: {
+    address: string;
+    promise: Promise<Responses['address_txs_content']>;
+  }[] = [];
+
+  addresses.map(item => {
+    if (item.data === 'empty') return;
+
+    const promise = blockfrostAPI.addressesTxs(item.address, 1, 1);
+    promisesBundle.push({ address: item.address, promise });
+  });
+
+  const result = await Promise.all(
+    promisesBundle.map(p =>
+      p.promise
+        .then(data => {
+          return data;
+        })
+        .catch(error => {
+          throw Error(error);
+        }),
+    ),
+  );
+
+  return result.flat().length === 0;
 };
 
 export const utxosWithBlocks = async (

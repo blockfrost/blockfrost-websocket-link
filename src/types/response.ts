@@ -26,6 +26,7 @@ type Transactions =
 export interface AccountInfo {
   balance: string;
   addresses: string[];
+  empty: boolean;
   availableBalance: string;
   descriptor: string;
   tokens?: Balance[];
