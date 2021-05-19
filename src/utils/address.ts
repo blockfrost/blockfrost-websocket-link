@@ -143,7 +143,7 @@ export const isAccountEmpty = async (
   addresses.map(item => {
     if (item.data === 'empty') return;
 
-    const promise = blockfrostAPI.addressesTxs(item.address, 1, 100);
+    const promise = blockfrostAPI.addressesTxs(item.address, 1, 1);
     promisesBundle.push({ address: item.address, promise });
   });
 
