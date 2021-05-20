@@ -7,7 +7,7 @@ import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
 import * as Server from './types/server';
 import { MESSAGES, MESSAGES_RESPONSE, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
-import { getMessage, prepareMessage, prepareErrorMessage } from './utils/message';
+import { getMessage, prepareErrorMessage } from './utils/message';
 
 import { events } from './events';
 import getServerInfo from './methods/getServerInfo';
@@ -73,8 +73,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
   events.on('LATEST_BLOCK', (block: Responses['block_content']) => {
     if (subscriptionBlockActive) {
-      const message = prepareMessage(1, MESSAGES_RESPONSE.LATEST_BLOCK, block);
-      ws.send(message);
+      ws.emit(MESSAGES_RESPONSE.LATEST_BLOCK, block);
     }
 
     if (subscriptionAccountActive) {
