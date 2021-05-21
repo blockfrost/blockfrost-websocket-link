@@ -51,13 +51,8 @@ export type Messages =
     }
   | {
       id: number;
-      command: 'SUBSCRIBE_ADDRESS';
-      params: null;
-    }
-  | {
-      id: number;
-      command: 'SUBSCRIBE_ACCOUNT';
-      params: null;
+      command: 'SUBSCRIBE_ADDRESSES';
+      params: { addresses: string[] };
     }
   | {
       id: number;
@@ -66,12 +61,7 @@ export type Messages =
     }
   | {
       id: number;
-      command: 'UNSUBSCRIBE_ADDRESS';
-      params: null;
-    }
-  | {
-      id: number;
-      command: 'UNSUBSCRIBE_ACCOUNT';
+      command: 'UNSUBSCRIBE_ADDRESSES';
       params: null;
     }
   | {
