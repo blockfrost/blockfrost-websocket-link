@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.13.16"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.13.15"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.13.0"],
-            ["@blockfrost/blockfrost-js", "npm:0.3.0"],
+            ["@blockfrost/blockfrost-js", "npm:0.3.1"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:6.1.0"],
             ["@types/express", "npm:4.17.11"],
             ["@types/jest", "npm:26.0.22"],
@@ -2530,12 +2530,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:0.3.0", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-0.3.0-0757940d88-7791ecdbc6.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:0.3.1", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-0.3.1-3fd9970dba-22d170d686.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:0.3.0"],
+            ["@blockfrost/blockfrost-js", "npm:0.3.1"],
             ["@blockfrost/openapi", "npm:0.1.15"],
-            ["@yarnpkg/pnpify", "virtual:0757940d88ca3253d58a315b3f826aa25268ddd068add9643293f3711fc6526e20f6f5a4a877f7e1af633ee93bd7715fc01ec06b1868f2f66bb61209ded4a990#npm:2.4.0"],
+            ["@yarnpkg/pnpify", "virtual:3fd9970dbaa98e87b7591e1c1c08eee16ff7efddfc81c298c7ed6bde99fe23a2c37052016679a6375e90ff06551e8fa31e99f4fde42ffdac8d144ee7022943aa#npm:2.4.0"],
             ["axios", "npm:0.21.1"],
             ["axios-retry", "npm:3.1.9"],
             ["dotenv", "npm:8.2.0"],
@@ -2554,7 +2554,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.13.16"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.13.15"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.13.0"],
-            ["@blockfrost/blockfrost-js", "npm:0.3.0"],
+            ["@blockfrost/blockfrost-js", "npm:0.3.1"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:6.1.0"],
             ["@types/express", "npm:4.17.11"],
             ["@types/jest", "npm:26.0.22"],
@@ -3615,10 +3615,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:0757940d88ca3253d58a315b3f826aa25268ddd068add9643293f3711fc6526e20f6f5a4a877f7e1af633ee93bd7715fc01ec06b1868f2f66bb61209ded4a990#npm:2.4.0", {
-          "packageLocation": "./.yarn/__virtual__/@yarnpkg-pnpify-virtual-8834fb4f3d/0/cache/@yarnpkg-pnpify-npm-2.4.0-f9312c18ed-f0f68b9bea.zip/node_modules/@yarnpkg/pnpify/",
+        ["virtual:3fd9970dbaa98e87b7591e1c1c08eee16ff7efddfc81c298c7ed6bde99fe23a2c37052016679a6375e90ff06551e8fa31e99f4fde42ffdac8d144ee7022943aa#npm:2.4.0", {
+          "packageLocation": "./.yarn/__virtual__/@yarnpkg-pnpify-virtual-89b037f6d6/0/cache/@yarnpkg-pnpify-npm-2.4.0-f9312c18ed-f0f68b9bea.zip/node_modules/@yarnpkg/pnpify/",
           "packageDependencies": [
-            ["@yarnpkg/pnpify", "virtual:0757940d88ca3253d58a315b3f826aa25268ddd068add9643293f3711fc6526e20f6f5a4a877f7e1af633ee93bd7715fc01ec06b1868f2f66bb61209ded4a990#npm:2.4.0"],
+            ["@yarnpkg/pnpify", "virtual:3fd9970dbaa98e87b7591e1c1c08eee16ff7efddfc81c298c7ed6bde99fe23a2c37052016679a6375e90ff06551e8fa31e99f4fde42ffdac8d144ee7022943aa#npm:2.4.0"],
             ["@types/eslint", null],
             ["@types/typescript", null],
             ["@yarnpkg/core", "npm:2.4.0"],
