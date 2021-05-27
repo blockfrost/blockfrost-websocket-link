@@ -5,6 +5,7 @@ import {
   addressesToBalances,
   addressesToTxIds,
   isAccountEmpty,
+  getAddressesData,
 } from '../utils/address';
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
@@ -41,18 +42,21 @@ export default async (
 
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
-    const internalAccountAddresses = internalAddresses.map(a => a.address);
 
     const usedExternalAddresses = externalAddresses.filter(a => a.data !== 'empty');
     const unusedExternalAddresses = externalAddresses.filter(a => a.data === 'empty');
+
+    const change = await getAddressesData(internalAddresses);
+    const used = await getAddressesData(usedExternalAddresses);
+    const unused = await getAddressesData(unusedExternalAddresses);
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
       empty,
       addresses: {
-        change: internalAccountAddresses,
-        used: usedExternalAddresses.map(a => a.address),
-        unused: unusedExternalAddresses.map(a => a.address),
+        change,
+        used,
+        unused,
       },
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',

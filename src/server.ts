@@ -149,6 +149,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.SUBSCRIBE_BLOCK: {
         const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
+
         if (!activeBlockSub) {
           activeSubscriptions.push({
             type: 'block',
@@ -170,7 +171,7 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       case MESSAGES.SUBSCRIBE_ADDRESSES: {
-        if (data.params.addresses.length > 0) {
+        if (data.params.addresses && data.params.addresses.length > 0) {
           const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
 
           if (!activeAddressSub) {

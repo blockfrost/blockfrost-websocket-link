@@ -10,7 +10,11 @@ import {
   StakeCredential,
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
-const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): string => {
+const deriveAddress = (
+  publicKey: string,
+  addressIndex: number,
+  type = 1 | 0,
+): { address: string; path: string } => {
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const utxoPubKey = accountKey.derive(type).derive(addressIndex);
   const stakeKey = accountKey.derive(2).derive(0);
@@ -20,40 +24,43 @@ const deriveAddress = (publicKey: string, addressIndex: number, type = 1 | 0): s
     StakeCredential.from_keyhash(stakeKey.to_raw_key().hash()),
   );
 
-  return baseAddr.to_address().to_bech32();
+  return {
+    address: baseAddr.to_address().to_bech32(),
+    path: `m/1852'/1815'/0'/${type}/${addressIndex}`,
+  };
 };
 
 export const discoverAddresses = async (
   publicKey: string,
   type: Addresses.Type,
-): Promise<Addresses.Result> => {
+): Promise<Addresses.Result[]> => {
   let addressDiscoveredCount = 0;
   let lastEmptyCount = 0;
   let addressCount = 0;
 
-  const result: Addresses.Result = [];
+  const result: Addresses.Result[] = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
     const promisesBundle: Addresses.Bundle = [];
 
     for (let i = addressDiscoveredCount; i < addressDiscoveredCount + ADDRESS_GAP_LIMIT; i++) {
-      const address = deriveAddress(publicKey, addressCount, type);
+      const { address, path } = deriveAddress(publicKey, addressCount, type);
       addressCount++;
       const promise = blockfrostAPI.addresses(address);
-      promisesBundle.push({ address, promise });
+      promisesBundle.push({ address, promise, path });
     }
 
     await Promise.all(
       promisesBundle.map(p =>
         p.promise
           .then(data => {
-            result.push({ address: p.address, data });
+            result.push({ address: p.address, path: p.path, data });
             lastEmptyCount = 0;
           })
           .catch(error => {
             lastEmptyCount++;
             if (error.status === 404) {
-              result.push({ address: p.address, data: 'empty' });
+              result.push({ address: p.address, data: 'empty', path: p.path });
             } else {
               throw Error(error);
             }
@@ -197,7 +204,7 @@ export const utxosWithBlocks = async (
 };
 
 export const addressesToTxIds = async (
-  addresses: Addresses.Result,
+  addresses: Addresses.Result[],
 ): Promise<{ address: string; data: string[] }[]> => {
   const promisesBundle: {
     address: string;
@@ -224,6 +231,115 @@ export const addressesToTxIds = async (
         }),
     ),
   );
+
+  return result;
+};
+
+export const getAddressesData = async (
+  addresses: Addresses.Result[],
+): Promise<Addresses.AddressData[]> => {
+  const bundle: Addresses.GetAddressDataBundle[] = [];
+
+  addresses.map(addr => {
+    const promise = blockfrostAPI.addressesTxsAll(addr.address);
+    bundle.push({
+      promise,
+      address: addr.address,
+      path: addr.path,
+    });
+  });
+
+  const txIds: { address: string; path: string; txIds: string[] }[] = [];
+
+  await Promise.all(
+    bundle.map(p =>
+      p.promise
+        .then(data => {
+          txIds.push({
+            address: p.address,
+            path: p.path,
+            txIds: data,
+          });
+        })
+        .catch(error => {
+          if (error.status === 404) {
+            txIds.push({
+              address: p.address,
+              path: p.path,
+              txIds: [],
+            });
+          } else {
+            console.log('error', error.data, error.request);
+          }
+        }),
+    ),
+  );
+
+  const bundleAddressesTxUtxos: {
+    address: string;
+    path: string;
+    promise: Promise<Responses['tx_content_utxo']>;
+  }[] = [];
+
+  txIds.map(data => {
+    data.txIds.map(txId => {
+      const promise = blockfrostAPI.txsUtxos(txId);
+      bundleAddressesTxUtxos.push({
+        promise,
+        address: data.address,
+        path: data.path,
+      });
+    });
+  });
+
+  const res: {
+    address: string;
+    path: string;
+    utxos: Responses['tx_content_utxo'];
+  }[] = [];
+
+  await Promise.all(
+    bundleAddressesTxUtxos.map(p =>
+      p.promise
+        .then(data => {
+          const item = res.find(r => r.address === p.address);
+
+          if (!item) {
+            res.push({
+              address: p.address,
+              path: p.path,
+              utxos: data,
+            });
+          } else {
+            item.utxos.outputs = [...item.utxos.outputs, ...data.outputs];
+            item.utxos.inputs = [...item.utxos.inputs, ...data.inputs];
+          }
+        })
+        .catch(error => {
+          throw Error(error);
+        }),
+    ),
+  );
+
+  const result = res.map(r => {
+    const received = r.utxos.inputs.reduce((acc, currentValue) => {
+      const lovelaceAmount = currentValue.amount.find(a => a.unit === 'lovelace');
+      return acc.plus(lovelaceAmount?.quantity || '0');
+    }, new BigNumber(0));
+
+    const sent = r.utxos.outputs.reduce((acc, currentValue) => {
+      const lovelaceAmount = currentValue.amount.find(a => a.unit === 'lovelace');
+      return acc.plus(lovelaceAmount?.quantity || '0');
+    }, new BigNumber(0));
+
+    return {
+      address: r.address,
+      path: r.path,
+      transfers: r.utxos.inputs.length + r.utxos.outputs.length,
+      received: received.toString(),
+      sent: sent.toString(),
+    };
+  });
 
   return result;
 };
