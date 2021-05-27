@@ -1,3 +1,4 @@
+import { Responses } from '@blockfrost/blockfrost-js';
 import * as Types from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 
@@ -19,7 +20,11 @@ export const txIdsToTransactions = async (
             const blockInfo = await blockfrostAPI.blocks(tx.block);
             const txUtxos = await blockfrostAPI.txsUtxos(hash);
 
-            return resolve({ txData: tx, txUtxos, blockInfo });
+            return resolve({
+              txData: tx,
+              txUtxos,
+              blockInfo,
+            });
           } catch (err) {
             return reject(err);
           }
@@ -61,4 +66,63 @@ export const txIdsToTransactions = async (
   );
 
   return sortedTxs;
+};
+
+export const getBlockTransactionsByAddresses = async (
+  block: Responses['block_content'],
+  addresses: string[],
+): Promise<Responses['tx_content'][]> => {
+  const blockAddressTxs: Responses['tx_content'][] = [];
+
+  const promisesBundle: {
+    address: string;
+    promise: Promise<string[]>;
+  }[] = [];
+
+  addresses.map(async address => {
+    const promise = blockfrostAPI.addressesTxsAll(address);
+    promisesBundle.push({ address, promise });
+  });
+
+  const txIds: { address: string; txId: string }[] = [];
+
+  await Promise.all(
+    promisesBundle.map(p =>
+      p.promise
+        .then(data => {
+          data.map(id => {
+            txIds.push({ address: p.address, txId: id });
+          });
+        })
+        .catch(error => {
+          throw Error(error);
+        }),
+    ),
+  );
+
+  const promisesBundleTxs: {
+    address: string;
+    promise: Promise<Responses['tx_content']>;
+  }[] = [];
+
+  txIds.map(tx => {
+    const promise = blockfrostAPI.txs(tx.txId);
+    promisesBundleTxs.push({ address: tx.address, promise });
+  });
+
+  await Promise.all(
+    promisesBundleTxs.map(p =>
+      p.promise
+        .then(data => {
+          if (data.block === block.hash) {
+            blockAddressTxs.push(data);
+          }
+        })
+        .catch(error => {
+          throw Error(error);
+        }),
+    ),
+  );
+
+  return blockAddressTxs;
 };

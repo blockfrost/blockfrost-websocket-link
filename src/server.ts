@@ -6,8 +6,9 @@ import dotenv from 'dotenv';
 import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
 import * as Server from './types/server';
-import { MESSAGES, MESSAGES_RESPONSE, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
-import { getMessage, prepareErrorMessage } from './utils/message';
+import { MESSAGES, WELCOME_MESSAGE, MESSAGES_RESPONSE, REPOSITORY_URL } from './constants';
+import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
+import { getBlockTransactionsByAddresses } from './utils/transaction';
 
 import { events } from './events';
 import getServerInfo from './methods/getServerInfo';
@@ -24,6 +25,7 @@ const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 let subscribeBlockInterval: NodeJS.Timeout;
+const activeSubscriptions: Server.Subscription[] = [];
 
 app.get('/', (_req, res) => {
   res.send(WELCOME_MESSAGE);
@@ -45,10 +47,6 @@ const heartbeat = (ws: Server.Ws) => {
 const ping = () => {};
 
 wss.on('connection', (ws: Server.Ws) => {
-  let subscriptionBlockActive = false;
-  let subscriptionAddressActive = false;
-  let subscriptionAccountActive = false;
-
   ws.isAlive = true;
 
   ws.on('pong', () => {
@@ -57,7 +55,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
   if (!process.env.PROJECT_ID) {
     const message = prepareErrorMessage(
-      0,
+      -1,
       'server',
       `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
     );
@@ -71,17 +69,34 @@ wss.on('connection', (ws: Server.Ws) => {
     ws.send(message);
   });
 
-  events.on('LATEST_BLOCK', (block: Responses['block_content']) => {
-    if (subscriptionBlockActive) {
-      ws.emit(MESSAGES_RESPONSE.LATEST_BLOCK, block);
+  events.on('block', async (latestBlock: Responses['block_content']) => {
+    const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
+
+    if (activeBlockSub) {
+      const message = prepareMessage(
+        activeBlockSub.id.toString(),
+        MESSAGES_RESPONSE.BLOCK,
+        latestBlock,
+      );
+
+      ws.send(message);
     }
 
-    if (subscriptionAccountActive) {
-      console.log('subscriptionAccountActive');
-    }
+    const activeAddressesSub = activeSubscriptions.find(i => i.type === 'addresses');
 
-    if (subscriptionAddressActive) {
-      console.log('subscriptionAddressActive');
+    if (activeAddressesSub && activeAddressesSub.type === 'addresses') {
+      const tsxInBlock = await getBlockTransactionsByAddresses(
+        latestBlock,
+        activeAddressesSub.addresses,
+      );
+
+      const message = prepareMessage(
+        activeAddressesSub.id.toString(),
+        MESSAGES_RESPONSE.NOTIFICATION,
+        tsxInBlock,
+      );
+
+      ws.send(message);
     }
   });
 
@@ -127,37 +142,67 @@ wss.on('connection', (ws: Server.Ws) => {
           data.params.page,
           data.params.pageSize,
         );
+
         ws.send(accountInfoMessage);
         break;
       }
 
       case MESSAGES.SUBSCRIBE_BLOCK: {
-        subscriptionBlockActive = true;
-        break;
-      }
+        const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
 
-      case MESSAGES.SUBSCRIBE_ADDRESS: {
-        subscriptionAddressActive = true;
-        break;
-      }
+        if (!activeBlockSub) {
+          activeSubscriptions.push({
+            type: 'block',
+            id: activeSubscriptions.length,
+          });
+        }
 
-      case MESSAGES.SUBSCRIBE_ACCOUNT: {
-        subscriptionAccountActive = true;
         break;
       }
 
       case MESSAGES.UNSUBSCRIBE_BLOCK: {
-        subscriptionBlockActive = false;
+        const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
+
+        if (activeBlockSub) {
+          activeSubscriptions.splice(activeBlockSub.id);
+        }
+
         break;
       }
 
-      case MESSAGES.UNSUBSCRIBE_ADDRESS: {
-        subscriptionAddressActive = false;
+      case MESSAGES.SUBSCRIBE_ADDRESSES: {
+        if (data.params.addresses && data.params.addresses.length > 0) {
+          const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
+
+          if (!activeAddressSub) {
+            activeSubscriptions.push({
+              type: 'addresses',
+              id: activeSubscriptions.length,
+              addresses: data.params.addresses,
+            });
+          } else {
+            if (activeAddressSub.type === 'addresses') {
+              const activeAddresses = activeAddressSub.addresses;
+
+              data.params.addresses.map(inputAddr => {
+                if (!activeAddresses.includes(inputAddr)) {
+                  activeAddressSub.addresses.push(inputAddr);
+                }
+              });
+            }
+          }
+        }
+
         break;
       }
 
-      case MESSAGES.UNSUBSCRIBE_ACCOUNT: {
-        subscriptionAccountActive = false;
+      case MESSAGES.UNSUBSCRIBE_ADDRESSES: {
+        const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
+
+        if (activeAddressSub) {
+          activeSubscriptions.splice(activeAddressSub.id);
+        }
+
         break;
       }
 

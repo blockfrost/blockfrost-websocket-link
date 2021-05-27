@@ -16,13 +16,14 @@ export const prepareErrorMessage = (id: number, message: string, error: Error | 
   JSON.stringify({ id, message, type: 'error', error });
 
 export const prepareMessage = (
-  id: number,
+  id: string | number,
   message: string,
   data:
     | ServerInfo
     | AccountInfo
     | string
     | Responses['block_content']
+    | Responses['tx_content'][]
     | Responses['tx_content']
     | UtxosWithBlockResponse[],
 ): string => JSON.stringify({ id, type: 'message', message, data });

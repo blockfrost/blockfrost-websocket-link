@@ -1,4 +1,4 @@
-import { Balance } from './address';
+import { Balance, AddressData } from './address';
 import { Responses } from '@blockfrost/blockfrost-js';
 
 export interface ServerInfo {
@@ -26,9 +26,9 @@ type Transactions =
 export interface AccountInfo {
   balance: string;
   addresses: {
-    change: string[];
-    used: string[];
-    unused: string[];
+    change: AddressData[];
+    used: AddressData[];
+    unused: AddressData[];
   };
   empty: boolean;
   availableBalance: string;
