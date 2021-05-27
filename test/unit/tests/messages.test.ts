@@ -1,4 +1,4 @@
-import * as utils from '../../src/utils/message';
+import * as utils from '../../../src/utils/message';
 
 describe('messages utils', () => {
   test('get params', () => {

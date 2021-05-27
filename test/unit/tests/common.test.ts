@@ -1,4 +1,4 @@
-import * as utils from '../../src/utils/common';
+import * as utils from '../../../src/utils/common';
 
 describe('common utils', () => {
   test('pagination', () => {
