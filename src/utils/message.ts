@@ -12,8 +12,9 @@ export const getMessage = (message: string): Messages | null => {
   }
 };
 
-export const prepareErrorMessage = (id: number, message: string, error: Error | string): string =>
-  JSON.stringify({ id, message, type: 'error', error });
+export const prepareErrorMessage = (id: number, message: string, error: Error | string): string => {
+  return JSON.stringify({ id, message, type: 'error', error });
+};
 
 export const prepareMessage = (
   id: string | number,

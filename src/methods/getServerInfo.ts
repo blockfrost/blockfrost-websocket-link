@@ -18,9 +18,8 @@ export default async (id: number): Promise<string> => {
 
     const message = prepareMessage(1, MESSAGES_RESPONSE.SERVER_INFO, serverInfo);
     return message;
-  } catch (err) {
-    console.log(err);
-    const message = prepareErrorMessage(id, MESSAGES_RESPONSE.SERVER_INFO, err.data);
+  } catch (error) {
+    const message = prepareErrorMessage(id, MESSAGES_RESPONSE.SERVER_INFO, error);
     return message;
   }
 };

@@ -1,7 +1,6 @@
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
-import childProcess from 'child_process';
 import dotenv from 'dotenv';
 import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
@@ -35,7 +34,6 @@ app.get('/status', (_req, res) => {
   res.send({
     status: 'ok',
     version: packageJson.version,
-    commit: childProcess.execSync('git rev-parse HEAD').toString().trim(),
   });
 });
 
@@ -69,8 +67,12 @@ wss.on('connection', (ws: Server.Ws) => {
     ws.send(message);
   });
 
-  events.on('block', async (latestBlock: Responses['block_content']) => {
+  events.on('newBlock', async (latestBlock: Responses['block_content']) => {
+    console.log('activeSubscriptions', activeSubscriptions);
+
     const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
+
+    console.log('activeBlockSub', activeBlockSub);
 
     if (activeBlockSub) {
       const message = prepareMessage(
@@ -83,6 +85,8 @@ wss.on('connection', (ws: Server.Ws) => {
     }
 
     const activeAddressesSub = activeSubscriptions.find(i => i.type === 'addresses');
+
+    console.log('activeAddressesSub', activeAddressesSub);
 
     if (activeAddressesSub && activeAddressesSub.type === 'addresses') {
       const tsxInBlock = await getBlockTransactionsByAddresses(
