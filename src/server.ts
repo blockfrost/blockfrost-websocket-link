@@ -68,11 +68,7 @@ wss.on('connection', (ws: Server.Ws) => {
   });
 
   events.on('newBlock', async (latestBlock: Responses['block_content']) => {
-    console.log('activeSubscriptions', activeSubscriptions);
-
     const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
-
-    console.log('activeBlockSub', activeBlockSub);
 
     if (activeBlockSub) {
       const message = prepareMessage(
@@ -85,8 +81,6 @@ wss.on('connection', (ws: Server.Ws) => {
     }
 
     const activeAddressesSub = activeSubscriptions.find(i => i.type === 'addresses');
-
-    console.log('activeAddressesSub', activeAddressesSub);
 
     if (activeAddressesSub && activeAddressesSub.type === 'addresses') {
       const tsxInBlock = await getBlockTransactionsByAddresses(
