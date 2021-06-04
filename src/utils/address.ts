@@ -62,6 +62,7 @@ export const discoverAddresses = async (
             if (error.status === 404) {
               result.push({ address: p.address, data: 'empty', path: p.path });
             } else {
+              console.log(error);
               throw Error(error);
             }
           }),
