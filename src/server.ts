@@ -231,6 +231,15 @@ wss.on('connection', (ws: Server.Ws) => {
       }
     }
   });
+
+  ws.on('close', () => {
+    // clear intervals on close
+    clearInterval(interval);
+    clearInterval(subscribeBlockInterval);
+
+    // remove subscriptions on close
+    activeSubscriptions = [];
+  });
 });
 
 const interval = setInterval(() => {
@@ -246,15 +255,6 @@ const interval = setInterval(() => {
     });
   });
 }, 30000);
-
-wss.on('close', () => {
-  // clear intervals on close
-  clearInterval(interval);
-  clearInterval(subscribeBlockInterval);
-
-  // remove subscriptions on close
-  activeSubscriptions = [];
-});
 
 server.listen(port, () => {
   console.log(`✨✨✨ Server started - http://localhost:${port} ✨✨✨`);
