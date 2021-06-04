@@ -1,7 +1,6 @@
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
-import childProcess from 'child_process';
 import dotenv from 'dotenv';
 import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
@@ -24,18 +23,20 @@ const app = express();
 const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
-let subscribeBlockInterval: NodeJS.Timeout;
-const activeSubscriptions: Server.Subscription[] = [];
 
+let subscribeBlockInterval: NodeJS.Timeout;
+let activeSubscriptions: Server.Subscription[] = [];
+
+// index route
 app.get('/', (_req, res) => {
   res.send(WELCOME_MESSAGE);
 });
 
+// status route
 app.get('/status', (_req, res) => {
   res.send({
     status: 'ok',
     version: packageJson.version,
-    commit: childProcess.execSync('git rev-parse HEAD').toString().trim(),
   });
 });
 
@@ -69,7 +70,9 @@ wss.on('connection', (ws: Server.Ws) => {
     ws.send(message);
   });
 
-  events.on('block', async (latestBlock: Responses['block_content']) => {
+  // this event is triggered with every new block see events.ts
+  events.on('newBlock', async (latestBlock: Responses['block_content']) => {
+    // block subscriptions
     const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
 
     if (activeBlockSub) {
@@ -82,6 +85,7 @@ wss.on('connection', (ws: Server.Ws) => {
       ws.send(message);
     }
 
+    // address subscriptions
     const activeAddressesSub = activeSubscriptions.find(i => i.type === 'addresses');
 
     if (activeAddressesSub && activeAddressesSub.type === 'addresses') {
@@ -90,15 +94,20 @@ wss.on('connection', (ws: Server.Ws) => {
         activeAddressesSub.addresses,
       );
 
-      const message = prepareMessage(
-        activeAddressesSub.id.toString(),
-        MESSAGES_RESPONSE.NOTIFICATION,
-        tsxInBlock,
-      );
+      // do not send empty notification
+      if (tsxInBlock.length > 0) {
+        const message = prepareMessage(
+          activeAddressesSub.id.toString(),
+          MESSAGES_RESPONSE.NOTIFICATION,
+          tsxInBlock,
+        );
 
-      ws.send(message);
+        ws.send(message);
+      }
     }
   });
+
+  // general messages
 
   ws.on('message', async (message: string) => {
     const data = getMessage(message);
@@ -239,8 +248,12 @@ const interval = setInterval(() => {
 }, 30000);
 
 wss.on('close', () => {
+  // clear intervals on close
   clearInterval(interval);
   clearInterval(subscribeBlockInterval);
+
+  // remove subscriptions on close
+  activeSubscriptions = [];
 });
 
 server.listen(port, () => {
