@@ -18,7 +18,7 @@ export const prepareErrorMessage = (id: number, message: string, error: Error | 
 
 export const prepareMessage = (
   id: string | number,
-  message: string,
+  message: string | null,
   data:
     | ServerInfo
     | AccountInfo
@@ -26,5 +26,12 @@ export const prepareMessage = (
     | Responses['block_content']
     | Responses['tx_content'][]
     | Responses['tx_content']
-    | UtxosWithBlockResponse[],
-): string => JSON.stringify({ id, type: 'message', message, data });
+    | UtxosWithBlockResponse[]
+    | { subscribed: boolean },
+): string => {
+  if (message) {
+    return JSON.stringify({ id, type: 'message', message, data });
+  } else {
+    return JSON.stringify({ id, type: 'message', data });
+  }
+};

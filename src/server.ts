@@ -158,13 +158,17 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.SUBSCRIBE_BLOCK: {
         const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
+        const subId = activeSubscriptions.length;
 
         if (!activeBlockSub) {
           activeSubscriptions.push({
             type: 'block',
-            id: activeSubscriptions.length,
+            id: subId,
           });
         }
+
+        const message = prepareMessage(subId, null, { subscribed: true });
+        ws.send(message);
 
         break;
       }
@@ -173,22 +177,30 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
 
         if (activeBlockSub) {
+          const message = prepareMessage(activeBlockSub.id, null, { subscribed: false });
+
+          ws.send(message);
           activeSubscriptions.splice(activeBlockSub.id);
         }
 
         break;
       }
 
-      case MESSAGES.SUBSCRIBE_ADDRESSES: {
+      case MESSAGES.SUBSCRIBE_ADDRESS: {
         if (data.params.addresses && data.params.addresses.length > 0) {
           const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
 
           if (!activeAddressSub) {
+            const subId = activeSubscriptions.length;
             activeSubscriptions.push({
               type: 'addresses',
-              id: activeSubscriptions.length,
+              id: subId,
               addresses: data.params.addresses,
             });
+
+            const message = prepareMessage(subId, null, { subscribed: true });
+
+            ws.send(message);
           } else {
             if (activeAddressSub.type === 'addresses') {
               const activeAddresses = activeAddressSub.addresses;
@@ -205,10 +217,15 @@ wss.on('connection', (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.UNSUBSCRIBE_ADDRESSES: {
+      case MESSAGES.UNSUBSCRIBE_ADDRESS: {
         const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
 
         if (activeAddressSub) {
+          const message = prepareMessage(activeAddressSub.id, null, {
+            subscribed: false,
+          });
+
+          ws.send(message);
           activeSubscriptions.splice(activeAddressSub.id);
         }
 
