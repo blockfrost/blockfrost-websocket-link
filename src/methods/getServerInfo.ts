@@ -16,7 +16,7 @@ export default async (id: number): Promise<string> => {
       blockHash: latestBlock.hash,
     };
 
-    const message = prepareMessage(1, MESSAGES_RESPONSE.SERVER_INFO, serverInfo);
+    const message = prepareMessage(id, MESSAGES_RESPONSE.SERVER_INFO, serverInfo);
     return message;
   } catch (error) {
     const message = prepareErrorMessage(id, MESSAGES_RESPONSE.SERVER_INFO, error);

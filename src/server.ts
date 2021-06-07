@@ -76,11 +76,7 @@ wss.on('connection', (ws: Server.Ws) => {
     const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
 
     if (activeBlockSub) {
-      const message = prepareMessage(
-        activeBlockSub.id.toString(),
-        MESSAGES_RESPONSE.BLOCK,
-        latestBlock,
-      );
+      const message = prepareMessage(activeBlockSub.id, MESSAGES_RESPONSE.BLOCK, latestBlock);
 
       ws.send(message);
     }
@@ -97,7 +93,7 @@ wss.on('connection', (ws: Server.Ws) => {
       // do not send empty notification
       if (tsxInBlock.length > 0) {
         const message = prepareMessage(
-          activeAddressesSub.id.toString(),
+          activeAddressesSub.id,
           MESSAGES_RESPONSE.NOTIFICATION,
           tsxInBlock,
         );
@@ -158,17 +154,19 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.SUBSCRIBE_BLOCK: {
         const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
-        const subId = activeSubscriptions.length;
 
         if (!activeBlockSub) {
           activeSubscriptions.push({
             type: 'block',
-            id: subId,
+            id: data.id,
           });
-        }
 
-        const message = prepareMessage(subId, null, { subscribed: true });
-        ws.send(message);
+          const message = prepareMessage(data.id, null, { subscribed: true });
+          ws.send(message);
+        } else {
+          const message = prepareMessage(data.id, null, { subscribed: true });
+          ws.send(message);
+        }
 
         break;
       }
@@ -177,10 +175,10 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
 
         if (activeBlockSub) {
-          const message = prepareMessage(activeBlockSub.id, null, { subscribed: false });
+          const message = prepareMessage(data.id, null, { subscribed: false });
 
           ws.send(message);
-          activeSubscriptions.splice(activeBlockSub.id);
+          activeSubscriptions.splice(data.id);
         }
 
         break;
@@ -191,14 +189,13 @@ wss.on('connection', (ws: Server.Ws) => {
           const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
 
           if (!activeAddressSub) {
-            const subId = activeSubscriptions.length;
             activeSubscriptions.push({
               type: 'addresses',
-              id: subId,
+              id: data.id,
               addresses: data.params.addresses,
             });
 
-            const message = prepareMessage(subId, null, { subscribed: true });
+            const message = prepareMessage(data.id, null, { subscribed: true });
 
             ws.send(message);
           } else {
@@ -221,12 +218,12 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
 
         if (activeAddressSub) {
-          const message = prepareMessage(activeAddressSub.id, null, {
+          const message = prepareMessage(data.id, null, {
             subscribed: false,
           });
 
           ws.send(message);
-          activeSubscriptions.splice(activeAddressSub.id);
+          activeSubscriptions.splice(data.id);
         }
 
         break;
