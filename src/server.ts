@@ -109,7 +109,7 @@ wss.on('connection', (ws: Server.Ws) => {
     const data = getMessage(message);
 
     if (!data) {
-      const message = prepareErrorMessage(1, MESSAGES.ERROR, 'Cannot parse the message');
+      const message = prepareErrorMessage(-1, MESSAGES.ERROR, 'Cannot parse the message');
       ws.send(message);
       return;
     }
@@ -172,13 +172,15 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       case MESSAGES.UNSUBSCRIBE_BLOCK: {
-        const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
+        const activeBlockSubIndex = activeSubscriptions.findIndex(i => i.type === 'block');
 
-        if (activeBlockSub) {
-          const message = prepareMessage(data.id, null, { subscribed: false });
+        if (activeBlockSubIndex > -1) {
+          const message = prepareMessage(activeSubscriptions[activeBlockSubIndex].id, null, {
+            subscribed: false,
+          });
 
           ws.send(message);
-          activeSubscriptions.splice(data.id);
+          activeSubscriptions.splice(activeBlockSubIndex);
         }
 
         break;
@@ -215,15 +217,15 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       case MESSAGES.UNSUBSCRIBE_ADDRESS: {
-        const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
+        const activeAddressSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
 
-        if (activeAddressSub) {
-          const message = prepareMessage(data.id, null, {
+        if (activeAddressSubIndex > -1) {
+          const message = prepareMessage(activeSubscriptions[activeAddressSubIndex].id, null, {
             subscribed: false,
           });
 
           ws.send(message);
-          activeSubscriptions.splice(data.id);
+          activeSubscriptions.splice(activeAddressSubIndex);
         }
 
         break;
