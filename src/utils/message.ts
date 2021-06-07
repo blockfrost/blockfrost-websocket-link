@@ -29,11 +29,9 @@ export const prepareMessage = (
     | UtxosWithBlockResponse[]
     | { subscribed: boolean },
 ): string => {
-  const idStr = id.toString();
-
   if (message) {
-    return JSON.stringify({ id: idStr, type: 'message', message, data });
+    return JSON.stringify({ id, type: 'message', message, data });
   } else {
-    return JSON.stringify({ id: idStr, type: 'message', data });
+    return JSON.stringify({ id, type: 'message', data });
   }
 };
