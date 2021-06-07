@@ -186,7 +186,7 @@ wss.on('connection', (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.SUBSCRIBE_ADDRESSES: {
+      case MESSAGES.SUBSCRIBE_ADDRESS: {
         if (data.params.addresses && data.params.addresses.length > 0) {
           const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
 
@@ -217,7 +217,7 @@ wss.on('connection', (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.UNSUBSCRIBE_ADDRESSES: {
+      case MESSAGES.UNSUBSCRIBE_ADDRESS: {
         const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
 
         if (activeAddressSub) {
