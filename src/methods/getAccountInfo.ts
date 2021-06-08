@@ -10,7 +10,6 @@ import {
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
-import { MESSAGES_RESPONSE } from '../constants';
 
 export default async (
   id: number,
@@ -23,11 +22,7 @@ export default async (
   const pageNumber = Number(page);
 
   if (!publicKey) {
-    const message = prepareErrorMessage(
-      id,
-      MESSAGES_RESPONSE.ACCOUNT_INFO,
-      'Missing parameter descriptor',
-    );
+    const message = prepareErrorMessage(id, 'Missing parameter descriptor');
 
     return message;
   }
@@ -90,16 +85,16 @@ export default async (
 
         accountInfo.page.total = paginatedTxs.length;
       } catch (err) {
-        const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
+        const message = prepareMessage(id, accountInfo);
         return message;
       }
     }
 
-    const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, accountInfo);
+    const message = prepareMessage(id, accountInfo);
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, MESSAGES_RESPONSE.ACCOUNT_INFO, err.data);
+    const message = prepareMessage(id, err.data);
     return message;
   }
 };
