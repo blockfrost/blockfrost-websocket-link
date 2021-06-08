@@ -12,13 +12,12 @@ export const getMessage = (message: string): Messages | null => {
   }
 };
 
-export const prepareErrorMessage = (id: number, message: string, error: Error | string): string => {
-  return JSON.stringify({ id, message, type: 'error', error });
+export const prepareErrorMessage = (id: number, error: Error | string): string => {
+  return JSON.stringify({ id, type: 'error', error });
 };
 
 export const prepareMessage = (
   id: string | number,
-  message: string | null,
   data:
     | ServerInfo
     | AccountInfo
@@ -29,9 +28,5 @@ export const prepareMessage = (
     | UtxosWithBlockResponse[]
     | { subscribed: boolean },
 ): string => {
-  if (message) {
-    return JSON.stringify({ id, type: 'message', message, data });
-  } else {
-    return JSON.stringify({ id, type: 'message', data });
-  }
+  return JSON.stringify({ id, type: 'message', data });
 };

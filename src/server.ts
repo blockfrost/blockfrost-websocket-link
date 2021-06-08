@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import { Responses } from '@blockfrost/blockfrost-js';
 import packageJson from '../package.json';
 import * as Server from './types/server';
-import { MESSAGES, WELCOME_MESSAGE, MESSAGES_RESPONSE, REPOSITORY_URL } from './constants';
+import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
 import { getBlockTransactionsByAddresses } from './utils/transaction';
 
@@ -57,7 +57,6 @@ wss.on('connection', (ws: Server.Ws) => {
   if (!process.env.PROJECT_ID) {
     const message = prepareErrorMessage(
       -1,
-      'server',
       `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
     );
 
@@ -66,7 +65,7 @@ wss.on('connection', (ws: Server.Ws) => {
   }
 
   ws.on('error', error => {
-    const message = prepareErrorMessage(1, MESSAGES.ERROR, error);
+    const message = prepareErrorMessage(1, error);
     ws.send(message);
   });
 
@@ -76,7 +75,7 @@ wss.on('connection', (ws: Server.Ws) => {
     const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
 
     if (activeBlockSub) {
-      const message = prepareMessage(activeBlockSub.id, MESSAGES_RESPONSE.BLOCK, latestBlock);
+      const message = prepareMessage(activeBlockSub.id, latestBlock);
 
       ws.send(message);
     }
@@ -92,11 +91,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
       // do not send empty notification
       if (tsxInBlock.length > 0) {
-        const message = prepareMessage(
-          activeAddressesSub.id,
-          MESSAGES_RESPONSE.NOTIFICATION,
-          tsxInBlock,
-        );
+        const message = prepareMessage(activeAddressesSub.id, tsxInBlock);
 
         ws.send(message);
       }
@@ -109,7 +104,7 @@ wss.on('connection', (ws: Server.Ws) => {
     const data = getMessage(message);
 
     if (!data) {
-      const message = prepareErrorMessage(-1, MESSAGES.ERROR, 'Cannot parse the message');
+      const message = prepareErrorMessage(-1, 'Cannot parse the message');
       ws.send(message);
       return;
     }
@@ -153,20 +148,19 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       case MESSAGES.SUBSCRIBE_BLOCK: {
-        const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
+        const activeBlockSubIndex = activeSubscriptions.findIndex(i => i.type === 'block');
 
-        if (!activeBlockSub) {
-          activeSubscriptions.push({
-            type: 'block',
-            id: data.id,
-          });
-
-          const message = prepareMessage(data.id, null, { subscribed: true });
-          ws.send(message);
-        } else {
-          const message = prepareMessage(data.id, null, { subscribed: true });
-          ws.send(message);
+        if (activeBlockSubIndex > -1) {
+          activeSubscriptions.splice(activeBlockSubIndex);
         }
+
+        activeSubscriptions.push({
+          type: 'block',
+          id: data.id,
+        });
+
+        const message = prepareMessage(data.id, { subscribed: true });
+        ws.send(message);
 
         break;
       }
@@ -175,7 +169,7 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeBlockSubIndex = activeSubscriptions.findIndex(i => i.type === 'block');
 
         if (activeBlockSubIndex > -1) {
-          const message = prepareMessage(activeSubscriptions[activeBlockSubIndex].id, null, {
+          const message = prepareMessage(activeSubscriptions[activeBlockSubIndex].id, {
             subscribed: false,
           });
 
@@ -197,7 +191,7 @@ wss.on('connection', (ws: Server.Ws) => {
               addresses: data.params.addresses,
             });
 
-            const message = prepareMessage(data.id, null, { subscribed: true });
+            const message = prepareMessage(data.id, { subscribed: true });
 
             ws.send(message);
           } else {
@@ -220,7 +214,7 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeAddressSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
 
         if (activeAddressSubIndex > -1) {
-          const message = prepareMessage(activeSubscriptions[activeAddressSubIndex].id, null, {
+          const message = prepareMessage(activeSubscriptions[activeAddressSubIndex].id, {
             subscribed: false,
           });
 
@@ -238,11 +232,7 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       default: {
-        const message = prepareErrorMessage(
-          data.id,
-          MESSAGES.ERROR,
-          `Unknown message id: ${data.command}`,
-        );
+        const message = prepareErrorMessage(data.id, `Unknown message id: ${data.command}`);
         ws.send(message);
       }
     }
