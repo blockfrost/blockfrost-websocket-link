@@ -94,8 +94,8 @@ export const getBlockTransactionsByAddresses = async (
             txIds.push({ address: p.address, txId: id });
           });
         })
-        .catch(error => {
-          throw Error(error);
+        .catch(() => {
+          // invalid address?
         }),
     ),
   );

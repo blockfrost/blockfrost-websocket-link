@@ -5,5 +5,11 @@ export interface Ws extends WebSocket {
 }
 
 export type Subscription =
-  | { id: number; type: 'block' }
-  | { id: number; type: 'addresses'; addresses: string[] };
+  | {
+      id: number;
+      type: 'block';
+    }
+  | {
+      id: number;
+      type: 'addresses';
+    };
