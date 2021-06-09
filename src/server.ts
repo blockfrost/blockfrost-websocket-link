@@ -25,7 +25,6 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let subscribeBlockInterval: NodeJS.Timeout;
-let activeSubscriptions: Server.Subscription[] = [];
 
 // index route
 app.get('/', (_req, res) => {
@@ -48,6 +47,8 @@ const heartbeat = (ws: Server.Ws) => {
 const ping = () => {};
 
 wss.on('connection', (ws: Server.Ws) => {
+  let activeSubscriptions: Server.Subscription[] = [];
+
   ws.isAlive = true;
 
   ws.on('pong', () => {
