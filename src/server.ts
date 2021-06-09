@@ -48,6 +48,7 @@ const ping = () => {};
 
 wss.on('connection', (ws: Server.Ws) => {
   let activeSubscriptions: Server.Subscription[] = [];
+  let addressedSubscribed: string[] = [];
 
   ws.isAlive = true;
 
@@ -82,17 +83,15 @@ wss.on('connection', (ws: Server.Ws) => {
     }
 
     // address subscriptions
-    const activeAddressesSub = activeSubscriptions.find(i => i.type === 'addresses');
+    const activeAddressesSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
+    const activeAddressSub = activeSubscriptions[activeAddressesSubIndex];
 
-    if (activeAddressesSub && activeAddressesSub.type === 'addresses') {
-      const tsxInBlock = await getBlockTransactionsByAddresses(
-        latestBlock,
-        activeAddressesSub.addresses,
-      );
+    if (activeAddressSub && activeAddressSub.type === 'addresses') {
+      const tsxInBlock = await getBlockTransactionsByAddresses(latestBlock, addressedSubscribed);
 
       // do not send empty notification
       if (tsxInBlock.length > 0) {
-        const message = prepareMessage(activeAddressesSub.id, tsxInBlock);
+        const message = prepareMessage(activeAddressSub.id, tsxInBlock);
 
         ws.send(message);
       }
@@ -183,29 +182,26 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.SUBSCRIBE_ADDRESS: {
         if (data.params.addresses && data.params.addresses.length > 0) {
-          const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
-
-          if (!activeAddressSub) {
-            activeSubscriptions.push({
-              type: 'addresses',
-              id: data.id,
-              addresses: data.params.addresses,
-            });
-
-            const message = prepareMessage(data.id, { subscribed: true });
-
-            ws.send(message);
-          } else {
-            if (activeAddressSub.type === 'addresses') {
-              const activeAddresses = activeAddressSub.addresses;
-
-              data.params.addresses.map(inputAddr => {
-                if (!activeAddresses.includes(inputAddr)) {
-                  activeAddressSub.addresses.push(inputAddr);
-                }
-              });
+          data.params.addresses.map(addressInput => {
+            if (!addressedSubscribed.includes(addressInput)) {
+              addressedSubscribed.push(addressInput);
             }
+          });
+
+          const activeAddressSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
+
+          if (activeAddressSubIndex > -1) {
+            activeSubscriptions.splice(activeAddressSubIndex);
           }
+
+          activeSubscriptions.push({
+            type: 'addresses',
+            id: data.id,
+          });
+
+          const message = prepareMessage(data.id, { subscribed: true });
+
+          ws.send(message);
         }
 
         break;
@@ -220,6 +216,7 @@ wss.on('connection', (ws: Server.Ws) => {
           });
 
           ws.send(message);
+          addressedSubscribed = [];
           activeSubscriptions.splice(activeAddressSubIndex);
         }
 
@@ -246,6 +243,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
     // remove subscriptions on close
     activeSubscriptions = [];
+    addressedSubscribed = [];
   });
 });
 
