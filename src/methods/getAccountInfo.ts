@@ -43,7 +43,7 @@ export default async (
 
     const change = await getAddressesData(internalAddresses);
     const used = await getAddressesData(usedExternalAddresses);
-    const unused = await getAddressesData(unusedExternalAddresses);
+    const unused = await getAddressesData(unusedExternalAddresses, true);
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
