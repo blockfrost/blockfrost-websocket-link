@@ -44,9 +44,21 @@ const heartbeat = (ws: Server.Ws) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-const ping = () => {};
+function noop() {}
 
 wss.on('connection', (ws: Server.Ws) => {
+  const interval = setInterval(() => {
+    wss.clients.forEach(w => {
+      const ws = w as Server.Ws;
+      if (ws.isAlive === false) {
+        return ws.terminate();
+      }
+
+      ws.isAlive = false;
+      ws.ping(noop);
+    });
+  }, 15000);
+
   let activeSubscriptions: Server.Subscription[] = [];
   let addressedSubscribed: string[] = [];
 
@@ -67,7 +79,7 @@ wss.on('connection', (ws: Server.Ws) => {
   }
 
   ws.on('error', error => {
-    const message = prepareErrorMessage(1, error);
+    const message = prepareErrorMessage(-1, error);
     ws.send(message);
   });
 
@@ -211,7 +223,7 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeAddressSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
 
         if (activeAddressSubIndex > -1) {
-          const message = prepareMessage(activeSubscriptions[activeAddressSubIndex].id, {
+          const message = prepareMessage(data.id, {
             subscribed: false,
           });
 
@@ -246,20 +258,6 @@ wss.on('connection', (ws: Server.Ws) => {
     addressedSubscribed = [];
   });
 });
-
-const interval = setInterval(() => {
-  wss.clients.forEach(w => {
-    const ws = w as Server.Ws;
-    if (ws.isAlive === false) {
-      return ws.terminate();
-    }
-
-    ws.isAlive = false;
-    ws.ping(() => {
-      ping();
-    });
-  });
-}, 30000);
 
 server.listen(port, () => {
   console.log(`✨✨✨ Server started - http://localhost:${port} ✨✨✨`);
