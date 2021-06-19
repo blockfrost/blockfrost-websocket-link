@@ -8,7 +8,7 @@ export default async (id: number): Promise<string> => {
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareErrorMessage(id, err.data);
+    const message = prepareErrorMessage(id, err);
     return message;
   }
 };
