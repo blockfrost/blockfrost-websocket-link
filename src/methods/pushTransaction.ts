@@ -9,7 +9,7 @@ export default async (id: number, transaction: Uint8Array): Promise<string> => {
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, err.data);
+    const message = prepareMessage(id, err);
     return message;
   }
 };

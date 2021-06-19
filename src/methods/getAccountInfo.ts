@@ -94,7 +94,7 @@ export default async (
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, err.data);
+    const message = prepareMessage(id, err);
     return message;
   }
 };
