@@ -12,7 +12,7 @@
     "type-check": "tsc --project tsconfig.json"
   },
   "dependencies": {
-    "@blockfrost/blockfrost-js": "0.5.3",
+    "@blockfrost/blockfrost-js": "0.7.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^7.1.0",
     "@types/express": "^4.17.12",
     "bignumber.js": "9.0.1",
