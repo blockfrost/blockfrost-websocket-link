@@ -59,11 +59,10 @@ export const discoverAddresses = async (
           })
           .catch(error => {
             lastEmptyCount++;
-            if (error.status === 404) {
+            if (error.status_code === 404) {
               result.push({ address: p.address, data: 'empty', path: p.path });
             } else {
-              console.log(error);
-              // throw Error(error);
+              throw Error(error);
             }
           }),
       ),
@@ -238,19 +237,8 @@ export const addressesToTxIds = async (
 
 export const getAddressesData = async (
   addresses: Addresses.Result[],
-  unused = false,
 ): Promise<Addresses.AddressData[]> => {
   const bundle: Addresses.GetAddressDataBundle[] = [];
-
-  if (unused) {
-    return addresses.map(addressData => ({
-      address: addressData.address,
-      path: addressData.path,
-      transfers: 0,
-      received: '0',
-      sent: '0',
-    }));
-  }
 
   addresses.map(addr => {
     const promise = blockfrostAPI.addressesTxsAll(addr.address);
@@ -281,7 +269,7 @@ export const getAddressesData = async (
               txIds: [],
             });
           } else {
-            console.log('error', error.data, error.request);
+            throw Error(error);
           }
         }),
     ),
