@@ -8022,13 +8022,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest-get-type", "npm:27.0.1"]
           ],
           "linkType": "HARD",
-        }],
-        ["npm:27.0.1", {
-          "packageLocation": "./.yarn/cache/jest-get-type-npm-27.0.1-aa40b7f8ce-22c5e04700.zip/node_modules/jest-get-type/",
-          "packageDependencies": [
-            ["jest-get-type", "npm:27.0.1"]
-          ],
-          "linkType": "HARD",
         }]
       ]],
       ["jest-haste-map", [
@@ -9441,6 +9434,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/p-each-series-npm-2.2.0-b9907a1ae6-5fbe2f1f19.zip/node_modules/p-each-series/",
           "packageDependencies": [
             ["p-each-series", "npm:2.2.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["p-finally", [
+        ["npm:1.0.0", {
+          "packageLocation": "./.yarn/cache/p-finally-npm-1.0.0-35fbaa57c6-93a654c53d.zip/node_modules/p-finally/",
+          "packageDependencies": [
+            ["p-finally", "npm:1.0.0"]
           ],
           "linkType": "HARD",
         }]
