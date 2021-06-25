@@ -16,6 +16,7 @@ import getAccountUtxo from './methods/getAccountUtxo';
 import getBlock from './methods/getBlock';
 import getTransaction from './methods/getTransaction';
 import submitTransaction from './methods/pushTransaction';
+import estimateFee from './methods/estimateFee';
 
 dotenv.config();
 
@@ -57,7 +58,7 @@ wss.on('connection', (ws: Server.Ws) => {
       ws.isAlive = false;
       ws.ping(noop);
     });
-  }, 15000);
+  }, 60000);
 
   let activeSubscriptions: Server.Subscription[] = [];
   let addressedSubscribed: string[] = [];
@@ -143,6 +144,12 @@ wss.on('connection', (ws: Server.Ws) => {
       case MESSAGES.GET_ACCOUNT_UTXO: {
         const accountUtxoMessage = await getAccountUtxo(data.id, data.params.descriptor);
         ws.send(accountUtxoMessage);
+        break;
+      }
+
+      case MESSAGES.ESTIMATE_FEE: {
+        const estimateFeeMessage = await estimateFee(data.id);
+        ws.send(estimateFeeMessage);
         break;
       }
 
