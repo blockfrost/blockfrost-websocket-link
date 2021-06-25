@@ -61,6 +61,11 @@ export type Messages =
     }
   | {
       id: number;
+      command: 'ESTIMATE_FEE';
+      params: null;
+    }
+  | {
+      id: number;
       command: 'UNSUBSCRIBE_ADDRESS';
       params: null;
     }
