@@ -6,7 +6,7 @@ export default async (id: number): Promise<string> => {
     const epochsLatest = await blockfrostAPI.epochsLatest();
     const epochsParameters = await blockfrostAPI.epochsParameters(epochsLatest.epoch);
     const message = prepareMessage(id, {
-      feePerUnit: epochsParameters.min_fee_b,
+      lovelacePerByte: epochsParameters.min_fee_a,
     });
     return message;
   } catch (err) {
