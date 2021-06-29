@@ -34,7 +34,6 @@ export default async (
     const addresses = [...externalAddresses, ...internalAddresses];
     const empty = await isAccountEmpty(addresses);
     const transactionsIds = await addressesToTxIds(addresses);
-    const txs = await txIdsToTransactions(transactionsIds);
     const balances = await addressesToBalances(addresses);
 
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
@@ -46,7 +45,7 @@ export default async (
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',
       history: {
-        total: txs.length,
+        total: transactionsIds.length,
         unconfirmed: 0,
         transactions: [],
       },
@@ -62,6 +61,7 @@ export default async (
     }
 
     if (details === 'txs' || details === 'txids') {
+      const txs = await txIdsToTransactions(transactionsIds);
       try {
         const paginatedTxs = paginate(txs, pageSizeNumber);
         const paginatedTxsCount = paginatedTxs.length;
