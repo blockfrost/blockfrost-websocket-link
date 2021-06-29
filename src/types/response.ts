@@ -25,7 +25,7 @@ type Transactions =
 
 export interface AccountInfo {
   balance: string;
-  addresses: {
+  addresses?: {
     change: AddressData[];
     used: AddressData[];
     unused: AddressData[];

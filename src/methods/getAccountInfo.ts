@@ -33,36 +33,19 @@ export default async (
 
     const addresses = [...externalAddresses, ...internalAddresses];
     const empty = await isAccountEmpty(addresses);
+    const transactionsIds = await addressesToTxIds(addresses);
     const balances = await addressesToBalances(addresses);
 
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
 
-    const usedExternalAddresses = externalAddresses.filter(a => a.data !== 'empty');
-    const unusedExternalAddresses = externalAddresses.filter(a => a.data === 'empty');
-
-    const change = await getAddressesData(internalAddresses);
-    const used = await getAddressesData(usedExternalAddresses);
-    const unused = unusedExternalAddresses.map(addressData => ({
-      address: addressData.address,
-      path: addressData.path,
-      transfers: 0,
-      received: '0',
-      sent: '0',
-    }));
-
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
       empty,
-      addresses: {
-        change,
-        used,
-        unused,
-      },
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',
       history: {
-        total: 0,
+        total: transactionsIds.length,
         unconfirmed: 0,
         transactions: [],
       },
@@ -78,9 +61,8 @@ export default async (
     }
 
     if (details === 'txs' || details === 'txids') {
+      const txs = await txIdsToTransactions(transactionsIds);
       try {
-        const transactionsIds = await addressesToTxIds(addresses);
-        const txs = await txIdsToTransactions(transactionsIds);
         const paginatedTxs = paginate(txs, pageSizeNumber);
         const paginatedTxsCount = paginatedTxs.length;
 
@@ -94,6 +76,27 @@ export default async (
         const message = prepareMessage(id, accountInfo);
         return message;
       }
+    }
+
+    if (details === 'txs') {
+      const usedExternalAddresses = externalAddresses.filter(a => a.data !== 'empty');
+      const unusedExternalAddresses = externalAddresses.filter(a => a.data === 'empty');
+      const change = await getAddressesData(internalAddresses);
+      const used = await getAddressesData(usedExternalAddresses);
+
+      const unused = unusedExternalAddresses.map(addressData => ({
+        address: addressData.address,
+        path: addressData.path,
+        transfers: 0,
+        received: '0',
+        sent: '0',
+      }));
+
+      accountInfo.addresses = {
+        change,
+        used,
+        unused,
+      };
     }
 
     const message = prepareMessage(id, accountInfo);
