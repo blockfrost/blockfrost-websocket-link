@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.14.6"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.7"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.5"],
-            ["@blockfrost/blockfrost-js", "npm:0.7.0"],
+            ["@blockfrost/blockfrost-js", "npm:0.7.1"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
             ["@types/express", "npm:4.17.12"],
             ["@types/jest", "npm:26.0.23"],
@@ -2863,12 +2863,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:0.7.0", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-0.7.0-1260a1c84c-aeb280d8c6.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:0.7.1", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-0.7.1-e15da260c0-3a7a93b9ad.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:0.7.0"],
+            ["@blockfrost/blockfrost-js", "npm:0.7.1"],
             ["@blockfrost/openapi", "npm:0.1.21"],
-            ["@yarnpkg/pnpify", "virtual:1260a1c84c0d0444c0bccd9711e65be5a48e4c5df3eb45df7822f3927909b58437460f84b960b16759c06fa369706218968f55f58388a6e1d4914e74b6231f01#npm:3.0.0-rc.6"],
+            ["@yarnpkg/pnpify", "virtual:e15da260c0b47cdfb18a56ef6a8fb08c4bb44d876119fd0e349a169f9bab5fd24031f6cf28d6f1e2b8c7335e7d20a7f3276931b470323452a409cdeac7445c03#npm:3.0.0-rc.6"],
             ["axios", "npm:0.21.1"],
             ["axios-retry", "npm:3.1.9"],
             ["dotenv", "npm:10.0.0"],
@@ -2887,7 +2887,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.14.6"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.7"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.5"],
-            ["@blockfrost/blockfrost-js", "npm:0.7.0"],
+            ["@blockfrost/blockfrost-js", "npm:0.7.1"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
             ["@types/express", "npm:4.17.12"],
             ["@types/jest", "npm:26.0.23"],
@@ -3991,10 +3991,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:1260a1c84c0d0444c0bccd9711e65be5a48e4c5df3eb45df7822f3927909b58437460f84b960b16759c06fa369706218968f55f58388a6e1d4914e74b6231f01#npm:3.0.0-rc.6", {
-          "packageLocation": "./.yarn/__virtual__/@yarnpkg-pnpify-virtual-25ac5e1a35/0/cache/@yarnpkg-pnpify-npm-3.0.0-rc.6-812edbcf65-70c7e56828.zip/node_modules/@yarnpkg/pnpify/",
+        ["virtual:e15da260c0b47cdfb18a56ef6a8fb08c4bb44d876119fd0e349a169f9bab5fd24031f6cf28d6f1e2b8c7335e7d20a7f3276931b470323452a409cdeac7445c03#npm:3.0.0-rc.6", {
+          "packageLocation": "./.yarn/__virtual__/@yarnpkg-pnpify-virtual-4720cc72da/0/cache/@yarnpkg-pnpify-npm-3.0.0-rc.6-812edbcf65-70c7e56828.zip/node_modules/@yarnpkg/pnpify/",
           "packageDependencies": [
-            ["@yarnpkg/pnpify", "virtual:1260a1c84c0d0444c0bccd9711e65be5a48e4c5df3eb45df7822f3927909b58437460f84b960b16759c06fa369706218968f55f58388a6e1d4914e74b6231f01#npm:3.0.0-rc.6"],
+            ["@yarnpkg/pnpify", "virtual:e15da260c0b47cdfb18a56ef6a8fb08c4bb44d876119fd0e349a169f9bab5fd24031f6cf28d6f1e2b8c7335e7d20a7f3276931b470323452a409cdeac7445c03#npm:3.0.0-rc.6"],
             ["@types/eslint", null],
             ["@types/typescript", null],
             ["@yarnpkg/core", "npm:3.0.0-rc.6"],
