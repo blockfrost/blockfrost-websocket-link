@@ -73,6 +73,7 @@ export default async (
 
         accountInfo.page.total = paginatedTxs.length;
       } catch (err) {
+        console.log('err', err);
         const message = prepareMessage(id, accountInfo);
         return message;
       }
