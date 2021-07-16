@@ -62,6 +62,7 @@ export const discoverAddresses = async (
             if (error.status_code === 404) {
               result.push({ address: p.address, data: 'empty', path: p.path });
             } else {
+              console.log('error', error);
               throw Error(error);
             }
           }),
@@ -150,7 +151,10 @@ export const isAccountEmpty = async (
   addresses.map(item => {
     if (item.data === 'empty') return;
 
-    const promise = blockfrostAPI.addressesTxs(item.address, 1, 1);
+    const promise = blockfrostAPI.addressesTxs(item.address, {
+      page: 1,
+      count: 1,
+    });
     promisesBundle.push({ address: item.address, promise });
   });
 
@@ -269,6 +273,7 @@ export const getAddressesData = async (
               txIds: [],
             });
           } else {
+            console.log('error', error);
             throw Error(error);
           }
         }),
