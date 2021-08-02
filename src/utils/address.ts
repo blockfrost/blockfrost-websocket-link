@@ -63,7 +63,6 @@ export const discoverAddresses = async (
               result.push({ address: p.address, data: 'empty', path: p.path });
             } else {
               console.log('error', error);
-              throw Error(error);
             }
           }),
       ),
@@ -132,7 +131,7 @@ export const addressesToUtxos = async (
           result.push({ address: p.address, data });
         })
         .catch(error => {
-          throw Error(error);
+          console.log(error);
         }),
     ),
   );
@@ -165,7 +164,7 @@ export const isAccountEmpty = async (
           return data;
         })
         .catch(error => {
-          throw Error(error);
+          console.log(error);
         }),
     ),
   );
@@ -198,8 +197,8 @@ export const utxosWithBlocks = async (
             blockInfo: data,
           });
         })
-        .catch(err => {
-          throw Error(err);
+        .catch(error => {
+          console.log(error);
         }),
     ),
   );
@@ -231,7 +230,7 @@ export const addressesToTxIds = async (
           result.push({ address: p.address, data });
         })
         .catch(error => {
-          throw Error(error);
+          console.log(error);
         }),
     ),
   );
@@ -274,7 +273,6 @@ export const getAddressesData = async (
             });
           } else {
             console.log('error', error);
-            throw Error(error);
           }
         }),
     ),
@@ -321,7 +319,7 @@ export const getAddressesData = async (
           }
         })
         .catch(error => {
-          throw Error(error);
+          console.log(error);
         }),
     ),
   );
