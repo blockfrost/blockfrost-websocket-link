@@ -41,6 +41,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.5"],
             ["@blockfrost/blockfrost-js", "npm:0.9.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
+            ["@sentry/node", "npm:6.10.0"],
+            ["@sentry/tracing", "npm:6.10.0"],
             ["@types/express", "npm:4.17.12"],
             ["@types/jest", "npm:26.0.23"],
             ["@types/node", "npm:15.12.4"],
@@ -2878,6 +2880,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.5"],
             ["@blockfrost/blockfrost-js", "npm:0.9.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
+            ["@sentry/node", "npm:6.10.0"],
+            ["@sentry/tracing", "npm:6.10.0"],
             ["@types/express", "npm:4.17.12"],
             ["@types/jest", "npm:26.0.23"],
             ["@types/node", "npm:15.12.4"],
@@ -3251,6 +3255,96 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@nodelib/fs.walk", "npm:1.2.6"],
             ["@nodelib/fs.scandir", "npm:2.1.4"],
             ["fastq", "npm:1.11.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@sentry/core", [
+        ["npm:6.10.0", {
+          "packageLocation": "./.yarn/cache/@sentry-core-npm-6.10.0-e0d9bbf49f-62a2801dbc.zip/node_modules/@sentry/core/",
+          "packageDependencies": [
+            ["@sentry/core", "npm:6.10.0"],
+            ["@sentry/hub", "npm:6.10.0"],
+            ["@sentry/minimal", "npm:6.10.0"],
+            ["@sentry/types", "npm:6.10.0"],
+            ["@sentry/utils", "npm:6.10.0"],
+            ["tslib", "npm:1.14.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@sentry/hub", [
+        ["npm:6.10.0", {
+          "packageLocation": "./.yarn/cache/@sentry-hub-npm-6.10.0-0af4ca3daa-c4b66ee17b.zip/node_modules/@sentry/hub/",
+          "packageDependencies": [
+            ["@sentry/hub", "npm:6.10.0"],
+            ["@sentry/types", "npm:6.10.0"],
+            ["@sentry/utils", "npm:6.10.0"],
+            ["tslib", "npm:1.14.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@sentry/minimal", [
+        ["npm:6.10.0", {
+          "packageLocation": "./.yarn/cache/@sentry-minimal-npm-6.10.0-ad57f5a453-5d2cc02529.zip/node_modules/@sentry/minimal/",
+          "packageDependencies": [
+            ["@sentry/minimal", "npm:6.10.0"],
+            ["@sentry/hub", "npm:6.10.0"],
+            ["@sentry/types", "npm:6.10.0"],
+            ["tslib", "npm:1.14.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@sentry/node", [
+        ["npm:6.10.0", {
+          "packageLocation": "./.yarn/cache/@sentry-node-npm-6.10.0-6157517d25-2b4b99682c.zip/node_modules/@sentry/node/",
+          "packageDependencies": [
+            ["@sentry/node", "npm:6.10.0"],
+            ["@sentry/core", "npm:6.10.0"],
+            ["@sentry/hub", "npm:6.10.0"],
+            ["@sentry/tracing", "npm:6.10.0"],
+            ["@sentry/types", "npm:6.10.0"],
+            ["@sentry/utils", "npm:6.10.0"],
+            ["cookie", "npm:0.4.1"],
+            ["https-proxy-agent", "npm:5.0.0"],
+            ["lru_map", "npm:0.3.3"],
+            ["tslib", "npm:1.14.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@sentry/tracing", [
+        ["npm:6.10.0", {
+          "packageLocation": "./.yarn/cache/@sentry-tracing-npm-6.10.0-a947defe8b-f65e6a46f7.zip/node_modules/@sentry/tracing/",
+          "packageDependencies": [
+            ["@sentry/tracing", "npm:6.10.0"],
+            ["@sentry/hub", "npm:6.10.0"],
+            ["@sentry/minimal", "npm:6.10.0"],
+            ["@sentry/types", "npm:6.10.0"],
+            ["@sentry/utils", "npm:6.10.0"],
+            ["tslib", "npm:1.14.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@sentry/types", [
+        ["npm:6.10.0", {
+          "packageLocation": "./.yarn/cache/@sentry-types-npm-6.10.0-2eb9f6269f-17d5b91436.zip/node_modules/@sentry/types/",
+          "packageDependencies": [
+            ["@sentry/types", "npm:6.10.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@sentry/utils", [
+        ["npm:6.10.0", {
+          "packageLocation": "./.yarn/cache/@sentry-utils-npm-6.10.0-34a7d21f2c-1b6c68085d.zip/node_modules/@sentry/utils/",
+          "packageDependencies": [
+            ["@sentry/utils", "npm:6.10.0"],
+            ["@sentry/types", "npm:6.10.0"],
+            ["tslib", "npm:1.14.1"]
           ],
           "linkType": "HARD",
         }]
@@ -4983,6 +5077,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/cookie-npm-0.4.0-4b3d629e45-760384ba0a.zip/node_modules/cookie/",
           "packageDependencies": [
             ["cookie", "npm:0.4.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:0.4.1", {
+          "packageLocation": "./.yarn/cache/cookie-npm-0.4.1-cc5e2ebb42-bd7c47f5d9.zip/node_modules/cookie/",
+          "packageDependencies": [
+            ["cookie", "npm:0.4.1"]
           ],
           "linkType": "HARD",
         }]
@@ -8219,6 +8320,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["lru-cache", "npm:6.0.0"],
             ["yallist", "npm:4.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["lru_map", [
+        ["npm:0.3.3", {
+          "packageLocation": "./.yarn/cache/lru_map-npm-0.3.3-a038bb3418-ca9dd43c65.zip/node_modules/lru_map/",
+          "packageDependencies": [
+            ["lru_map", "npm:0.3.3"]
           ],
           "linkType": "HARD",
         }]

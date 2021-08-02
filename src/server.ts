@@ -3,6 +3,8 @@ import http from 'http';
 import WebSocket from 'ws';
 import dotenv from 'dotenv';
 import { Responses } from '@blockfrost/blockfrost-js';
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 import packageJson from '../package.json';
 import * as Server from './types/server';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
@@ -21,6 +23,20 @@ import estimateFee from './methods/estimateFee';
 dotenv.config();
 
 const app = express();
+
+Sentry.init({
+  dsn: 'https://19ef87c9068a4a78b7a53e4c57b6677f@o508102.ingest.sentry.io/5889476',
+  integrations: [
+    new Sentry.Integrations.Http({ tracing: true }),
+    new Tracing.Integrations.Express({ app }),
+  ],
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 0.5,
+});
+
 const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
