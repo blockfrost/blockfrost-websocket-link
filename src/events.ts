@@ -15,7 +15,7 @@ setInterval(async () => {
       events.emit('newBlock', latestBlock);
     }
   } catch (err) {
-    throw Error(err);
+    console.log('error', err);
   }
 }, 1000);
 
