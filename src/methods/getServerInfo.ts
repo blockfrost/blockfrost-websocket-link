@@ -3,12 +3,13 @@ import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export default async (id: number): Promise<string> => {
   try {
+    const isTestnet = blockfrostAPI.apiUrl.includes('testnet');
     const info = await blockfrostAPI.root();
     const latestBlock = await blockfrostAPI.blocksLatest();
     const serverInfo = {
       name: 'Cardano',
-      shortcut: 'ada',
-      testnet: blockfrostAPI.apiUrl.includes('testnet'),
+      shortcut: isTestnet ? 'tada' : 'ada',
+      testnet: isTestnet,
       version: info.version,
       decimals: 6,
       blockHeight: latestBlock.height || 0,
