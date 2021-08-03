@@ -8,7 +8,7 @@ export default async (id: number): Promise<string> => {
     const latestBlock = await blockfrostAPI.blocksLatest();
     const serverInfo = {
       name: 'Cardano',
-      shortcut: `${isTestnet ? 't' : ''}ada`,
+      shortcut: isTestnet ? 'tada' : 'ada',
       testnet: isTestnet,
       version: info.version,
       decimals: 6,
