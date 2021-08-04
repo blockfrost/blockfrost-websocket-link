@@ -26,7 +26,7 @@ const deriveAddress = (
 
   return {
     address: baseAddr.to_address().to_bech32(),
-    path: `m/1852'/1815'/0'/${type}/${addressIndex}`,
+    path: `m/1852'/1815'/i'/${type}/${addressIndex}`,
   };
 };
 
