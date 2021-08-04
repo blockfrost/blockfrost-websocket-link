@@ -23,6 +23,10 @@ type Transactions =
       data: Responses['tx_content'];
     }[];
 
+export interface TokenBalance extends Balance {
+  decimals: number;
+  fingerprint: string;
+}
 export interface AccountInfo {
   balance: string;
   addresses?: {
@@ -33,7 +37,7 @@ export interface AccountInfo {
   empty: boolean;
   availableBalance: string;
   descriptor: string;
-  tokens?: Balance[];
+  tokens?: TokenBalance[];
   history: {
     total: number; // total transactions
     tokens?: number; // tokens transactions

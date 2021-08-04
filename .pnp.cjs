@@ -41,11 +41,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.5"],
             ["@blockfrost/blockfrost-js", "npm:0.9.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
+            ["@emurgo/cip14-js", "npm:2.0.0"],
             ["@sentry/node", "npm:6.10.0"],
             ["@sentry/tracing", "npm:6.10.0"],
             ["@types/express", "npm:4.17.12"],
             ["@types/jest", "npm:26.0.23"],
-            ["@types/node", "npm:15.12.4"],
+            ["@types/node", "npm:16.4.11"],
             ["@types/validator", "npm:13.1.4"],
             ["@types/ws", "npm:7.4.5"],
             ["@typescript-eslint/eslint-plugin", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:4.20.0"],
@@ -2880,11 +2881,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.5"],
             ["@blockfrost/blockfrost-js", "npm:0.9.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
+            ["@emurgo/cip14-js", "npm:2.0.0"],
             ["@sentry/node", "npm:6.10.0"],
             ["@sentry/tracing", "npm:6.10.0"],
             ["@types/express", "npm:4.17.12"],
             ["@types/jest", "npm:26.0.23"],
-            ["@types/node", "npm:15.12.4"],
+            ["@types/node", "npm:16.4.11"],
             ["@types/validator", "npm:13.1.4"],
             ["@types/ws", "npm:7.4.5"],
             ["@typescript-eslint/eslint-plugin", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:4.20.0"],
@@ -2923,6 +2925,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-7.1.0-9dde1e6073-7ea9089cdd.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",
           "packageDependencies": [
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@emurgo/cip14-js", [
+        ["npm:2.0.0", {
+          "packageLocation": "./.yarn/cache/@emurgo-cip14-js-npm-2.0.0-3500cc6e4a-1b07171cd2.zip/node_modules/@emurgo/cip14-js/",
+          "packageDependencies": [
+            ["@emurgo/cip14-js", "npm:2.0.0"],
+            ["bech32", "npm:2.0.0"],
+            ["blake2b", "npm:2.1.3"]
           ],
           "linkType": "HARD",
         }]
@@ -3554,10 +3567,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:15.12.4", {
-          "packageLocation": "./.yarn/cache/@types-node-npm-15.12.4-9b6a9838ed-1731c610eb.zip/node_modules/@types/node/",
+        ["npm:16.4.11", {
+          "packageLocation": "./.yarn/cache/@types-node-npm-16.4.11-9f16741294-9c50c79acc.zip/node_modules/@types/node/",
           "packageDependencies": [
-            ["@types/node", "npm:15.12.4"]
+            ["@types/node", "npm:16.4.11"]
           ],
           "linkType": "HARD",
         }]
@@ -4565,6 +4578,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["bech32", [
+        ["npm:2.0.0", {
+          "packageLocation": "./.yarn/cache/bech32-npm-2.0.0-ad98b7dd79-fa15acb270.zip/node_modules/bech32/",
+          "packageDependencies": [
+            ["bech32", "npm:2.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["bignumber.js", [
         ["npm:9.0.1", {
           "packageLocation": "./.yarn/cache/bignumber.js-npm-9.0.1-270d0c8a55-6e72f6069d.zip/node_modules/bignumber.js/",
@@ -4586,6 +4608,27 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/binary-extensions-npm-2.2.0-180c33fec7-ccd267956c.zip/node_modules/binary-extensions/",
           "packageDependencies": [
             ["binary-extensions", "npm:2.2.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["blake2b", [
+        ["npm:2.1.3", {
+          "packageLocation": "./.yarn/cache/blake2b-npm-2.1.3-b5b61ec9ad-e652234249.zip/node_modules/blake2b/",
+          "packageDependencies": [
+            ["blake2b", "npm:2.1.3"],
+            ["blake2b-wasm", "npm:1.1.7"],
+            ["nanoassert", "npm:1.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["blake2b-wasm", [
+        ["npm:1.1.7", {
+          "packageLocation": "./.yarn/cache/blake2b-wasm-npm-1.1.7-ac747aaa82-be5ebacdd2.zip/node_modules/blake2b-wasm/",
+          "packageDependencies": [
+            ["blake2b-wasm", "npm:1.1.7"],
+            ["nanoassert", "npm:1.1.0"]
           ],
           "linkType": "HARD",
         }]
@@ -8626,6 +8669,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/ms-npm-2.1.3-81ff3cfac1-aa92de6080.zip/node_modules/ms/",
           "packageDependencies": [
             ["ms", "npm:2.1.3"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["nanoassert", [
+        ["npm:1.1.0", {
+          "packageLocation": "./.yarn/cache/nanoassert-npm-1.1.0-1da45b4766-f360fe639d.zip/node_modules/nanoassert/",
+          "packageDependencies": [
+            ["nanoassert", "npm:1.1.0"]
           ],
           "linkType": "HARD",
         }]
