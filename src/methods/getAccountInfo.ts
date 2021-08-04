@@ -10,6 +10,7 @@ import {
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
+import { transformToken } from '../utils/asset';
 
 export default async (
   id: number,
@@ -57,7 +58,7 @@ export default async (
     };
 
     if (details !== 'basic') {
-      accountInfo.tokens = tokensBalances;
+      accountInfo.tokens = tokensBalances.map(t => transformToken(t));
     }
 
     if (details === 'txs' || details === 'txids') {

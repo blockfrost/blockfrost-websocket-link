@@ -14,6 +14,7 @@
   "dependencies": {
     "@blockfrost/blockfrost-js": "0.9.2",
     "@emurgo/cardano-serialization-lib-nodejs": "^7.1.0",
+    "@emurgo/cip14-js": "^2.0.0",
     "@sentry/node": "^6.10.0",
     "@sentry/tracing": "^6.10.0",
     "bignumber.js": "9.0.1",
@@ -29,7 +30,7 @@
     "@babel/preset-typescript": "^7.14.5",
     "@types/express": "^4.17.12",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.12.4",
+    "@types/node": "^16.4.11",
     "@types/validator": "^13.1.4",
     "@types/ws": "^7.4.5",
     "@typescript-eslint/eslint-plugin": "latest",
