@@ -27,7 +27,7 @@ export const prepareMessage = (
     | Responses['tx_content']
     | UtxosWithBlockResponse[]
     | { subscribed: boolean }
-    | { lovelacePerByte: string }[],
+    | { lovelacePerByte: number }[],
 ): string => {
   return JSON.stringify({ id, type: 'message', data });
 };

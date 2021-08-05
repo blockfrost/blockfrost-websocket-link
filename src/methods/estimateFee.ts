@@ -7,7 +7,7 @@ export default async (id: number): Promise<string> => {
     const epochsLatest = await blockfrostAPI.epochsLatest();
     const epochsParameters = await blockfrostAPI.epochsParameters(epochsLatest.epoch);
     result.push({
-      lovelacePerByte: epochsParameters.min_fee_a.toString(),
+      lovelacePerByte: epochsParameters.min_fee_a,
     });
     const message = prepareMessage(id, result);
     return message;
