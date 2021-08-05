@@ -257,110 +257,32 @@ export const addressesToTxIds = async (
 export const getAddressesData = async (
   addresses: Addresses.Result[],
 ): Promise<Addresses.AddressData[]> => {
-  const bundle: Addresses.GetAddressDataBundle[] = [];
-
-  addresses.map(addr => {
-    const promise = blockfrostAPI.addressesTxsAll(addr.address);
-    bundle.push({
-      promise,
-      address: addr.address,
-      path: addr.path,
-    });
-  });
-
-  const txIds: { address: string; path: string; txIds: string[] }[] = [];
-
-  await Promise.all(
-    bundle.map(p =>
-      p.promise
-        .then(data => {
-          txIds.push({
-            address: p.address,
-            path: p.path,
-            txIds: data,
-          });
-        })
-        .catch(error => {
-          if (error.status === 404) {
-            txIds.push({
-              address: p.address,
-              path: p.path,
-              txIds: [],
-            });
-          } else {
-            console.log('error', error);
-            console.log('error JSON.stringify', JSON.stringify(error));
-          }
-        }),
-    ),
+  const promises = addresses.map(addr =>
+    blockfrostAPI.addressesTotal(addr.address).catch(error => {
+      if (error.status_code === 404) {
+        return {
+          address: addr.address,
+          path: addr.path,
+          tx_count: 0,
+          received_sum: [{ unit: 'lovelace', quantity: '0' }],
+          sent_sum: [{ unit: 'lovelace', quantity: '0' }],
+        };
+      } else {
+        throw Error(error);
+      }
+    }),
   );
-
-  const bundleAddressesTxUtxos: {
-    address: string;
-    path: string;
-    promise: Promise<Responses['tx_content_utxo']>;
-  }[] = [];
-
-  txIds.map(data => {
-    data.txIds.map(txId => {
-      const promise = blockfrostAPI.txsUtxos(txId);
-      bundleAddressesTxUtxos.push({
-        promise,
-        address: data.address,
-        path: data.path,
-      });
-    });
-  });
-
-  const res: {
-    address: string;
-    path: string;
-    utxos: Responses['tx_content_utxo'];
-  }[] = [];
-
-  await Promise.all(
-    bundleAddressesTxUtxos.map(p =>
-      p.promise
-        .then(data => {
-          const item = res.find(r => r.address === p.address);
-
-          if (!item) {
-            res.push({
-              address: p.address,
-              path: p.path,
-              utxos: data,
-            });
-          } else {
-            item.utxos.outputs = [...item.utxos.outputs, ...data.outputs];
-            item.utxos.inputs = [...item.utxos.inputs, ...data.inputs];
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          console.log('error JSON.stringify', JSON.stringify(error));
-        }),
-    ),
-  );
-
-  const result = res.map(r => {
-    const received = r.utxos.inputs.reduce((acc, currentValue) => {
-      const lovelaceAmount = currentValue.amount.find(a => a.unit === 'lovelace');
-      return acc.plus(lovelaceAmount?.quantity || '0');
-    }, new BigNumber(0));
-
-    const sent = r.utxos.outputs.reduce((acc, currentValue) => {
-      const lovelaceAmount = currentValue.amount.find(a => a.unit === 'lovelace');
-      return acc.plus(lovelaceAmount?.quantity || '0');
-    }, new BigNumber(0));
+  const responses = await Promise.all(promises);
+  return addresses.map(addr => {
+    const response = responses.find(r => r.address === addr.address);
+    if (!response) throw Error('Failed getAddressData');
 
     return {
-      address: r.address,
-      path: r.path,
-      transfers: r.utxos.inputs.length + r.utxos.outputs.length,
-      received: received.toString(),
-      sent: sent.toString(),
+      address: addr.address,
+      path: addr.path,
+      transfers: response.tx_count,
+      received: response.received_sum.find(b => b.unit === 'lovelace')?.quantity ?? '0',
+      sent: response.sent_sum.find(b => b.unit === 'lovelace')?.quantity ?? '0',
     };
   });
-
-  return result;
 };
