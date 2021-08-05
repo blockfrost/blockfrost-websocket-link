@@ -3,12 +3,13 @@ import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export default async (id: number): Promise<string> => {
   try {
-    const result = [];
     const epochsLatest = await blockfrostAPI.epochsLatest();
     const epochsParameters = await blockfrostAPI.epochsParameters(epochsLatest.epoch);
-    result.push({
-      lovelacePerByte: epochsParameters.min_fee_a.toString(),
-    });
+
+    const result = {
+      lovelacePerByte: epochsParameters.min_fee_a,
+    };
+
     const message = prepareMessage(id, result);
     return message;
   } catch (err) {

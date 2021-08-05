@@ -63,21 +63,16 @@ export default async (
 
     if (details === 'txs' || details === 'txids') {
       const txs = await txIdsToTransactions(transactionsIds);
-      try {
-        const paginatedTxs = paginate(txs, pageSizeNumber);
-        const paginatedTxsCount = paginatedTxs.length;
 
-        if (paginatedTxsCount > page) {
-          accountInfo.history.transactions = paginatedTxs[pageNumber];
-          accountInfo.history.total = paginatedTxs.length;
-        }
+      const paginatedTxs = paginate(txs, pageSizeNumber);
+      const paginatedTxsCount = paginatedTxs.length;
 
-        accountInfo.page.total = paginatedTxs.length;
-      } catch (err) {
-        console.log('err', err);
-        const message = prepareMessage(id, accountInfo);
-        return message;
+      if (paginatedTxsCount > page) {
+        accountInfo.history.transactions = paginatedTxs[pageNumber];
+        accountInfo.history.total = paginatedTxs.length;
       }
+
+      accountInfo.page.total = paginatedTxs.length;
     }
 
     if (details === 'txs') {
@@ -105,7 +100,7 @@ export default async (
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareMessage(id, err);
+    const message = prepareErrorMessage(id, err);
     return message;
   }
 };
