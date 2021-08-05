@@ -15,11 +15,15 @@ const deriveAddress = (
   addressIndex: number,
   type: number,
 ): { address: string; path: string } => {
+  const networkId = blockfrostAPI.apiUrl.includes('mainnet')
+    ? NetworkInfo.mainnet().network_id()
+    : NetworkInfo.testnet().network_id();
+
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const utxoPubKey = accountKey.derive(type).derive(addressIndex);
   const stakeKey = accountKey.derive(2).derive(0);
   const baseAddr = BaseAddress.new(
-    NetworkInfo.mainnet().network_id(),
+    networkId,
     StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
     StakeCredential.from_keyhash(stakeKey.to_raw_key().hash()),
   );
