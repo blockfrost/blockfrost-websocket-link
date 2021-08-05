@@ -13,7 +13,7 @@ import {
 const deriveAddress = (
   publicKey: string,
   addressIndex: number,
-  type = 1 | 0,
+  type: number,
 ): { address: string; path: string } => {
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const utxoPubKey = accountKey.derive(type).derive(addressIndex);
@@ -72,7 +72,14 @@ export const discoverAddresses = async (
     addressDiscoveredCount++;
   }
 
-  return result;
+  const sortedResult = result.sort((item1, item2) => {
+    const path1 = parseInt(item1.path.split('/').slice(-1)[0], 10);
+    const path2 = parseInt(item2.path.split('/').slice(-1)[0], 10);
+
+    return path1 - path2;
+  });
+
+  return sortedResult;
 };
 
 export const addressesToBalances = async (
