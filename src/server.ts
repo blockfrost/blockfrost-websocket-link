@@ -61,19 +61,19 @@ const heartbeat = (ws: Server.Ws) => {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 function noop() {}
 
+const interval = setInterval(() => {
+  wss.clients.forEach(w => {
+    const ws = w as Server.Ws;
+    if (ws.isAlive === false) {
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping(noop);
+  });
+}, 30000);
+
 wss.on('connection', (ws: Server.Ws) => {
-  const interval = setInterval(() => {
-    wss.clients.forEach(w => {
-      const ws = w as Server.Ws;
-      if (ws.isAlive === false) {
-        return ws.terminate();
-      }
-
-      ws.isAlive = false;
-      ws.ping(noop);
-    });
-  }, 5000);
-
   let activeSubscriptions: Server.Subscription[] = [];
   let addressedSubscribed: string[] = [];
 
