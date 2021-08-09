@@ -25,7 +25,6 @@ type Transactions =
 
 export interface TokenBalance extends Balance {
   decimals: number;
-  fingerprint: string;
 }
 export interface AccountInfo {
   balance: string;
