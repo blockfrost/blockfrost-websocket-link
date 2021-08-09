@@ -71,8 +71,8 @@ export const txIdsToTransactions = async (
 export const getBlockTransactionsByAddresses = async (
   block: Responses['block_content'],
   addresses: string[],
-): Promise<Responses['tx_content'][]> => {
-  const blockAddressTxs: Responses['tx_content'][] = [];
+): Promise<Types.TxIdsToTransactionsResponse[]> => {
+  const blockAddressTxs: { address: string; data: Responses['tx_content'] }[] = [];
 
   const promisesBundle: {
     address: string;
@@ -115,7 +115,7 @@ export const getBlockTransactionsByAddresses = async (
       p.promise
         .then(data => {
           if (data.block === block.hash) {
-            blockAddressTxs.push(data);
+            blockAddressTxs.push({ address: p.address, data });
           }
         })
         .catch(error => {
@@ -124,5 +124,12 @@ export const getBlockTransactionsByAddresses = async (
     ),
   );
 
-  return blockAddressTxs;
+  const prepared = blockAddressTxs.map(tx => ({
+    address: tx.address,
+    data: [tx.data.hash],
+  }));
+
+  const result = txIdsToTransactions(prepared);
+
+  return result;
 };
