@@ -1,5 +1,6 @@
 import { Responses } from '@blockfrost/blockfrost-js';
 import { Messages } from '../types/message';
+import * as TxTypes from '../types/transactions';
 import { UtxosWithBlockResponse } from '../types/address';
 import { AccountInfo, ServerInfo } from '../types/response';
 
@@ -23,7 +24,7 @@ export const prepareMessage = (
     | AccountInfo
     | string
     | Responses['block_content']
-    | Responses['tx_content'][]
+    | TxTypes.TxIdsToTransactionsResponse[]
     | Responses['tx_content']
     | UtxosWithBlockResponse[]
     | { subscribed: boolean }
