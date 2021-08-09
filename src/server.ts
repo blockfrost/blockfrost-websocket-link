@@ -37,7 +37,7 @@ const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-server.keepAliveTimeout = 60000;
+server.keepAliveTimeout = 65000;
 
 let subscribeBlockInterval: NodeJS.Timeout;
 
@@ -71,7 +71,7 @@ const interval = setInterval(() => {
     ws.isAlive = false;
     ws.ping(noop);
   });
-}, 30000);
+}, 60000);
 
 wss.on('connection', (ws: Server.Ws) => {
   let activeSubscriptions: Server.Subscription[] = [];
