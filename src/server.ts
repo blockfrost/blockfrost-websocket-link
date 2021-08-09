@@ -37,6 +37,8 @@ const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+server.keepAliveTimeout = 60000;
+
 let subscribeBlockInterval: NodeJS.Timeout;
 
 // index route
