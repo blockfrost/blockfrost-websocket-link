@@ -71,7 +71,7 @@ const interval = setInterval(() => {
     ws.isAlive = false;
     ws.ping(noop);
   });
-}, 5000);
+}, 30000);
 
 wss.on('connection', (ws: Server.Ws) => {
   let activeSubscriptions: Server.Subscription[] = [];
