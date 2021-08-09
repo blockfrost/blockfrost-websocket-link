@@ -70,7 +70,7 @@ wss.on('connection', (ws: Server.Ws) => {
       ws.isAlive = false;
       ws.ping(noop);
     });
-  }, 60000);
+  }, 5000);
 
   let activeSubscriptions: Server.Subscription[] = [];
   let addressedSubscribed: string[] = [];
