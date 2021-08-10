@@ -62,7 +62,9 @@ export const txIdsToTransactions = async (
   );
 
   const sortedTxs = result.sort(
-    (first, second) => first.txData.block_height - second.txData.block_height,
+    (first, second) =>
+      second.txData.block_height - first.txData.block_height ||
+      second.txData.index - first.txData.index,
   );
 
   return sortedTxs;
