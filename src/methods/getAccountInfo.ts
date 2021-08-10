@@ -39,6 +39,7 @@ export default async (
 
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
+    const txCount = transactionsPerAddressList.reduce((acc, item) => acc + item.data.length, 0);
 
     const uniqueTxIds: string[] = [];
     transactionsPerAddressList.forEach(item => {
@@ -55,7 +56,7 @@ export default async (
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',
       history: {
-        total: uniqueTxIds.length,
+        total: txCount,
         unconfirmed: 0,
         transactions: [],
       },
