@@ -16,7 +16,7 @@ export default async (
   id: number,
   publicKey: string,
   details: Messages.Details,
-  page = 0,
+  page = 1,
   pageSize = 25,
 ): Promise<string> => {
   const pageSizeNumber = Number(pageSize);
@@ -34,7 +34,7 @@ export default async (
 
     const addresses = [...externalAddresses, ...internalAddresses];
     const empty = await isAccountEmpty(addresses);
-    const transactionsIds = await addressesToTxIds(addresses);
+    const transactionsPerAddressList = await addressesToTxIds(addresses);
     const balances = await addressesToBalances(addresses);
 
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
@@ -46,7 +46,7 @@ export default async (
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',
       history: {
-        total: transactionsIds.length,
+        total: 0,
         unconfirmed: 0,
         transactions: [],
       },
@@ -62,16 +62,10 @@ export default async (
     }
 
     if (details === 'txs' || details === 'txids') {
-      const txs = await txIdsToTransactions(transactionsIds);
-
+      const txs = await txIdsToTransactions(transactionsPerAddressList);
       const paginatedTxs = paginate(txs, pageSizeNumber);
-      const paginatedTxsCount = paginatedTxs.length;
-
-      if (paginatedTxsCount > page) {
-        accountInfo.history.transactions = paginatedTxs[pageNumber];
-        accountInfo.history.total = paginatedTxs.length;
-      }
-
+      accountInfo.history.transactions = paginatedTxs[pageNumber];
+      accountInfo.history.total = txs.length;
       accountInfo.page.total = paginatedTxs.length;
     }
 
