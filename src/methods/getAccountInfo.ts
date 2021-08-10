@@ -40,13 +40,22 @@ export default async (
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
 
+    const uniqueTxIds: string[] = [];
+    transactionsPerAddressList.forEach(item => {
+      item.data.forEach(id => {
+        if (!uniqueTxIds.includes(id)) {
+          uniqueTxIds.push(id);
+        }
+      });
+    });
+
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
       empty,
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',
       history: {
-        total: 0,
+        total: uniqueTxIds.length,
         unconfirmed: 0,
         transactions: [],
       },
