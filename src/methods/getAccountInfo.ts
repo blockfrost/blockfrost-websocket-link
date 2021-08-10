@@ -11,6 +11,7 @@ import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
 import { transformToken } from '../utils/asset';
+import { TxIdsToTransactionsResponse } from 'types/transactions';
 
 export default async (
   id: number,
@@ -39,7 +40,14 @@ export default async (
 
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
-    const txCount = transactionsPerAddressList.reduce((acc, item) => acc + item.data.length, 0);
+    const uniqueTxIds: string[] = [];
+    transactionsPerAddressList.forEach(item => {
+      item.data.forEach(id => {
+        if (!uniqueTxIds.includes(id)) {
+          uniqueTxIds.push(id);
+        }
+      });
+    });
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
@@ -47,13 +55,13 @@ export default async (
       balance: lovelaceBalance?.quantity || '0',
       availableBalance: lovelaceBalance?.quantity || '0',
       history: {
-        total: txCount,
+        total: uniqueTxIds.length,
         unconfirmed: 0,
       },
       page: {
         index: page,
         size: pageSize,
-        total: Math.ceil(txCount / pageSize),
+        total: Math.ceil(uniqueTxIds.length / pageSize),
       },
     };
 
@@ -63,10 +71,15 @@ export default async (
 
     if (details === 'txs' || details === 'txids') {
       const txs = await txIdsToTransactions(transactionsPerAddressList);
-      const paginatedTxs = paginate(txs, pageSizeNumber);
+      const uniqueTxs: TxIdsToTransactionsResponse[] = [];
+      txs.forEach(tx => {
+        if (!uniqueTxs.find(ut => ut.txHash === tx.txHash)) {
+          uniqueTxs.push(tx);
+        }
+      });
+      const paginatedTxs = paginate(uniqueTxs, pageSizeNumber);
       accountInfo.history.transactions = paginatedTxs[pageNumber];
-      accountInfo.history.total = txs.length;
-      accountInfo.page.total = paginatedTxs.length;
+      accountInfo.page.total = paginatedTxs.length; // number of pages
     }
 
     if (details === 'txs') {
