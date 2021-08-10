@@ -1,5 +1,5 @@
 import { Balance, AddressData } from './address';
-import { Responses } from '@blockfrost/blockfrost-js';
+import { TxIdsToTransactionsResponse } from './transactions';
 
 export interface ServerInfo {
   name: string;
@@ -13,16 +13,7 @@ export interface ServerInfo {
 
 export type BlockHash = string;
 
-type Transactions =
-  | {
-      address: string;
-      data: string[];
-    }[]
-  | {
-      address: string;
-      data: Responses['tx_content'];
-    }[];
-
+type Transactions = TxIdsToTransactionsResponse[];
 export interface TokenBalance extends Balance {
   decimals: number;
 }

@@ -1,9 +1,13 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const paginate = (input: any[], size: number): any[][] => {
-  return input.reduce((ac, val, i) => {
-    const id = Math.floor(i / size);
+import { TxIdsToTransactionsResponse } from 'types/transactions';
+
+export const paginate = (
+  transactions: TxIdsToTransactionsResponse[],
+  pageSize: number,
+): TxIdsToTransactionsResponse[][] => {
+  return transactions.reduce((ac, val, i) => {
+    const id = Math.floor(i / pageSize);
     const page = ac[id] || (ac[id] = []);
     page.push(val);
     return ac;
-  }, []);
+  }, [] as TxIdsToTransactionsResponse[][]);
 };

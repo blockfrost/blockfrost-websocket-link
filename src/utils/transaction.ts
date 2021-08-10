@@ -131,7 +131,7 @@ export const getBlockTransactionsByAddresses = async (
     data: [tx.data.hash],
   }));
 
-  const result = txIdsToTransactions(prepared);
+  const result = await txIdsToTransactions(prepared);
 
   return result;
 };
