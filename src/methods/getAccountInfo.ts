@@ -20,7 +20,7 @@ export default async (
   pageSize = 25,
 ): Promise<string> => {
   const pageSizeNumber = Number(pageSize);
-  const pageNumber = Number(page);
+  const pageNumber = Number(page) - 1;
 
   if (!publicKey) {
     const message = prepareErrorMessage(id, 'Missing parameter descriptor');
@@ -41,15 +41,6 @@ export default async (
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
     const txCount = transactionsPerAddressList.reduce((acc, item) => acc + item.data.length, 0);
 
-    const uniqueTxIds: string[] = [];
-    transactionsPerAddressList.forEach(item => {
-      item.data.forEach(id => {
-        if (!uniqueTxIds.includes(id)) {
-          uniqueTxIds.push(id);
-        }
-      });
-    });
-
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
       empty,
@@ -58,12 +49,11 @@ export default async (
       history: {
         total: txCount,
         unconfirmed: 0,
-        transactions: [],
       },
       page: {
         index: page,
         size: pageSize,
-        total: 0,
+        total: Math.ceil(txCount / pageSize),
       },
     };
 
