@@ -48,17 +48,20 @@ export interface Utxo {
 export interface UtxosWithBlockResponse {
   address: string;
   utxoData: Utxo;
+  path: string;
   blockInfo: Responses['block_content'];
 }
 
 export interface UtxosWithBlocksBundle {
   address: string;
+  path: string;
   utxoData: Utxo;
   promise: Promise<Responses['block_content']>;
 }
 
 export type UtxosWithBlocksParams = {
   address: string;
+  path: string;
   data: Responses['address_utxo_content'] | 'empty';
 }[];
 
