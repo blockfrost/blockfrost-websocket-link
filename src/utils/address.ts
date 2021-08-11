@@ -117,15 +117,19 @@ export const addressesToBalances = async (
 };
 
 export const addressesToUtxos = async (
-  addresses: { address: string; data: Responses['address_content'] | 'empty' }[],
-): Promise<{ address: string; data: Responses['address_utxo_content'] | 'empty' }[]> => {
+  addresses: { address: string; path: string; data: Responses['address_content'] | 'empty' }[],
+): Promise<
+  { address: string; path: string; data: Responses['address_utxo_content'] | 'empty' }[]
+> => {
   const promisesBundle: {
     address: string;
+    path: string;
     promise: Promise<Responses['address_utxo_content']>;
   }[] = [];
 
   const result: {
     address: string;
+    path: string;
     data: Responses['address_utxo_content'] | 'empty';
   }[] = [];
 
@@ -133,14 +137,14 @@ export const addressesToUtxos = async (
     if (item.data === 'empty') return;
 
     const promise = blockfrostAPI.addressesUtxosAll(item.address);
-    promisesBundle.push({ address: item.address, promise });
+    promisesBundle.push({ address: item.address, path: item.path, promise });
   });
 
   await Promise.all(
     promisesBundle.map(p =>
       p.promise
         .then(data => {
-          result.push({ address: p.address, data });
+          result.push({ address: p.address, data, path: p.path });
         })
         .catch(error => {
           console.log(error);
@@ -197,7 +201,7 @@ export const utxosWithBlocks = async (
 
     utxo.data.map(utxoData => {
       const promise = blockfrostAPI.blocks(utxoData.block);
-      promisesBundle.push({ address: utxo.address, utxoData, promise });
+      promisesBundle.push({ address: utxo.address, path: utxo.path, utxoData, promise });
     });
   });
 
@@ -207,6 +211,7 @@ export const utxosWithBlocks = async (
         .then(data => {
           result.push({
             address: p.address,
+            path: p.path,
             utxoData: p.utxoData,
             blockInfo: data,
           });
