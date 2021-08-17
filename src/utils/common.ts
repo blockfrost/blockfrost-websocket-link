@@ -18,14 +18,18 @@ const formatCoingeckoTime = (date: number): string => {
   return format(date * 1000, 'mm-dd-yyyy');
 };
 
-export const getRatesForDate = async (date: number): Promise<Record<number, string> | null> => {
+export const getRatesForDate = async (date: number): Promise<Record<string, number> | null> => {
   const coingeckoDateFormat = formatCoingeckoTime(date);
-  console.log('coingeckoDateFormat', coingeckoDateFormat);
+
   try {
-    const response = await got(
+    const response: {
+      market_data: {
+        current_price: Record<string, number>;
+      };
+    } = await got(
       `https://api.coingecko.com/api/v3/coins/cardano/history?date=${coingeckoDateFormat}`,
     ).json();
-    // @ts-ignore
+
     return response.market_data.current_price;
   } catch (error) {
     console.log(error);
