@@ -16,7 +16,7 @@ export const deriveAddress = (
   addressIndex: number,
   type: number,
 ): { address: string; path: string } => {
-  const networkId = getNetworkId();
+  const networkId = getNetworkId(blockfrostAPI.apiUrl);
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const utxoPubKey = accountKey.derive(type).derive(addressIndex);
   const stakeKey = accountKey.derive(2).derive(0);
@@ -34,7 +34,7 @@ export const deriveAddress = (
 
 export const deriveStakeAddress = (publicKey: string): string => {
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
-  const networkId = getNetworkId();
+  const networkId = getNetworkId(blockfrostAPI.apiUrl);
   const stakeKey = accountKey.derive(2).derive(0);
   const rewardAddr = RewardAddress.new(
     networkId,

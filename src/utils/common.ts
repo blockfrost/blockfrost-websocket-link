@@ -39,8 +39,8 @@ export const getRatesForDate = async (date: number): Promise<Record<string, numb
   }
 };
 
-export const getNetworkId = (): number => {
-  const networkId = blockfrostAPI.apiUrl.includes('mainnet')
+export const getNetworkId = (apiUrl: string): number => {
+  const networkId = apiUrl.includes('mainnet')
     ? NetworkInfo.mainnet().network_id()
     : NetworkInfo.testnet().network_id();
 
