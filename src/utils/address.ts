@@ -7,10 +7,11 @@ import {
   Bip32PublicKey,
   BaseAddress,
   NetworkInfo,
+  RewardAddress,
   StakeCredential,
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
-const deriveAddress = (
+export const deriveAddress = (
   publicKey: string,
   addressIndex: number,
   type: number,
@@ -32,6 +33,19 @@ const deriveAddress = (
     address: baseAddr.to_address().to_bech32(),
     path: `m/1852'/1815'/i'/${type}/${addressIndex}`,
   };
+};
+
+export const deriveStakeAddress = (publicKey: string): string => {
+  const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
+  const stakeKey = accountKey.derive(2).derive(0);
+  const rewardAddr = RewardAddress.new(
+    NetworkInfo.mainnet().network_id(),
+    StakeCredential.from_keyhash(stakeKey.to_raw_key().hash()),
+  )
+    .to_address()
+    .to_bech32();
+
+  return rewardAddr;
 };
 
 export const discoverAddresses = async (

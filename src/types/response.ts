@@ -17,6 +17,7 @@ type Transactions = TxIdsToTransactionsResponse[];
 export interface TokenBalance extends Balance {
   decimals: number;
 }
+
 export interface AccountInfo {
   balance: string;
   addresses?: {
@@ -38,5 +39,8 @@ export interface AccountInfo {
     size: number;
     total: number;
     index: number;
+  };
+  misc: {
+    rewards: string;
   };
 }

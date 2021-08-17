@@ -13,6 +13,16 @@ export type Messages =
     }
   | {
       id: number;
+      command: 'GET_BALANCE_HISTORY';
+      params: {
+        descriptor: string;
+        from: number;
+        to: number;
+        groupBy: string;
+      };
+    }
+  | {
+      id: number;
       command: 'GET_ACCOUNT_UTXO';
       params: {
         descriptor: string;

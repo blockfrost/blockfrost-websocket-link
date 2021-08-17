@@ -30,6 +30,7 @@ export const prepareMessage = (
     | AccountInfo
     | string
     | Responses['block_content']
+    | TxTypes.BalanceHistoryItem[]
     | TxTypes.TxIdsToTransactionsResponse[]
     | Responses['tx_content']
     | UtxosWithBlockResponse[]

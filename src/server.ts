@@ -19,6 +19,7 @@ import getBlock from './methods/getBlock';
 import getTransaction from './methods/getTransaction';
 import submitTransaction from './methods/pushTransaction';
 import estimateFee from './methods/estimateFee';
+import getBalanceHistory from './methods/getBalanceHistory';
 
 dotenv.config();
 
@@ -138,37 +139,37 @@ wss.on('connection', (ws: Server.Ws) => {
 
     switch (data.command) {
       case MESSAGES.GET_SERVER_INFO: {
-        const serverInfoMessage = await getServerInfo(data.id);
-        ws.send(serverInfoMessage);
+        const message = await getServerInfo(data.id);
+        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_TRANSACTION: {
-        const txMessage = await getTransaction(data.id, data.params.txId);
-        ws.send(txMessage);
+        const message = await getTransaction(data.id, data.params.txId);
+        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_BLOCK: {
-        const blockHashMessage = await getBlock(data.id, data.params.hashOrNumber);
-        ws.send(blockHashMessage);
+        const message = await getBlock(data.id, data.params.hashOrNumber);
+        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_ACCOUNT_UTXO: {
-        const accountUtxoMessage = await getAccountUtxo(data.id, data.params.descriptor);
-        ws.send(accountUtxoMessage);
+        const message = await getAccountUtxo(data.id, data.params.descriptor);
+        ws.send(message);
         break;
       }
 
       case MESSAGES.ESTIMATE_FEE: {
-        const estimateFeeMessage = await estimateFee(data.id);
-        ws.send(estimateFeeMessage);
+        const message = await estimateFee(data.id);
+        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_ACCOUNT_INFO: {
-        const accountInfoMessage = await getAccountInfo(
+        const message = await getAccountInfo(
           data.id,
           data.params.descriptor,
           data.params.details,
@@ -176,7 +177,20 @@ wss.on('connection', (ws: Server.Ws) => {
           data.params.pageSize,
         );
 
-        ws.send(accountInfoMessage);
+        ws.send(message);
+        break;
+      }
+
+      case MESSAGES.GET_BALANCE_HISTORY: {
+        const message = await getBalanceHistory(
+          data.id,
+          data.params.descriptor,
+          data.params.from,
+          data.params.to,
+          data.params.groupBy,
+        );
+
+        ws.send(message);
         break;
       }
 
