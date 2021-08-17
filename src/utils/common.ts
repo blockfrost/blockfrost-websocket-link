@@ -1,5 +1,7 @@
 import { format } from 'date-fns';
 import got from 'got';
+import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { NetworkInfo } from '@emurgo/cardano-serialization-lib-nodejs';
 
 export const paginate = <T>(items: T[], pageSize: number): T[][] => {
   return items.reduce((ac, val, i) => {
@@ -35,4 +37,12 @@ export const getRatesForDate = async (date: number): Promise<Record<string, numb
     console.log(error);
     return null;
   }
+};
+
+export const getNetworkId = (): number => {
+  const networkId = blockfrostAPI.apiUrl.includes('mainnet')
+    ? NetworkInfo.mainnet().network_id()
+    : NetworkInfo.testnet().network_id();
+
+  return networkId;
 };
