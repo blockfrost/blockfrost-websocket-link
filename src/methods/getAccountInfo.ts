@@ -52,7 +52,7 @@ export default async (
 
     const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
     const balanceBig = new BigNumber(lovelaceBalance?.quantity || '0').plus(
-      stakeAddressData.rewards_sum,
+      stakeAddressData.withdrawable_amount,
     );
 
     const accountInfo: Responses.AccountInfo = {
@@ -70,7 +70,8 @@ export default async (
         total: Math.ceil(uniqueTxIds.length / pageSize),
       },
       misc: {
-        rewards: stakeAddressData.rewards_sum,
+        rewards: stakeAddressData.withdrawable_amount,
+        isCurrentlyStaking: stakeAddressData.active && stakeAddressData.pool_id !== null,
       },
     };
 

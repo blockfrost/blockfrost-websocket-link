@@ -1,6 +1,5 @@
 import { format } from 'date-fns';
 import got from 'got';
-import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { NetworkInfo } from '@emurgo/cardano-serialization-lib-nodejs';
 
 export const paginate = <T>(items: T[], pageSize: number): T[][] => {

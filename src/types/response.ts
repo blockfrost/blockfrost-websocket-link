@@ -42,5 +42,6 @@ export interface AccountInfo {
   };
   misc: {
     rewards: string;
+    isCurrentlyStaking: boolean;
   };
 }
