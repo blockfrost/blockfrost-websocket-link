@@ -1,11 +1,14 @@
 import * as Responses from '../types/response';
+import BigNumber from 'bignumber.js';
 import * as Messages from '../types/message';
+import { blockfrostAPI } from '../utils/blockfrostAPI';
 import {
   discoverAddresses,
   addressesToBalances,
   addressesToTxIds,
   isAccountEmpty,
   getAddressesData,
+  deriveStakeAddress,
 } from '../utils/address';
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
@@ -25,19 +28,17 @@ export default async (
 
   if (!publicKey) {
     const message = prepareErrorMessage(id, 'Missing parameter descriptor');
-
     return message;
   }
 
   try {
     const externalAddresses = await discoverAddresses(publicKey, 0);
     const internalAddresses = await discoverAddresses(publicKey, 1);
-
+    const stakeAddress = deriveStakeAddress(publicKey);
     const addresses = [...externalAddresses, ...internalAddresses];
     const empty = await isAccountEmpty(addresses);
     const transactionsPerAddressList = await addressesToTxIds(addresses);
     const balances = await addressesToBalances(addresses);
-
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
     const uniqueTxIds: string[] = [];
@@ -49,10 +50,15 @@ export default async (
       });
     });
 
+    const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
+    const balanceBig = new BigNumber(lovelaceBalance?.quantity || '0').plus(
+      stakeAddressData.withdrawable_amount,
+    );
+
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
       empty,
-      balance: lovelaceBalance?.quantity || '0',
+      balance: balanceBig.toString(),
       availableBalance: lovelaceBalance?.quantity || '0',
       history: {
         total: uniqueTxIds.length,
@@ -62,6 +68,10 @@ export default async (
         index: page,
         size: pageSize,
         total: Math.ceil(uniqueTxIds.length / pageSize),
+      },
+      misc: {
+        rewards: stakeAddressData.withdrawable_amount,
+        isCurrentlyStaking: stakeAddressData.active && stakeAddressData.pool_id !== null,
       },
     };
 

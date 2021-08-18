@@ -16,3 +16,12 @@ export interface TxIdsToTransactionsPromises {
   txHash: string;
   promise: Promise<Data>;
 }
+
+export interface BalanceHistoryItem {
+  time: number;
+  txs: number;
+  received: string;
+  sent: string;
+  sentToSelf: string;
+  rates: Record<string, number>;
+}

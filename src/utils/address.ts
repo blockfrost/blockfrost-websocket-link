@@ -1,24 +1,22 @@
 import { ADDRESS_GAP_LIMIT } from '../constants';
 import * as Addresses from '../types/address';
+import { getNetworkId } from '../utils/common';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { Responses } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import {
   Bip32PublicKey,
   BaseAddress,
-  NetworkInfo,
+  RewardAddress,
   StakeCredential,
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
-const deriveAddress = (
+export const deriveAddress = (
   publicKey: string,
   addressIndex: number,
   type: number,
 ): { address: string; path: string } => {
-  const networkId = blockfrostAPI.apiUrl.includes('mainnet')
-    ? NetworkInfo.mainnet().network_id()
-    : NetworkInfo.testnet().network_id();
-
+  const networkId = getNetworkId(blockfrostAPI.apiUrl);
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const utxoPubKey = accountKey.derive(type).derive(addressIndex);
   const stakeKey = accountKey.derive(2).derive(0);
@@ -32,6 +30,20 @@ const deriveAddress = (
     address: baseAddr.to_address().to_bech32(),
     path: `m/1852'/1815'/i'/${type}/${addressIndex}`,
   };
+};
+
+export const deriveStakeAddress = (publicKey: string): string => {
+  const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
+  const networkId = getNetworkId(blockfrostAPI.apiUrl);
+  const stakeKey = accountKey.derive(2).derive(0);
+  const rewardAddr = RewardAddress.new(
+    networkId,
+    StakeCredential.from_keyhash(stakeKey.to_raw_key().hash()),
+  )
+    .to_address()
+    .to_bech32();
+
+  return rewardAddr;
 };
 
 export const discoverAddresses = async (
