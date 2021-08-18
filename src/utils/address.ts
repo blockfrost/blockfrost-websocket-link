@@ -303,3 +303,22 @@ export const getAddressesData = async (
     };
   });
 };
+
+export const getStakingData = async (stakeAddress: string): Promise<Addresses.StakingData> => {
+  try {
+    const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
+    return {
+      rewards: stakeAddressData.withdrawable_amount,
+      isActive: stakeAddressData.active && stakeAddressData.pool_id !== null,
+    };
+  } catch (error) {
+    if (error.status_code === 404) {
+      return {
+        rewards: '0',
+        isActive: false,
+      };
+    } else {
+      throw Error(error);
+    }
+  }
+};

@@ -1,7 +1,6 @@
 import * as Responses from '../types/response';
 import BigNumber from 'bignumber.js';
 import * as Messages from '../types/message';
-import { blockfrostAPI } from '../utils/blockfrostAPI';
 import {
   discoverAddresses,
   addressesToBalances,
@@ -9,6 +8,7 @@ import {
   isAccountEmpty,
   getAddressesData,
   deriveStakeAddress,
+  getStakingData,
 } from '../utils/address';
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
@@ -41,6 +41,7 @@ export default async (
     const balances = await addressesToBalances(addresses);
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
+
     const uniqueTxIds: string[] = [];
     transactionsPerAddressList.forEach(item => {
       item.data.forEach(id => {
@@ -50,10 +51,8 @@ export default async (
       });
     });
 
-    const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
-    const balanceBig = new BigNumber(lovelaceBalance?.quantity || '0').plus(
-      stakeAddressData.withdrawable_amount,
-    );
+    const stakingData = await getStakingData(stakeAddress);
+    const balanceBig = new BigNumber(lovelaceBalance?.quantity || '0').plus(stakingData.rewards);
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
@@ -72,8 +71,8 @@ export default async (
       misc: {
         staking: {
           address: stakeAddress,
-          rewards: stakeAddressData.withdrawable_amount,
-          isActive: stakeAddressData.active && stakeAddressData.pool_id !== null,
+          rewards: stakingData.rewards,
+          isActive: stakingData.isActive,
         },
       },
     };
