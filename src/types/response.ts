@@ -41,7 +41,10 @@ export interface AccountInfo {
     index: number;
   };
   misc: {
-    rewards: string;
-    isCurrentlyStaking: boolean;
+    staking: {
+      address: string;
+      isActive: boolean;
+      rewards: string;
+    };
   };
 }
