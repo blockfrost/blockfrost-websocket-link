@@ -70,8 +70,11 @@ export default async (
         total: Math.ceil(uniqueTxIds.length / pageSize),
       },
       misc: {
-        rewards: stakeAddressData.withdrawable_amount,
-        isCurrentlyStaking: stakeAddressData.active && stakeAddressData.pool_id !== null,
+        staking: {
+          address: stakeAddress,
+          rewards: stakeAddressData.withdrawable_amount,
+          isActive: stakeAddressData.active && stakeAddressData.pool_id !== null,
+        },
       },
     };
 
