@@ -70,3 +70,8 @@ export type GetAddressDataBundle = {
   path: string;
   promise: Promise<Responses['address_txs_content']>;
 };
+
+export type StakingData = {
+  rewards: string;
+  isActive: boolean;
+};
