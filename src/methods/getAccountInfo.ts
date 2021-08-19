@@ -73,6 +73,7 @@ export default async (
           address: stakeAddress,
           rewards: stakingData.rewards,
           isActive: stakingData.isActive,
+          poolId: stakingData.poolId,
         },
       },
     };
