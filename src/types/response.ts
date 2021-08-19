@@ -45,6 +45,7 @@ export interface AccountInfo {
       address: string;
       isActive: boolean;
       rewards: string;
+      poolId: string | null;
     };
   };
 }
