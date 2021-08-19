@@ -74,4 +74,5 @@ export type GetAddressDataBundle = {
 export type StakingData = {
   rewards: string;
   isActive: boolean;
+  poolId: string | null;
 };
