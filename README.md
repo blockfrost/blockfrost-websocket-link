@@ -1,14 +1,20 @@
-# websocket-link
+<img src="https://blockfrost.io/images/logo.svg" width="250" align="right" height="90">
 
-#### UI explorer
+# blockfrost-websocket-link
+
+<br/>
+
+<p align="center">Websockets for <a href="https://github.com/blockfrost/blockfrost-websocket-link">Blockfrost.io</a> API</br></p>
+
+## UI explorer
 
 https://websocket-link.blockfrost.dev
 
-#### dev
+## dev
 
 `yarn dev`
 
-#### production
+## production
 
 `yarn start`
 
