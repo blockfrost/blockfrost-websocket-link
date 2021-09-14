@@ -10,11 +10,11 @@
 
 https://websocket-link.blockfrost.dev
 
-## dev
+## Dev
 
 `yarn dev`
 
-## production
+## Production
 
 `yarn start`
 
