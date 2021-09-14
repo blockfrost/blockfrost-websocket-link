@@ -4,7 +4,7 @@
 
 <br/>
 
-<p align="center">Websockets for <a href="https://github.com/blockfrost/blockfrost-websocket-link">Blockfrost.io</a> API</br></p>
+<p align="center">Websockets for <a href="https://blockfrost.io">Blockfrost.io</a> API</br></p>
 
 ## UI explorer
 
