@@ -5,7 +5,6 @@ import {
   discoverAddresses,
   addressesToBalances,
   addressesToTxIds,
-  isAccountEmpty,
   getAddressesData,
   deriveStakeAddress,
   getStakingData,
@@ -32,13 +31,20 @@ export default async (
   }
 
   try {
-    const externalAddresses = await discoverAddresses(publicKey, 0);
-    const internalAddresses = await discoverAddresses(publicKey, 1);
+    const [externalAddresses, internalAddresses] = await Promise.all([
+      discoverAddresses(publicKey, 0),
+      discoverAddresses(publicKey, 1),
+    ]);
     const stakeAddress = deriveStakeAddress(publicKey);
+
     const addresses = [...externalAddresses, ...internalAddresses];
-    const empty = await isAccountEmpty(addresses);
-    const transactionsPerAddressList = await addressesToTxIds(addresses);
-    const balances = await addressesToBalances(addresses);
+    const [transactionsPerAddressList, stakingData] = await Promise.all([
+      addressesToTxIds(addresses),
+      getStakingData(stakeAddress),
+    ]);
+
+    const empty = !transactionsPerAddressList.find(txs => txs.data.length > 0);
+    const balances = addressesToBalances(addresses);
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
 
@@ -51,7 +57,6 @@ export default async (
       });
     });
 
-    const stakingData = await getStakingData(stakeAddress);
     const balanceBig = new BigNumber(lovelaceBalance?.quantity || '0').plus(stakingData.rewards);
 
     const accountInfo: Responses.AccountInfo = {
