@@ -24,7 +24,7 @@ export default async (
   pageSize = 25,
 ): Promise<string> => {
   const pageSizeNumber = Number(pageSize);
-  const pageIndex = Number(page - 1);
+  const pageIndex = Number(page) - 1;
 
   if (page < 1) {
     const message = prepareErrorMessage(id, 'Invalid page number - first page is 1');
