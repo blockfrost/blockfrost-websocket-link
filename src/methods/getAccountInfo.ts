@@ -20,11 +20,16 @@ export default async (
   id: number,
   publicKey: string,
   details: Messages.Details,
-  page = 1,
+  pageIndex = 1,
   pageSize = 25,
 ): Promise<string> => {
   const pageSizeNumber = Number(pageSize);
-  const pageNumber = Number(page) - 1;
+  const pageNumber = Number(pageIndex);
+
+  if (pageNumber < 1) {
+    const message = prepareErrorMessage(id, 'Invalid page number - first page is 1');
+    return message;
+  }
 
   if (!publicKey) {
     const message = prepareErrorMessage(id, 'Missing parameter descriptor');
@@ -64,7 +69,7 @@ export default async (
         unconfirmed: 0,
       },
       page: {
-        index: page,
+        index: pageIndex,
         size: pageSize,
         total: Math.ceil(uniqueTxIds.length / pageSize),
       },
