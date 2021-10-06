@@ -20,13 +20,13 @@ export default async (
   id: number,
   publicKey: string,
   details: Messages.Details,
-  pageIndex = 1,
+  page = 1,
   pageSize = 25,
 ): Promise<string> => {
   const pageSizeNumber = Number(pageSize);
-  const pageNumber = Number(pageIndex);
+  const pageIndex = Number(page - 1);
 
-  if (pageNumber < 1) {
+  if (page < 1) {
     const message = prepareErrorMessage(id, 'Invalid page number - first page is 1');
     return message;
   }
@@ -69,7 +69,7 @@ export default async (
         unconfirmed: 0,
       },
       page: {
-        index: pageIndex,
+        index: page,
         size: pageSize,
         total: Math.ceil(uniqueTxIds.length / pageSize),
       },
@@ -96,7 +96,7 @@ export default async (
         }
       });
       const paginatedTxs = paginate(uniqueTxs, pageSizeNumber);
-      accountInfo.history.transactions = paginatedTxs[pageNumber];
+      accountInfo.history.transactions = paginatedTxs[pageIndex];
       accountInfo.page.total = paginatedTxs.length; // number of pages
     }
 
