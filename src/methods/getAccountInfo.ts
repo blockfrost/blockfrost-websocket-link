@@ -24,7 +24,12 @@ export default async (
   pageSize = 25,
 ): Promise<string> => {
   const pageSizeNumber = Number(pageSize);
-  const pageNumber = Number(page) - 1;
+  const pageIndex = Number(page) - 1;
+
+  if (page < 1) {
+    const message = prepareErrorMessage(id, 'Invalid page number - first page is 1');
+    return message;
+  }
 
   if (!publicKey) {
     const message = prepareErrorMessage(id, 'Missing parameter descriptor');
@@ -91,7 +96,7 @@ export default async (
         }
       });
       const paginatedTxs = paginate(uniqueTxs, pageSizeNumber);
-      accountInfo.history.transactions = paginatedTxs[pageNumber];
+      accountInfo.history.transactions = paginatedTxs[pageIndex];
       accountInfo.page.total = paginatedTxs.length; // number of pages
     }
 
