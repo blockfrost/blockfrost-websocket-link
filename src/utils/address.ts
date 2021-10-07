@@ -50,7 +50,6 @@ export const discoverAddresses = async (
   publicKey: string,
   type: Addresses.Type,
 ): Promise<Addresses.Result[]> => {
-  let addressDiscoveredCount = 0;
   let lastEmptyCount = 0;
   let addressCount = 0;
 
@@ -59,7 +58,7 @@ export const discoverAddresses = async (
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
     const promisesBundle: Addresses.Bundle = [];
 
-    for (let i = addressDiscoveredCount; i < addressDiscoveredCount + ADDRESS_GAP_LIMIT; i++) {
+    for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
       const { address, path } = deriveAddress(publicKey, addressCount, type);
       addressCount++;
       const promise = blockfrostAPI.addresses(address);
@@ -84,8 +83,6 @@ export const discoverAddresses = async (
           }),
       ),
     );
-
-    addressDiscoveredCount++;
   }
 
   const sortedResult = result.sort((item1, item2) => {
@@ -98,9 +95,9 @@ export const discoverAddresses = async (
   return sortedResult;
 };
 
-export const addressesToBalances = async (
+export const addressesToBalances = (
   addresses: { address: string; data: Responses['address_content'] | 'empty' }[],
-): Promise<Addresses.Balance[]> => {
+): Addresses.Balance[] => {
   const balances: Addresses.Balance[] = [];
 
   addresses.map(address => {
