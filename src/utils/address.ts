@@ -170,13 +170,13 @@ export const isAccountEmpty = async (
 ): Promise<boolean> => {
   const promisesBundle: {
     address: string;
-    promise: Promise<Responses['address_txs_content']>;
+    promise: Promise<Responses['address_transactions_content']>;
   }[] = [];
 
   addresses.map(item => {
     if (item.data === 'empty') return;
 
-    const promise = blockfrostAPI.addressesTxs(item.address, {
+    const promise = blockfrostAPI.addressesTransactions(item.address, {
       page: 1,
       count: 1,
     });
@@ -237,20 +237,23 @@ export const utxosWithBlocks = async (
 
 export const addressesToTxIds = async (
   addresses: Addresses.Result[],
-): Promise<{ address: string; data: string[] }[]> => {
+): Promise<{ address: string; data: Responses['address_transactions_content'] }[]> => {
   const promisesBundle: {
     address: string;
-    promise: Promise<string[]>;
+    promise: Promise<Responses['address_transactions_content']>;
   }[] = [];
 
   addresses.map(item => {
     if (item.data === 'empty') return;
 
-    const promise = blockfrostAPI.addressesTxsAll(item.address);
+    const promise = blockfrostAPI.addressesTransactionsAll(item.address);
     promisesBundle.push({ address: item.address, promise });
   });
 
-  const result: { address: string; data: string[] }[] = [];
+  const result: {
+    address: string;
+    data: Responses['address_transactions_content'];
+  }[] = [];
 
   await Promise.all(
     promisesBundle.map(p =>

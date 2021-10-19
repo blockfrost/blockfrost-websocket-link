@@ -74,26 +74,26 @@ export const getBlockTransactionsByAddresses = async (
   block: Responses['block_content'],
   addresses: string[],
 ): Promise<Types.TxIdsToTransactionsResponse[]> => {
-  const blockAddressTxs: { address: string; data: Responses['tx_content'] }[] = [];
-
   const promisesBundle: {
     address: string;
-    promise: Promise<string[]>;
+    promise: Promise<Responses['address_transactions_content']>;
   }[] = [];
 
-  addresses.map(async address => {
-    const promise = blockfrostAPI.addressesTxsAll(address);
+  addresses.forEach(address => {
+    // TODO: we don't have to download all transactions at once,
+    // we can stop fetching once we have a page where some tx is older than the block
+    const promise = blockfrostAPI.addressesTransactionsAll(address);
     promisesBundle.push({ address, promise });
   });
 
-  const txIds: { address: string; txId: string }[] = [];
+  const txIds: { address: string; txId: string; blockHeight: number }[] = [];
 
   await Promise.all(
     promisesBundle.map(p =>
       p.promise
         .then(data => {
           data.map(id => {
-            txIds.push({ address: p.address, txId: id });
+            txIds.push({ address: p.address, txId: id.tx_hash, blockHeight: id.block_height });
           });
         })
         .catch(() => {
@@ -102,33 +102,11 @@ export const getBlockTransactionsByAddresses = async (
     ),
   );
 
-  const promisesBundleTxs: {
-    address: string;
-    promise: Promise<Responses['tx_content']>;
-  }[] = [];
+  const relevantTxs = txIds.filter(tx => tx.blockHeight === block.height);
 
-  txIds.map(tx => {
-    const promise = blockfrostAPI.txs(tx.txId);
-    promisesBundleTxs.push({ address: tx.address, promise });
-  });
-
-  await Promise.all(
-    promisesBundleTxs.map(p =>
-      p.promise
-        .then(data => {
-          if (data.block === block.hash) {
-            blockAddressTxs.push({ address: p.address, data });
-          }
-        })
-        .catch(error => {
-          throw Error(error);
-        }),
-    ),
-  );
-
-  const prepared = blockAddressTxs.map(tx => ({
+  const prepared = relevantTxs.map(tx => ({
     address: tx.address,
-    data: [tx.data.hash],
+    data: [tx.txId],
   }));
 
   const result = await txIdsToTransactions(prepared);
