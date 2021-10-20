@@ -226,7 +226,7 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeBlockSubIndex = activeSubscriptions.findIndex(i => i.type === 'block');
 
         if (activeBlockSubIndex > -1) {
-          const message = prepareMessage(activeSubscriptions[activeBlockSubIndex].id, {
+          const message = prepareMessage(data.id, {
             subscribed: false,
           });
 
