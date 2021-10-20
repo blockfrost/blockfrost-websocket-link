@@ -10,6 +10,7 @@ import * as Server from './types/server';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
 import { getBlockTransactionsByAddresses } from './utils/transaction';
+import { jsonToPrometheus } from './utils/prometheus';
 
 import { events } from './events';
 import getServerInfo from './methods/getServerInfo';
@@ -57,9 +58,11 @@ app.get('/status', (_req, res) => {
 
 // metrics route
 app.get('/metrics', (_req, res) => {
-  res.send({
-    clients: wss.clients.size,
-  });
+  const metrics = {
+    websocket_link_clients: wss.clients.size,
+  };
+  res.setHeader('Content-Type', 'text/plain');
+  res.send(jsonToPrometheus(metrics));
 });
 
 const heartbeat = (ws: Server.Ws) => {
