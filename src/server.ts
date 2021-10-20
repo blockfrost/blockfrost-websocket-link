@@ -55,6 +55,13 @@ app.get('/status', (_req, res) => {
   });
 });
 
+// metrics route
+app.get('/metrics', (_req, res) => {
+  res.send({
+    clients: wss.clients.size,
+  });
+});
+
 const heartbeat = (ws: Server.Ws) => {
   ws.isAlive = true;
 };
