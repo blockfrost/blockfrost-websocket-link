@@ -68,7 +68,7 @@ export type UtxosWithBlocksParams = {
 export type GetAddressDataBundle = {
   address: string;
   path: string;
-  promise: Promise<Responses['address_txs_content']>;
+  promise: Promise<Responses['address_transactions_content']>;
 };
 
 export type StakingData = {

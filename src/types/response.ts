@@ -34,6 +34,7 @@ export interface AccountInfo {
     tokens?: number; // tokens transactions
     unconfirmed: number; // unconfirmed transactions
     transactions?: Transactions; // list of transactions
+    txids?: string[];
   };
   page: {
     size: number;

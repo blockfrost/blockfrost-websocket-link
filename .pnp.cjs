@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.14.6"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.7"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.5"],
-            ["@blockfrost/blockfrost-js", "npm:0.9.2"],
+            ["@blockfrost/blockfrost-js", "npm:2.0.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
             ["@sentry/node", "npm:6.10.0"],
             ["@sentry/tracing", "npm:6.10.0"],
@@ -2857,15 +2857,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:0.9.2", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-0.9.2-820e1ce2da-b571b7cec4.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:2.0.2", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-2.0.2-0ae9f56fcf-6202b97d33.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:0.9.2"],
-            ["@blockfrost/openapi", "npm:0.1.24"],
-            ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
+            ["@blockfrost/blockfrost-js", "npm:2.0.2"],
+            ["@blockfrost/openapi", "npm:0.1.27"],
+            ["@emurgo/cardano-serialization-lib-nodejs", "npm:8.1.0"],
+            ["@emurgo/cip14-js", "npm:2.0.0"],
             ["axios", "npm:0.21.1"],
             ["form-data", "npm:4.0.0"],
-            ["retry-axios", "virtual:820e1ce2da4f86611bda5d1f39deae9b3f63e33a929411a9c9554680cabd2d048196dbbe75297c0d818613b847426ffb49962b216d2590106c92437b0ad94e84#npm:2.4.0"],
+            ["retry-axios", "virtual:0ae9f56fcfdf687787d077299da977668867ba888752787e0b921f141ec0d1895f729072f90cb67691150fb3b2dcc5c7aafe277979e547889e8c792e40d87af3#npm:2.4.0"],
             ["url-join", "npm:4.0.1"]
           ],
           "linkType": "HARD",
@@ -2880,7 +2881,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.14.6"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.7"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.14.5"],
-            ["@blockfrost/blockfrost-js", "npm:0.9.2"],
+            ["@blockfrost/blockfrost-js", "npm:2.0.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"],
             ["@sentry/node", "npm:6.10.0"],
             ["@sentry/tracing", "npm:6.10.0"],
@@ -2914,10 +2915,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/openapi", [
-        ["npm:0.1.24", {
-          "packageLocation": "./.yarn/cache/@blockfrost-openapi-npm-0.1.24-319ed90bf6-dcb38f5a4d.zip/node_modules/@blockfrost/openapi/",
+        ["npm:0.1.27", {
+          "packageLocation": "./.yarn/cache/@blockfrost-openapi-npm-0.1.27-3602795bd9-2c90e41ca6.zip/node_modules/@blockfrost/openapi/",
           "packageDependencies": [
-            ["@blockfrost/openapi", "npm:0.1.24"]
+            ["@blockfrost/openapi", "npm:0.1.27"]
           ],
           "linkType": "HARD",
         }]
@@ -2927,6 +2928,24 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-7.1.0-9dde1e6073-7ea9089cdd.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",
           "packageDependencies": [
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:7.1.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:8.1.0", {
+          "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-8.1.0-6a795df826-bb806e0dd1.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",
+          "packageDependencies": [
+            ["@emurgo/cardano-serialization-lib-nodejs", "npm:8.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@emurgo/cip14-js", [
+        ["npm:2.0.0", {
+          "packageLocation": "./.yarn/cache/@emurgo-cip14-js-npm-2.0.0-3500cc6e4a-1b07171cd2.zip/node_modules/@emurgo/cip14-js/",
+          "packageDependencies": [
+            ["@emurgo/cip14-js", "npm:2.0.0"],
+            ["bech32", "npm:2.0.0"],
+            ["blake2b", "npm:2.1.3"]
           ],
           "linkType": "HARD",
         }]
@@ -4630,6 +4649,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["bech32", [
+        ["npm:2.0.0", {
+          "packageLocation": "./.yarn/cache/bech32-npm-2.0.0-ad98b7dd79-fa15acb270.zip/node_modules/bech32/",
+          "packageDependencies": [
+            ["bech32", "npm:2.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["bignumber.js", [
         ["npm:9.0.1", {
           "packageLocation": "./.yarn/cache/bignumber.js-npm-9.0.1-270d0c8a55-6e72f6069d.zip/node_modules/bignumber.js/",
@@ -4651,6 +4679,27 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/binary-extensions-npm-2.2.0-180c33fec7-ccd267956c.zip/node_modules/binary-extensions/",
           "packageDependencies": [
             ["binary-extensions", "npm:2.2.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["blake2b", [
+        ["npm:2.1.3", {
+          "packageLocation": "./.yarn/cache/blake2b-npm-2.1.3-b5b61ec9ad-e652234249.zip/node_modules/blake2b/",
+          "packageDependencies": [
+            ["blake2b", "npm:2.1.3"],
+            ["blake2b-wasm", "npm:1.1.7"],
+            ["nanoassert", "npm:1.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["blake2b-wasm", [
+        ["npm:1.1.7", {
+          "packageLocation": "./.yarn/cache/blake2b-wasm-npm-1.1.7-ac747aaa82-be5ebacdd2.zip/node_modules/blake2b-wasm/",
+          "packageDependencies": [
+            ["blake2b-wasm", "npm:1.1.7"],
+            ["nanoassert", "npm:1.1.0"]
           ],
           "linkType": "HARD",
         }]
@@ -8860,6 +8909,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["nanoassert", [
+        ["npm:1.1.0", {
+          "packageLocation": "./.yarn/cache/nanoassert-npm-1.1.0-1da45b4766-f360fe639d.zip/node_modules/nanoassert/",
+          "packageDependencies": [
+            ["nanoassert", "npm:1.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["nanomatch", [
         ["npm:1.2.13", {
           "packageLocation": "./.yarn/cache/nanomatch-npm-1.2.13-bc9173dbe7-54d4166d6e.zip/node_modules/nanomatch/",
@@ -10053,10 +10111,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:820e1ce2da4f86611bda5d1f39deae9b3f63e33a929411a9c9554680cabd2d048196dbbe75297c0d818613b847426ffb49962b216d2590106c92437b0ad94e84#npm:2.4.0", {
-          "packageLocation": "./.yarn/__virtual__/retry-axios-virtual-469cd935b0/0/cache/retry-axios-npm-2.4.0-12bbd124ef-45d1d29230.zip/node_modules/retry-axios/",
+        ["virtual:0ae9f56fcfdf687787d077299da977668867ba888752787e0b921f141ec0d1895f729072f90cb67691150fb3b2dcc5c7aafe277979e547889e8c792e40d87af3#npm:2.4.0", {
+          "packageLocation": "./.yarn/__virtual__/retry-axios-virtual-5690b5c45d/0/cache/retry-axios-npm-2.4.0-12bbd124ef-45d1d29230.zip/node_modules/retry-axios/",
           "packageDependencies": [
-            ["retry-axios", "virtual:820e1ce2da4f86611bda5d1f39deae9b3f63e33a929411a9c9554680cabd2d048196dbbe75297c0d818613b847426ffb49962b216d2590106c92437b0ad94e84#npm:2.4.0"],
+            ["retry-axios", "virtual:0ae9f56fcfdf687787d077299da977668867ba888752787e0b921f141ec0d1895f729072f90cb67691150fb3b2dcc5c7aafe277979e547889e8c792e40d87af3#npm:2.4.0"],
             ["@types/axios", null],
             ["axios", "npm:0.21.1"]
           ],

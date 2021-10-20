@@ -1,4 +1,5 @@
 import * as Responses from '../types/response';
+import { Responses as BackendResponse } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import * as Messages from '../types/message';
 import {
@@ -13,7 +14,6 @@ import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
 import { transformToken } from '../utils/asset';
-import { TxIdsToTransactionsResponse } from 'types/transactions';
 
 export default async (
   id: number,
@@ -53,16 +53,20 @@ export default async (
     const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
     const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
 
-    const uniqueTxIds: string[] = [];
-    transactionsPerAddressList.forEach(item => {
-      item.data.forEach(id => {
-        if (!uniqueTxIds.includes(id)) {
-          uniqueTxIds.push(id);
+    const uniqueTxIds: ({
+      address: string;
+    } & BackendResponse['address_transactions_content'][number])[] = [];
+    transactionsPerAddressList.forEach(txsPerAddress => {
+      txsPerAddress.data.forEach(addrItem => {
+        if (!uniqueTxIds.find(item => addrItem.tx_hash === item.tx_hash)) {
+          uniqueTxIds.push({ address: txsPerAddress.address, ...addrItem });
         }
       });
     });
 
     const balanceBig = new BigNumber(lovelaceBalance?.quantity || '0').plus(stakingData.rewards);
+
+    const totalPages = Math.ceil(uniqueTxIds.length / pageSize);
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
@@ -76,7 +80,7 @@ export default async (
       page: {
         index: page,
         size: pageSize,
-        total: Math.ceil(uniqueTxIds.length / pageSize),
+        total: totalPages,
       },
       misc: {
         staking: {
@@ -93,37 +97,42 @@ export default async (
     }
 
     if (details === 'txs' || details === 'txids') {
-      const txs = await txIdsToTransactions(transactionsPerAddressList);
-      const uniqueTxs: TxIdsToTransactionsResponse[] = [];
-      txs.forEach(tx => {
-        if (!uniqueTxs.find(ut => ut.txHash === tx.txHash)) {
-          uniqueTxs.push(tx);
-        }
-      });
-      const paginatedTxs = paginate(uniqueTxs, pageSizeNumber);
-      accountInfo.history.transactions = paginatedTxs[pageIndex];
-      accountInfo.page.total = paginatedTxs.length; // number of pages
-    }
+      const sortedTxIds = uniqueTxIds.sort(
+        (first, second) =>
+          second.block_height - first.block_height || second.tx_index - first.tx_index,
+      );
+      const paginatedTxsIds = paginate(sortedTxIds, pageSizeNumber);
+      const requestedPageTxIds = paginatedTxsIds[pageIndex] ?? [];
+      accountInfo.page.total = totalPages; // number of pages
 
-    if (details === 'txs') {
-      const usedExternalAddresses = externalAddresses.filter(a => a.data !== 'empty');
-      const unusedExternalAddresses = externalAddresses.filter(a => a.data === 'empty');
-      const change = await getAddressesData(internalAddresses);
-      const used = await getAddressesData(usedExternalAddresses);
+      if (details === 'txs') {
+        const txs = await txIdsToTransactions(
+          requestedPageTxIds.map(item => ({ address: item.address, data: [item.tx_hash] })),
+        );
+        accountInfo.history.transactions = txs;
+        const usedExternalAddresses = externalAddresses.filter(a => a.data !== 'empty');
+        const unusedExternalAddresses = externalAddresses.filter(a => a.data === 'empty');
+        const change = await getAddressesData(internalAddresses);
+        const used = await getAddressesData(usedExternalAddresses);
 
-      const unused = unusedExternalAddresses.map(addressData => ({
-        address: addressData.address,
-        path: addressData.path,
-        transfers: 0,
-        received: '0',
-        sent: '0',
-      }));
+        const unused = unusedExternalAddresses.map(addressData => ({
+          address: addressData.address,
+          path: addressData.path,
+          transfers: 0,
+          received: '0',
+          sent: '0',
+        }));
 
-      accountInfo.addresses = {
-        change,
-        used,
-        unused,
-      };
+        accountInfo.addresses = {
+          change,
+          used,
+          unused,
+        };
+      }
+
+      if (details === 'txids') {
+        accountInfo.history.txids = requestedPageTxIds.map(t => t.tx_hash);
+      }
     }
 
     const message = prepareMessage(id, accountInfo);
