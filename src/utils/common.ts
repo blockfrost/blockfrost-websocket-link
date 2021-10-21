@@ -38,10 +38,10 @@ export const getRatesForDate = async (date: number): Promise<Record<string, numb
   }
 };
 
-export const getNetworkId = (apiUrl: string): number => {
-  const networkId = apiUrl.includes('mainnet')
-    ? NetworkInfo.mainnet().network_id()
-    : NetworkInfo.testnet().network_id();
+export const getNetworkId = (): number => {
+  const networkId = process.env.NETWORK.includes('testnet')
+    ? NetworkInfo.testnet().network_id()
+    : NetworkInfo.mainnet().network_id();
 
   return networkId;
 };
