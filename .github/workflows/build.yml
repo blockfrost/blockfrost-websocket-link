@@ -18,6 +18,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: yarn 
-    - run: yarn run lint
-    - run: yarn run test
-    - run: yarn run build
+    - run: NETWORK=${{ secrets.NETWORK }} yarn run lint
+    - run: NETWORK=${{ secrets.NETWORK }} yarn run test
+    - run: NETWORK=${{ secrets.NETWORK }} yarn run build
