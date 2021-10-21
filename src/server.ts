@@ -104,6 +104,13 @@ wss.on('connection', (ws: Server.Ws) => {
     return;
   }
 
+  if (!process.env.NETWORK) {
+    const message = prepareErrorMessage(-1, `Missing NETWORK env variable see: ${REPOSITORY_URL}`);
+
+    ws.send(message);
+    return;
+  }
+
   ws.on('error', error => {
     const message = prepareErrorMessage(-1, error);
     ws.send(message);

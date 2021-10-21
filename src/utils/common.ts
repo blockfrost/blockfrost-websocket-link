@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { blockfrostAPI } from '../utils/blockfrostAPI';
 import got from 'got';
 import { NetworkInfo } from '@emurgo/cardano-serialization-lib-nodejs';
 
@@ -38,10 +39,10 @@ export const getRatesForDate = async (date: number): Promise<Record<string, numb
   }
 };
 
-export const getNetworkId = (apiUrl: string): number => {
-  const networkId = apiUrl.includes('mainnet')
-    ? NetworkInfo.mainnet().network_id()
-    : NetworkInfo.testnet().network_id();
+export const getNetworkId = (): number => {
+  const networkId = blockfrostAPI.options.isTestnet
+    ? NetworkInfo.testnet().network_id()
+    : NetworkInfo.mainnet().network_id();
 
   return networkId;
 };
