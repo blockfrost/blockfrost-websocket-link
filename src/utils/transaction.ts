@@ -1,6 +1,7 @@
 import { Responses } from '@blockfrost/blockfrost-js';
 import * as Types from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { transformAsset } from './asset';
 
 export const txIdsToTransactions = async (
   addresses: {
@@ -45,8 +46,21 @@ export const txIdsToTransactions = async (
         .then(data => {
           result.push({
             address: p.address,
-            txData: data.txData,
-            txUtxos: data.txUtxos,
+            txData: {
+              ...data.txData,
+              output_amount: data.txData.output_amount.map(asset => transformAsset(asset)),
+            },
+            txUtxos: {
+              ...data.txUtxos,
+              inputs: data.txUtxos.inputs.map(input => ({
+                ...input,
+                amount: input.amount.map(asset => transformAsset(asset)),
+              })),
+              outputs: data.txUtxos.outputs.map(output => ({
+                ...output,
+                amount: output.amount.map(asset => transformAsset(asset)),
+              })),
+            },
             blockInfo: data.blockInfo,
             txHash: p.txHash,
           });

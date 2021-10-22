@@ -14,7 +14,8 @@ export interface ServerInfo {
 export type BlockHash = string;
 
 type Transactions = TxIdsToTransactionsResponse[];
-export interface TokenBalance extends Balance {
+export interface AssetBalance extends Balance {
+  fingerprint?: string; // lovelace has no fingerprint
   decimals: number;
 }
 
@@ -28,7 +29,7 @@ export interface AccountInfo {
   empty: boolean;
   availableBalance: string;
   descriptor: string;
-  tokens?: TokenBalance[];
+  tokens?: AssetBalance[];
   history: {
     total: number; // total transactions
     tokens?: number; // tokens transactions

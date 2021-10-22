@@ -10,6 +10,7 @@ import {
   RewardAddress,
   StakeCredential,
 } from '@emurgo/cardano-serialization-lib-nodejs';
+import { transformAsset } from './asset';
 
 export const deriveAddress = (
   publicKey: string,
@@ -124,12 +125,9 @@ export const addressesToBalances = (
 
   return balances;
 };
-
 export const addressesToUtxos = async (
   addresses: { address: string; path: string; data: Responses['address_content'] | 'empty' }[],
-): Promise<
-  { address: string; path: string; data: Responses['address_utxo_content'] | 'empty' }[]
-> => {
+): Promise<{ address: string; path: string; data: Addresses.TransformedUtxo[] | 'empty' }[]> => {
   const promisesBundle: {
     address: string;
     path: string;
@@ -139,7 +137,7 @@ export const addressesToUtxos = async (
   const result: {
     address: string;
     path: string;
-    data: Responses['address_utxo_content'] | 'empty';
+    data: Addresses.TransformedUtxo[] | 'empty';
   }[] = [];
 
   addresses.map(item => {
@@ -153,7 +151,14 @@ export const addressesToUtxos = async (
     promisesBundle.map(p =>
       p.promise
         .then(data => {
-          result.push({ address: p.address, data, path: p.path });
+          result.push({
+            address: p.address,
+            data: data.map(utxo => ({
+              ...utxo,
+              amount: utxo.amount.map(asset => transformAsset(asset)),
+            })),
+            path: p.path,
+          });
         })
         .catch(error => {
           console.log(error);
