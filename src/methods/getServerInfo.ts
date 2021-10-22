@@ -3,7 +3,7 @@ import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export default async (id: number): Promise<string> => {
   try {
-    const isTestnet = process.env.NETWORK.includes('testnet');
+    const isTestnet = !!blockfrostAPI.options.isTestnet;
     const info = await blockfrostAPI.root();
     const latestBlock = await blockfrostAPI.blocksLatest();
     const serverInfo = {
