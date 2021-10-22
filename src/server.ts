@@ -233,13 +233,14 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeBlockSubIndex = activeSubscriptions.findIndex(i => i.type === 'block');
 
         if (activeBlockSubIndex > -1) {
-          const message = prepareMessage(data.id, {
-            subscribed: false,
-          });
-
-          ws.send(message);
           activeSubscriptions.splice(activeBlockSubIndex);
         }
+
+        const message = prepareMessage(data.id, {
+          subscribed: false,
+        });
+
+        ws.send(message);
 
         break;
       }
@@ -262,11 +263,11 @@ wss.on('connection', (ws: Server.Ws) => {
             type: 'addresses',
             id: data.id,
           });
-
-          const message = prepareMessage(data.id, { subscribed: true });
-
-          ws.send(message);
         }
+
+        const message = prepareMessage(data.id, { subscribed: true });
+
+        ws.send(message);
 
         break;
       }
@@ -275,14 +276,15 @@ wss.on('connection', (ws: Server.Ws) => {
         const activeAddressSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
 
         if (activeAddressSubIndex > -1) {
-          const message = prepareMessage(data.id, {
-            subscribed: false,
-          });
-
-          ws.send(message);
-          addressedSubscribed = [];
           activeSubscriptions.splice(activeAddressSubIndex);
         }
+
+        const message = prepareMessage(data.id, {
+          subscribed: false,
+        });
+
+        ws.send(message);
+        addressedSubscribed = [];
 
         break;
       }
