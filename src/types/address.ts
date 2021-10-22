@@ -1,4 +1,5 @@
 import { Responses } from '@blockfrost/blockfrost-js';
+import { AssetBalance } from './response';
 
 export type Result = {
   address: string;
@@ -45,6 +46,10 @@ export interface Utxo {
   block: string;
 }
 
+export interface TransformedUtxo extends Omit<Utxo, 'amount'> {
+  amount: AssetBalance[];
+}
+
 export interface UtxosWithBlockResponse {
   address: string;
   utxoData: Utxo;
@@ -62,7 +67,7 @@ export interface UtxosWithBlocksBundle {
 export type UtxosWithBlocksParams = {
   address: string;
   path: string;
-  data: Responses['address_utxo_content'] | 'empty';
+  data: TransformedUtxo[] | 'empty';
 }[];
 
 export type GetAddressDataBundle = {
