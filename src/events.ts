@@ -17,6 +17,6 @@ setInterval(async () => {
   } catch (err) {
     console.log('error', err);
   }
-}, 1000);
+}, process.env.BLOCK_LISTEN_INTERVAL || 5000);
 
 export { events };
