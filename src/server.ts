@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
 import dotenv from 'dotenv';
+dotenv.config();
 import { Responses } from '@blockfrost/blockfrost-js';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
@@ -11,7 +12,6 @@ import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
 import { getBlockTransactionsByAddresses } from './utils/transaction';
 import { jsonToPrometheus } from './utils/prometheus';
-
 import { events } from './events';
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
@@ -21,8 +21,6 @@ import getTransaction from './methods/getTransaction';
 import submitTransaction from './methods/pushTransaction';
 import estimateFee from './methods/estimateFee';
 import getBalanceHistory from './methods/getBalanceHistory';
-
-dotenv.config();
 
 const app = express();
 
