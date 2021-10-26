@@ -5,7 +5,7 @@ declare global {
       BACKEND_URL: string;
       NETWORK: 'testnet' | 'mainnet';
       PROJECT_ID: string;
-      BLOCK_LISTEN_INTERVAL: number;
+      BLOCK_LISTEN_INTERVAL?: string;
     }
   }
 }

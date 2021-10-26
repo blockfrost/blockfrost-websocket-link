@@ -11,7 +11,7 @@ import {
   getStakingData,
 } from '../utils/address';
 import { txIdsToTransactions } from '../utils/transaction';
-import { prepareMessage, prepareErrorMessage } from '../utils/message';
+import { prepareMessage, prepareErrorMessage, prepareGenericErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
 import { transformAsset } from '../utils/asset';
 
@@ -139,7 +139,12 @@ export default async (
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareErrorMessage(id, err);
-    return message;
+    if (err instanceof Error) {
+      const message = prepareErrorMessage(id, err);
+      return message;
+    } else {
+      const message = prepareGenericErrorMessage(id, err);
+      return message;
+    }
   }
 };

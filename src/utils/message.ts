@@ -23,6 +23,16 @@ export const prepareErrorMessage = (id: number, error: Error | string): string =
   });
 };
 
+export const prepareGenericErrorMessage = (id: number, error: unknown): string => {
+  return JSON.stringify({
+    id,
+    type: 'error',
+    data: {
+      error,
+    },
+  });
+};
+
 export const prepareMessage = (
   id: string | number,
   data:

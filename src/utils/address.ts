@@ -318,6 +318,7 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
       poolId: stakeAddressData.pool_id,
     };
   } catch (error) {
+    // @ts-expect-error TODO FIX
     if (error.status_code === 404) {
       return {
         rewards: '0',
@@ -325,6 +326,7 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
         poolId: null,
       };
     } else {
+      // @ts-expect-error TODO FIX
       throw Error(error);
     }
   }

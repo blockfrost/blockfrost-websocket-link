@@ -1,4 +1,4 @@
-import { prepareMessage, prepareErrorMessage } from '../utils/message';
+import { prepareMessage, prepareErrorMessage, prepareGenericErrorMessage } from '../utils/message';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { transformAsset } from '../utils/asset';
 
@@ -13,8 +13,12 @@ export default async (id: number, txId: string): Promise<string> => {
     return message;
   } catch (err) {
     console.log(err);
-    const message = prepareErrorMessage(id, err);
-
-    return message;
+    if (err instanceof Error) {
+      const message = prepareErrorMessage(id, err);
+      return message;
+    } else {
+      const message = prepareGenericErrorMessage(id, err);
+      return message;
+    }
   }
 };
