@@ -11,8 +11,6 @@ setInterval(
     try {
       const latestBlock = await blockfrostAPI.blocksLatest();
 
-      console.log('aaaa');
-
       if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
         previousBlock = latestBlock;
         events.emit('newBlock', latestBlock);
