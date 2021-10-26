@@ -1,7 +1,5 @@
 import * as utils from '../../../src/utils/common';
 
-jest.mock('@blockfrost/blockfrost-js');
-
 describe('common utils', () => {
   test('pagination', () => {
     const input1 = [
