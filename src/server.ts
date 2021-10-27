@@ -251,7 +251,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.SUBSCRIBE_ADDRESS: {
         if (data.params.addresses && data.params.addresses.length > 0) {
-          data.params.addresses.map(addressInput => {
+          data.params.addresses.forEach(addressInput => {
             if (!addressedSubscribed.includes(addressInput)) {
               addressedSubscribed.push(addressInput);
             }

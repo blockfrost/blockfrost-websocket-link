@@ -12,7 +12,7 @@
     "type-check": "tsc --project tsconfig.json"
   },
   "dependencies": {
-    "@blockfrost/blockfrost-js": "2.0.2",
+    "@blockfrost/blockfrost-js": "3.0.0-beta.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^9.1.0",
     "@sentry/node": "^6.13.3",
     "@sentry/tracing": "^6.13.3",
@@ -21,6 +21,7 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "got": "^11.8.2",
+    "serialize-error": "^8.1.0",
     "validator": "^13.6.0",
     "ws": "^8.2.3"
   },

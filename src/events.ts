@@ -16,7 +16,7 @@ setInterval(
         events.emit('newBlock', latestBlock);
       }
     } catch (err) {
-      console.log('error', err);
+      console.error('newBlock emitter', err);
     }
   },
   process.env.BLOCK_LISTEN_INTERVAL ? parseInt(process.env.BLOCK_LISTEN_INTERVAL, 10) : 5000,

@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - report node.js memory usage on `/metrics`
 
+### Changed
+- throw error if any of the partial calls of GetAccountInfo fails
+
 
 ## [1.0.1] - 2021-10-26
 

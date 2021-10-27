@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.15.8"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.8"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.0"],
-            ["@blockfrost/blockfrost-js", "npm:2.0.2"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.1"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -64,6 +64,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.3.1"],
             ["prettier", "npm:2.4.1"],
             ["rimraf", "npm:3.0.2"],
+            ["serialize-error", "npm:8.1.0"],
             ["sinon", "npm:11.1.2"],
             ["ts-jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.0.7"],
             ["ts-node-dev", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:1.1.8"],
@@ -3277,16 +3278,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:2.0.2", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-2.0.2-0ae9f56fcf-6202b97d33.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:3.0.0-beta.1", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.0-beta.1-004ba06f8c-84c049bed0.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:2.0.2"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.1"],
             ["@blockfrost/openapi", "npm:0.1.27"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:8.1.0"],
             ["@emurgo/cip14-js", "npm:2.0.0"],
             ["axios", "npm:0.21.1"],
             ["form-data", "npm:4.0.0"],
-            ["retry-axios", "virtual:0ae9f56fcfdf687787d077299da977668867ba888752787e0b921f141ec0d1895f729072f90cb67691150fb3b2dcc5c7aafe277979e547889e8c792e40d87af3#npm:2.4.0"],
+            ["retry-axios", "virtual:004ba06f8caf833d1529c3404bea355090494abf6be50d0f4bf3df24419cec86162b434a51460204c0739088e0950c2f58657c15e6170c5eb00e2deda485e10b#npm:2.4.0"],
             ["url-join", "npm:4.0.1"]
           ],
           "linkType": "HARD",
@@ -3301,7 +3302,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.15.8"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.8"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.0"],
-            ["@blockfrost/blockfrost-js", "npm:2.0.2"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.1"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -3326,6 +3327,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.3.1"],
             ["prettier", "npm:2.4.1"],
             ["rimraf", "npm:3.0.2"],
+            ["serialize-error", "npm:8.1.0"],
             ["sinon", "npm:11.1.2"],
             ["ts-jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.0.7"],
             ["ts-node-dev", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:1.1.8"],
@@ -9635,10 +9637,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:0ae9f56fcfdf687787d077299da977668867ba888752787e0b921f141ec0d1895f729072f90cb67691150fb3b2dcc5c7aafe277979e547889e8c792e40d87af3#npm:2.4.0", {
-          "packageLocation": "./.yarn/__virtual__/retry-axios-virtual-5690b5c45d/0/cache/retry-axios-npm-2.4.0-12bbd124ef-45d1d29230.zip/node_modules/retry-axios/",
+        ["virtual:004ba06f8caf833d1529c3404bea355090494abf6be50d0f4bf3df24419cec86162b434a51460204c0739088e0950c2f58657c15e6170c5eb00e2deda485e10b#npm:2.4.0", {
+          "packageLocation": "./.yarn/__virtual__/retry-axios-virtual-ab1268e642/0/cache/retry-axios-npm-2.4.0-12bbd124ef-45d1d29230.zip/node_modules/retry-axios/",
           "packageDependencies": [
-            ["retry-axios", "virtual:0ae9f56fcfdf687787d077299da977668867ba888752787e0b921f141ec0d1895f729072f90cb67691150fb3b2dcc5c7aafe277979e547889e8c792e40d87af3#npm:2.4.0"],
+            ["retry-axios", "virtual:004ba06f8caf833d1529c3404bea355090494abf6be50d0f4bf3df24419cec86162b434a51460204c0739088e0950c2f58657c15e6170c5eb00e2deda485e10b#npm:2.4.0"],
             ["@types/axios", null],
             ["axios", "npm:0.21.1"]
           ],
@@ -9770,6 +9772,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["on-finished", "npm:2.3.0"],
             ["range-parser", "npm:1.2.1"],
             ["statuses", "npm:1.5.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["serialize-error", [
+        ["npm:8.1.0", {
+          "packageLocation": "./.yarn/cache/serialize-error-npm-8.1.0-a3c5bcc96c-2eef236d50.zip/node_modules/serialize-error/",
+          "packageDependencies": [
+            ["serialize-error", "npm:8.1.0"],
+            ["type-fest", "npm:0.20.2"]
           ],
           "linkType": "HARD",
         }]

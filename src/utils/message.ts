@@ -1,4 +1,10 @@
-import { Responses } from '@blockfrost/blockfrost-js';
+import {
+  BlockfrostClientError,
+  BlockfrostGenericError,
+  BlockfrostServerError,
+  Responses,
+} from '@blockfrost/blockfrost-js';
+import { serializeError } from 'serialize-error';
 import { Messages } from '../types/message';
 import * as TxTypes from '../types/transactions';
 import { UtxosWithBlockResponse } from '../types/address';
@@ -13,24 +19,29 @@ export const getMessage = (message: string): Messages | null => {
   }
 };
 
-export const prepareErrorMessage = (id: number, error: Error | string): string => {
-  return JSON.stringify({
-    id,
-    type: 'error',
-    data: {
-      error: { message: typeof error === 'string' ? error : error.message },
-    },
-  });
-};
-
-export const prepareGenericErrorMessage = (id: number, error: unknown): string => {
-  return JSON.stringify({
-    id,
-    type: 'error',
-    data: {
-      error,
-    },
-  });
+export const prepareErrorMessage = (id: number, error: unknown): string => {
+  if (
+    error instanceof BlockfrostClientError ||
+    error instanceof BlockfrostServerError ||
+    error instanceof BlockfrostGenericError ||
+    error instanceof Error
+  ) {
+    return JSON.stringify({
+      id,
+      type: 'error',
+      data: {
+        error: { ...serializeError(error), stack: undefined },
+      },
+    });
+  } else {
+    return JSON.stringify({
+      id,
+      type: 'error',
+      data: {
+        error: error,
+      },
+    });
+  }
 };
 
 export const prepareMessage = (
