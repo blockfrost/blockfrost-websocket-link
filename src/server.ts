@@ -58,6 +58,12 @@ app.get('/status', (_req, res) => {
 app.get('/metrics', (_req, res) => {
   const metrics = {
     websocket_link_clients: wss.clients.size,
+    // https://nodejs.org/api/process.html#processmemoryusage
+    websocket_link_rss: process.memoryUsage().rss,
+    websocket_link_heap_total: process.memoryUsage().heapTotal,
+    websocket_link_heap_used: process.memoryUsage().heapUsed,
+    websocket_link_external: process.memoryUsage().external,
+    websocket_link_array_buffers: process.memoryUsage().arrayBuffers,
   };
   res.setHeader('Content-Type', 'text/plain');
   res.send(jsonToPrometheus(metrics));
