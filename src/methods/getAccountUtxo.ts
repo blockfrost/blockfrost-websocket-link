@@ -1,4 +1,4 @@
-import { prepareMessage, prepareErrorMessage, prepareGenericErrorMessage } from '../utils/message';
+import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { discoverAddresses, addressesToUtxos, utxosWithBlocks } from '../utils/address';
 
 export default async (id: number, publicKey: string): Promise<string> => {
@@ -20,12 +20,7 @@ export default async (id: number, publicKey: string): Promise<string> => {
     return message;
   } catch (err) {
     console.log(err);
-    if (err instanceof Error) {
-      const message = prepareErrorMessage(id, err);
-      return message;
-    } else {
-      const message = prepareGenericErrorMessage(id, err);
-      return message;
-    }
+    const message = prepareErrorMessage(id, err);
+    return message;
   }
 };

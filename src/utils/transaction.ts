@@ -12,8 +12,8 @@ export const txIdsToTransactions = async (
   const promisesBundle: Types.TxIdsToTransactionsPromises[] = [];
   const result: Types.TxIdsToTransactionsResponse[] = [];
 
-  addresses.map(item => {
-    item.data.map(hash => {
+  addresses.forEach(item => {
+    item.data.forEach(hash => {
       const promise = new Promise<Types.Data>((resolve, reject) => {
         (async () => {
           try {

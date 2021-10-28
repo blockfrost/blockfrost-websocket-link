@@ -2,7 +2,7 @@ import { ADDRESS_GAP_LIMIT } from '../constants';
 import * as Addresses from '../types/address';
 import { getNetworkId } from '../utils/common';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
-import { Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import {
   Bip32PublicKey,
@@ -78,8 +78,7 @@ export const discoverAddresses = async (
             if (error.status_code === 404) {
               result.push({ address: p.address, data: 'empty', path: p.path });
             } else {
-              console.log('error', error);
-              console.log('error JSON.stringify', JSON.stringify(error));
+              throw error;
             }
           }),
       ),
@@ -101,11 +100,11 @@ export const addressesToBalances = (
 ): Addresses.Balance[] => {
   const balances: Addresses.Balance[] = [];
 
-  addresses.map(address => {
+  addresses.forEach(address => {
     const addressData = address.data;
     if (addressData === 'empty') return;
 
-    addressData.amount.map(amountItem => {
+    addressData.amount.forEach(amountItem => {
       if (amountItem.quantity && amountItem.unit) {
         const balanceRow = balances.find(balanceResult => balanceResult.unit === amountItem.unit);
 
@@ -140,7 +139,7 @@ export const addressesToUtxos = async (
     data: Addresses.TransformedUtxo[] | 'empty';
   }[] = [];
 
-  addresses.map(item => {
+  addresses.forEach(item => {
     if (item.data === 'empty') return;
 
     const promise = blockfrostAPI.addressesUtxosAll(item.address);
@@ -161,8 +160,7 @@ export const addressesToUtxos = async (
           });
         })
         .catch(error => {
-          console.log(error);
-          console.log('error JSON.stringify', JSON.stringify(error));
+          throw error;
         }),
     ),
   );
@@ -178,7 +176,7 @@ export const isAccountEmpty = async (
     promise: Promise<Responses['address_transactions_content']>;
   }[] = [];
 
-  addresses.map(item => {
+  addresses.forEach(item => {
     if (item.data === 'empty') return;
 
     const promise = blockfrostAPI.addressesTransactions(item.address, {
@@ -195,8 +193,7 @@ export const isAccountEmpty = async (
           return data;
         })
         .catch(error => {
-          console.log(error);
-          console.log('error JSON.stringify', JSON.stringify(error));
+          throw error;
         }),
     ),
   );
@@ -210,7 +207,7 @@ export const utxosWithBlocks = async (
   const promisesBundle: Addresses.UtxosWithBlocksBundle[] = [];
   const result: Addresses.UtxosWithBlockResponse[] = [];
 
-  utxos.map(utxo => {
+  utxos.forEach(utxo => {
     if (utxo.data === 'empty') return;
 
     utxo.data.map(utxoData => {
@@ -231,8 +228,7 @@ export const utxosWithBlocks = async (
           });
         })
         .catch(error => {
-          console.log(error);
-          console.log('error JSON.stringify', JSON.stringify(error));
+          throw error;
         }),
     ),
   );
@@ -248,7 +244,7 @@ export const addressesToTxIds = async (
     promise: Promise<Responses['address_transactions_content']>;
   }[] = [];
 
-  addresses.map(item => {
+  addresses.forEach(item => {
     if (item.data === 'empty') return;
 
     const promise = blockfrostAPI.addressesTransactionsAll(item.address);
@@ -267,8 +263,7 @@ export const addressesToTxIds = async (
           result.push({ address: p.address, data });
         })
         .catch(error => {
-          console.log(error);
-          console.log('error JSON.stringify', JSON.stringify(error));
+          throw error;
         }),
     ),
   );
@@ -318,16 +313,15 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
       poolId: stakeAddressData.pool_id,
     };
   } catch (error) {
-    // @ts-expect-error TODO FIX
-    if (error.status_code === 404) {
-      return {
-        rewards: '0',
-        isActive: false,
-        poolId: null,
-      };
-    } else {
-      // @ts-expect-error TODO FIX
-      throw Error(error);
+    if (error instanceof BlockfrostServerError) {
+      if (error.status_code === 404) {
+        return {
+          rewards: '0',
+          isActive: false,
+          poolId: null,
+        };
+      }
     }
+    throw error;
   }
 };
