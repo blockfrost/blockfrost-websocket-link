@@ -6,13 +6,13 @@ dotenv.config();
 import { Responses } from '@blockfrost/blockfrost-js';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+import { v4 as uuidv4 } from 'uuid';
 import packageJson from '../package.json';
 import * as Server from './types/server';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
-import { getBlockTransactionsByAddresses } from './utils/transaction';
 import { jsonToPrometheus } from './utils/prometheus';
-import { events } from './events';
+import { events, onBlock } from './events';
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
 import getAccountUtxo from './methods/getAccountUtxo';
@@ -39,7 +39,17 @@ const wss = new WebSocket.Server({ server });
 
 server.keepAliveTimeout = 65000;
 
-let subscribeBlockInterval: NodeJS.Timeout;
+const activeSubscriptions: Record<string, Server.Subscription[]> = {};
+const addressesSubscribed: Record<string, string[]> = {};
+
+const clients: Array<{
+  clientId: string;
+  newBlockCallback: (
+    latestBlock: Responses['block_content'],
+    activeSubscriptions: Server.Subscription[],
+    addressesSubscribed: string[],
+  ) => Promise<void>;
+}> = [];
 
 // index route
 app.get('/', (_req, res) => {
@@ -88,9 +98,27 @@ const interval = setInterval(() => {
   });
 }, 60000);
 
+// this event is triggered with every new block see events.ts
+events.on('newBlock', async (latestBlock: Responses['block_content']) => {
+  clients.forEach(client =>
+    client.newBlockCallback(
+      latestBlock,
+      activeSubscriptions[client.clientId],
+      addressesSubscribed[client.clientId],
+    ),
+  );
+});
+
 wss.on('connection', (ws: Server.Ws) => {
-  let activeSubscriptions: Server.Subscription[] = [];
-  let addressedSubscribed: string[] = [];
+  // generate unique client ID and set callbacks
+  const clientId = uuidv4();
+  addressesSubscribed[clientId] = [];
+  activeSubscriptions[clientId] = [];
+  clients.push({
+    clientId,
+    newBlockCallback: (latestBlock, activeSubscriptions, addressesSubscribed) =>
+      onBlock(ws, latestBlock, activeSubscriptions, addressesSubscribed),
+  });
 
   ws.isAlive = true;
 
@@ -118,33 +146,6 @@ wss.on('connection', (ws: Server.Ws) => {
   ws.on('error', error => {
     const message = prepareErrorMessage(-1, error);
     ws.send(message);
-  });
-
-  // this event is triggered with every new block see events.ts
-  events.on('newBlock', async (latestBlock: Responses['block_content']) => {
-    // block subscriptions
-    const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
-
-    if (activeBlockSub) {
-      const message = prepareMessage(activeBlockSub.id, latestBlock);
-
-      ws.send(message);
-    }
-
-    // address subscriptions
-    const activeAddressesSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
-    const activeAddressSub = activeSubscriptions[activeAddressesSubIndex];
-
-    if (activeAddressSub && activeAddressSub.type === 'addresses') {
-      const tsxInBlock = await getBlockTransactionsByAddresses(latestBlock, addressedSubscribed);
-
-      // do not send empty notification
-      if (tsxInBlock.length > 0) {
-        const message = prepareMessage(activeAddressSub.id, tsxInBlock);
-
-        ws.send(message);
-      }
-    }
   });
 
   // general messages
@@ -216,13 +217,15 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       case MESSAGES.SUBSCRIBE_BLOCK: {
-        const activeBlockSubIndex = activeSubscriptions.findIndex(i => i.type === 'block');
+        const activeBlockSubIndex = activeSubscriptions[clientId].findIndex(
+          i => i.type === 'block',
+        );
 
         if (activeBlockSubIndex > -1) {
-          activeSubscriptions.splice(activeBlockSubIndex);
+          activeSubscriptions[clientId].splice(activeBlockSubIndex);
         }
 
-        activeSubscriptions.push({
+        activeSubscriptions[clientId].push({
           type: 'block',
           id: data.id,
         });
@@ -234,10 +237,12 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       case MESSAGES.UNSUBSCRIBE_BLOCK: {
-        const activeBlockSubIndex = activeSubscriptions.findIndex(i => i.type === 'block');
+        const activeBlockSubIndex = activeSubscriptions[clientId].findIndex(
+          i => i.type === 'block',
+        );
 
         if (activeBlockSubIndex > -1) {
-          activeSubscriptions.splice(activeBlockSubIndex);
+          activeSubscriptions[clientId].splice(activeBlockSubIndex);
         }
 
         const message = prepareMessage(data.id, {
@@ -252,18 +257,20 @@ wss.on('connection', (ws: Server.Ws) => {
       case MESSAGES.SUBSCRIBE_ADDRESS: {
         if (data.params.addresses && data.params.addresses.length > 0) {
           data.params.addresses.forEach(addressInput => {
-            if (!addressedSubscribed.includes(addressInput)) {
-              addressedSubscribed.push(addressInput);
+            if (!addressesSubscribed[clientId].includes(addressInput)) {
+              addressesSubscribed[clientId].push(addressInput);
             }
           });
 
-          const activeAddressSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
+          const activeAddressSubIndex = activeSubscriptions[clientId].findIndex(
+            i => i.type === 'addresses',
+          );
 
           if (activeAddressSubIndex > -1) {
-            activeSubscriptions.splice(activeAddressSubIndex);
+            activeSubscriptions[clientId].splice(activeAddressSubIndex);
           }
 
-          activeSubscriptions.push({
+          activeSubscriptions[clientId].push({
             type: 'addresses',
             id: data.id,
           });
@@ -277,10 +284,12 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       case MESSAGES.UNSUBSCRIBE_ADDRESS: {
-        const activeAddressSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
+        const activeAddressSubIndex = activeSubscriptions[clientId].findIndex(
+          i => i.type === 'addresses',
+        );
 
         if (activeAddressSubIndex > -1) {
-          activeSubscriptions.splice(activeAddressSubIndex);
+          activeSubscriptions[clientId].splice(activeAddressSubIndex);
         }
 
         const message = prepareMessage(data.id, {
@@ -288,7 +297,7 @@ wss.on('connection', (ws: Server.Ws) => {
         });
 
         ws.send(message);
-        addressedSubscribed = [];
+        addressesSubscribed[clientId] = [];
 
         break;
       }
@@ -309,11 +318,14 @@ wss.on('connection', (ws: Server.Ws) => {
   ws.on('close', () => {
     // clear intervals on close
     clearInterval(interval);
-    clearInterval(subscribeBlockInterval);
 
     // remove subscriptions on close
-    activeSubscriptions = [];
-    addressedSubscribed = [];
+    clients.splice(
+      clients.findIndex(c => c.clientId === clientId),
+      1,
+    );
+    delete activeSubscriptions[clientId];
+    delete addressesSubscribed[clientId];
   });
 });
 
