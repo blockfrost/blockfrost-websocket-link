@@ -142,7 +142,7 @@ export default async (
 
     if (duration > 7) {
       console.warn(
-        `Warning: getAccountInfo-(${details}) took ${duration}s. Transactions: ${uniqueTxIds.length} Addresses: ${addresses.length} Tokens: ${tokensBalances.length} `,
+        `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${uniqueTxIds.length} Addresses: ${addresses.length} Tokens: ${tokensBalances.length} `,
       );
     }
 
