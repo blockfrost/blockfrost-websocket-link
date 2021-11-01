@@ -24,6 +24,7 @@
     "got": "^11.8.2",
     "memoizee": "^0.4.15",
     "serialize-error": "^8.1.0",
+    "uuid": "^8.3.2",
     "validator": "^13.6.0",
     "ws": "^8.2.3"
   },
@@ -37,6 +38,7 @@
     "@types/memoizee": "^0.4.6",
     "@types/node": "^16.11.5",
     "@types/sinon": "^10.0.6",
+    "@types/uuid": "^8.3.1",
     "@types/validator": "^13.6.5",
     "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
