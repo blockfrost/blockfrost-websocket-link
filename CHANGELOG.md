@@ -8,10 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - report node.js memory usage on `/metrics`
 
+### Fixed
+
+- use one global newBlock listener instead of one per each connection
+- fetch only transactions from current block in `onBlock` callback called on `newBlock` event
+
 ### Changed
+
 - throw error if any of the partial calls of GetAccountInfo fails
+- memoized address derivation in getAccountInfo method
 
 
 ## [1.0.1] - 2021-10-26
