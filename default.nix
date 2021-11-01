@@ -5,7 +5,7 @@ rec {
     src = pkgs.lib.cleanSource ./.;
 
     project = pkgs.callPackage ./yarn-project.nix {
-      nodejs = pkgs.nodejs-14_x;
+      nodejs = pkgs.nodejs-16_x;
     } src;
   in project.overrideAttrs (oldAttrs: rec {
 
