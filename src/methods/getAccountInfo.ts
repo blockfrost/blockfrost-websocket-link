@@ -7,8 +7,8 @@ import {
   addressesToBalances,
   addressesToTxIds,
   getAddressesData,
-  deriveStakeAddress,
   getStakingData,
+  memoizedDeriveStakeAddress,
 } from '../utils/address';
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
@@ -22,6 +22,7 @@ export default async (
   page = 1,
   pageSize = 25,
 ): Promise<string> => {
+  const tStart = new Date().getTime();
   const pageSizeNumber = Number(pageSize);
   const pageIndex = Number(page) - 1;
 
@@ -40,7 +41,7 @@ export default async (
       discoverAddresses(publicKey, 0),
       discoverAddresses(publicKey, 1),
     ]);
-    const stakeAddress = deriveStakeAddress(publicKey);
+    const stakeAddress = memoizedDeriveStakeAddress(publicKey);
 
     const addresses = [...externalAddresses, ...internalAddresses];
     const [transactionsPerAddressList, stakingData] = await Promise.all([
@@ -136,6 +137,15 @@ export default async (
     }
 
     const message = prepareMessage(id, accountInfo);
+    const tEnd = new Date().getTime();
+    const duration = (tEnd - tStart) / 1000;
+
+    if (duration > 7) {
+      console.warn(
+        `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${uniqueTxIds.length} Addresses: ${addresses.length} Tokens: ${tokensBalances.length} `,
+      );
+    }
+
     return message;
   } catch (err) {
     console.log(err);

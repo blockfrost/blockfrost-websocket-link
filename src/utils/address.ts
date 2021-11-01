@@ -4,6 +4,7 @@ import { getNetworkId } from '../utils/common';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
+import memoizee from 'memoizee';
 import {
   Bip32PublicKey,
   BaseAddress,
@@ -12,7 +13,7 @@ import {
 } from '@emurgo/cardano-serialization-lib-nodejs';
 import { transformAsset } from './asset';
 
-export const deriveAddress = (
+const deriveAddress = (
   publicKey: string,
   addressIndex: number,
   type: number,
@@ -33,7 +34,12 @@ export const deriveAddress = (
   };
 };
 
-export const deriveStakeAddress = (publicKey: string): string => {
+export const memoizedDeriveAddress = memoizee(deriveAddress, {
+  maxAge: 30 * 60 * 1000, // 30 mins
+  primitive: true,
+});
+
+const deriveStakeAddress = (publicKey: string): string => {
   const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
   const networkId = getNetworkId();
   const stakeKey = accountKey.derive(2).derive(0);
@@ -46,6 +52,11 @@ export const deriveStakeAddress = (publicKey: string): string => {
 
   return rewardAddr;
 };
+
+export const memoizedDeriveStakeAddress = memoizee(deriveStakeAddress, {
+  maxAge: 30 * 60 * 1000, // 30 mins
+  primitive: true,
+});
 
 export const discoverAddresses = async (
   publicKey: string,
@@ -60,7 +71,7 @@ export const discoverAddresses = async (
     const promisesBundle: Addresses.Bundle = [];
 
     for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
-      const { address, path } = deriveAddress(publicKey, addressCount, type);
+      const { address, path } = memoizedDeriveAddress(publicKey, addressCount, type);
       addressCount++;
       const promise = blockfrostAPI.addresses(address);
       promisesBundle.push({ address, promise, path });
