@@ -1,4 +1,11 @@
-{ pkgs ? import <nixpkgs> { } }:
+{
+  pkgs ? import
+    (builtins.fetchTarball {
+      url = "https://github.com/NixOS/nixpkgs/archive/9fe53aefc9eece8c3deba9da68d47539100a3360.tar.gz";
+      sha256 = "0vzjj0n6xqs2asc0769q0abj1xs3b0s3hqb4almmdr6cp1fgdpp1";
+    })
+    { }
+}:
 rec {
   blockfrost-websocket-link =
   let
