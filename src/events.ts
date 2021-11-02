@@ -14,6 +14,19 @@ setInterval(
     try {
       const latestBlock = await blockfrostAPI.blocksLatest();
 
+      // check if we missed some blocks since the last run
+      if (
+        latestBlock.height &&
+        previousBlock?.height &&
+        latestBlock.height - previousBlock.height > 1
+      ) {
+        for (let i = previousBlock.height; i < latestBlock.height; i++) {
+          console.warn(`newBlock emitter: emitting missed block ${i}`);
+          const missedBlock = await blockfrostAPI.blocks(i);
+          events.emit('newBlock', missedBlock);
+        }
+      }
+
       if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
         previousBlock = latestBlock;
         events.emit('newBlock', latestBlock);
