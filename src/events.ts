@@ -28,11 +28,11 @@ setInterval(
 export const onBlock = async (
   ws: Server.Ws,
   latestBlock: Responses['block_content'],
-  activeSubscriptions: Server.Subscription[],
-  addressesSubscribed: string[],
+  activeSubscriptions: Server.Subscription[] | undefined,
+  addressesSubscribed: string[] | undefined,
 ) => {
   // block subscriptions
-  const activeBlockSub = activeSubscriptions.find(i => i.type === 'block');
+  const activeBlockSub = activeSubscriptions?.find(i => i.type === 'block');
 
   if (activeBlockSub) {
     const message = prepareMessage(activeBlockSub.id, latestBlock);
@@ -41,17 +41,18 @@ export const onBlock = async (
   }
 
   // address subscriptions
-  const activeAddressesSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
-  const activeAddressSub = activeSubscriptions[activeAddressesSubIndex];
+  if (activeSubscriptions && addressesSubscribed) {
+    const activeAddressesSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
+    const activeAddressSub = activeSubscriptions[activeAddressesSubIndex];
 
-  if (activeAddressSub && activeAddressSub.type === 'addresses') {
-    const tsxInBlock = await getBlockTransactionsByAddresses(latestBlock, addressesSubscribed);
+    if (activeAddressSub && activeAddressSub.type === 'addresses') {
+      const tsxInBlock = await getBlockTransactionsByAddresses(latestBlock, addressesSubscribed);
 
-    // do not send empty notification
-    if (tsxInBlock.length > 0) {
-      const message = prepareMessage(activeAddressSub.id, tsxInBlock);
-
-      ws.send(message);
+      // do not send empty notification
+      if (tsxInBlock.length > 0) {
+        const message = prepareMessage(activeAddressSub.id, tsxInBlock);
+        ws.send(message);
+      }
     }
   }
 };

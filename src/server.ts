@@ -44,11 +44,7 @@ const addressesSubscribed: Record<string, string[]> = {};
 
 const clients: Array<{
   clientId: string;
-  newBlockCallback: (
-    latestBlock: Responses['block_content'],
-    activeSubscriptions: Server.Subscription[],
-    addressesSubscribed: string[],
-  ) => Promise<void>;
+  newBlockCallback: (latestBlock: Responses['block_content']) => Promise<void>;
 }> = [];
 
 // index route
@@ -100,13 +96,7 @@ const interval = setInterval(() => {
 
 // this event is triggered with every new block see events.ts
 events.on('newBlock', async (latestBlock: Responses['block_content']) => {
-  clients.forEach(client =>
-    client.newBlockCallback(
-      latestBlock,
-      activeSubscriptions[client.clientId],
-      addressesSubscribed[client.clientId],
-    ),
-  );
+  clients.forEach(client => client.newBlockCallback(latestBlock));
 });
 
 wss.on('connection', (ws: Server.Ws) => {
@@ -116,8 +106,8 @@ wss.on('connection', (ws: Server.Ws) => {
   activeSubscriptions[clientId] = [];
   clients.push({
     clientId,
-    newBlockCallback: (latestBlock, activeSubscriptions, addressesSubscribed) =>
-      onBlock(ws, latestBlock, activeSubscriptions, addressesSubscribed),
+    newBlockCallback: latestBlock =>
+      onBlock(ws, latestBlock, activeSubscriptions[clientId], addressesSubscribed[clientId]),
   });
 
   ws.isAlive = true;
