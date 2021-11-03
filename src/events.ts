@@ -4,7 +4,7 @@ import { prepareMessage } from './utils/message';
 import { getBlockTransactionsByAddresses } from './utils/transaction';
 import { blockfrostAPI } from './utils/blockfrostAPI';
 import { Responses } from '@blockfrost/blockfrost-js';
-import { promiseTimeout } from 'utils/common';
+import { promiseTimeout } from './utils/common';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;
