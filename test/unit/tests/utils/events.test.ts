@@ -56,5 +56,48 @@ describe('events', () => {
       events.removeAllListeners();
       _resetPreviousBlock();
     });
+
+    test(`${fixture.description} - timeout test`, async () => {
+      const blockLatestMock = sinon.stub(blockfrostAPI, 'blocksLatest');
+      blockLatestMock
+        .onCall(0)
+        // @ts-ignore
+        .resolves(fixture.latestBlocks[0]);
+        blockLatestMock
+        .onCall(1)
+        // @ts-ignore
+        .resolves(fixture.latestBlocks[1]);
+      const callback = jest.fn();
+      events.on('newBlock', callback);
+
+      const blockMock = sinon.stub(blockfrostAPI, 'blocks');
+      blockMock
+        .onCall(0)
+        // @ts-ignore
+        .resolves(fixture.missedBlocks[0]);
+        blockMock
+        .onCall(1)
+        .returns(
+          new Promise(resolve => {
+            setTimeout(() => {
+              // @ts-ignore
+              resolve(fixture.missedBlocks[1]);
+            }, 5000);
+          }),
+        ); // delay 2nd response by 5s, which should trigger timeout
+
+      await emitBlock();
+      expect(callback).toBeCalledTimes(1);
+      expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0]);
+
+      await emitBlock({fetchTimeoutMs: 4000});
+      expect(callback).toBeCalledTimes(3); // one time from the first emit, 3 times from 2nd emit (2 missed blocks + latest)
+      expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0]);
+      expect(callback).toHaveBeenNthCalledWith(3, fixture.latestBlocks[1]);
+      blockLatestMock.restore();
+      blockMock.restore();
+      events.removeAllListeners();
+      _resetPreviousBlock();
+    });
   });
 });

@@ -4,6 +4,11 @@ import { prepareMessage } from './utils/message';
 import { getBlockTransactionsByAddresses } from './utils/transaction';
 import { blockfrostAPI } from './utils/blockfrostAPI';
 import { Responses } from '@blockfrost/blockfrost-js';
+import { promiseTimeout } from 'utils/common';
+
+interface EmitBlockOptions {
+  fetchTimeoutMs?: number;
+}
 
 const events = new EventEmitter();
 
@@ -13,10 +18,9 @@ export const _resetPreviousBlock = () => {
   previousBlock = null;
 };
 
-export const emitBlock = async () => {
+export const emitBlock = async (options?: EmitBlockOptions) => {
   try {
     const latestBlock = await blockfrostAPI.blocksLatest();
-
     if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
       // check if we missed some blocks since the last run
       if (
@@ -28,9 +32,16 @@ export const emitBlock = async () => {
           console.warn(
             `newBlock emitter: emitting missed block: ${i} (current block: ${latestBlock.height})`,
           );
-          const missedBlock = await blockfrostAPI.blocks(i);
+
           // emit previously missed blocks
-          events.emit('newBlock', missedBlock);
+          await promiseTimeout(
+            blockfrostAPI.blocks(i).then(missedBlock => {
+              events.emit('newBlock', missedBlock);
+            }),
+            options?.fetchTimeoutMs ?? 2000,
+          ).catch(() => {
+            console.warn(`newBlock emitter: Skipping block ${i}. Fetch takes too long.`);
+          });
         }
       }
 
