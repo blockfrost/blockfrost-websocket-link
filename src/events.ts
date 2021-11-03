@@ -9,34 +9,39 @@ const events = new EventEmitter();
 
 let previousBlock: null | Responses['block_content'] = null;
 
-setInterval(
-  async () => {
-    try {
-      const latestBlock = await blockfrostAPI.blocksLatest();
+export const _resetPreviousBlock = () => {
+  previousBlock = null;
+};
 
+export const emitBlock = async () => {
+  try {
+    const latestBlock = await blockfrostAPI.blocksLatest();
+
+    if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
       // check if we missed some blocks since the last run
       if (
         latestBlock.height &&
         previousBlock?.height &&
         latestBlock.height - previousBlock.height > 1
       ) {
-        for (let i = previousBlock.height; i < latestBlock.height; i++) {
-          console.warn(`newBlock emitter: emitting missed block ${i}`);
+        for (let i = previousBlock.height + 1; i < latestBlock.height; i++) {
+          console.warn(
+            `newBlock emitter: emitting missed block: ${i} (current block: ${latestBlock.height})`,
+          );
           const missedBlock = await blockfrostAPI.blocks(i);
+          // emit previously missed blocks
           events.emit('newBlock', missedBlock);
         }
       }
 
-      if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
-        previousBlock = latestBlock;
-        events.emit('newBlock', latestBlock);
-      }
-    } catch (err) {
-      console.error('newBlock emitter', err);
+      // emit latest block
+      previousBlock = latestBlock;
+      events.emit('newBlock', latestBlock);
     }
-  },
-  process.env.BLOCK_LISTEN_INTERVAL ? parseInt(process.env.BLOCK_LISTEN_INTERVAL, 10) : 5000,
-);
+  } catch (err) {
+    console.error('newBlock emitter', err);
+  }
+};
 
 export const onBlock = async (
   ws: Server.Ws,
@@ -68,6 +73,14 @@ export const onBlock = async (
       }
     }
   }
+};
+
+export const startEmitter = () => {
+  console.info('Started block emitter');
+  setInterval(
+    emitBlock,
+    process.env.BLOCK_LISTEN_INTERVAL ? parseInt(process.env.BLOCK_LISTEN_INTERVAL, 10) : 5000,
+  );
 };
 
 export { events };
