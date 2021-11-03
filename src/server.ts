@@ -12,7 +12,7 @@ import * as Server from './types/server';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
 import { jsonToPrometheus } from './utils/prometheus';
-import { events, onBlock } from './events';
+import { events, onBlock, startEmitter } from './events';
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
 import getAccountUtxo from './methods/getAccountUtxo';
@@ -94,6 +94,7 @@ const interval = setInterval(() => {
   });
 }, 60000);
 
+startEmitter();
 // this event is triggered with every new block see events.ts
 events.on('newBlock', async (latestBlock: Responses['block_content']) => {
   clients.forEach(client => client.newBlockCallback(latestBlock));
