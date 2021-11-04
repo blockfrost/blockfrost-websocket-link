@@ -92,7 +92,7 @@ const interval = setInterval(() => {
     ws.isAlive = false;
     ws.ping(noop);
   });
-}, 60000);
+}, 30000);
 
 startEmitter();
 // this event is triggered with every new block see events.ts
