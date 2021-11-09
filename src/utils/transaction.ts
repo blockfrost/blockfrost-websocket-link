@@ -18,13 +18,11 @@ export const txIdsToTransactions = async (
         (async () => {
           try {
             const tx = await blockfrostAPI.txs(hash);
-            const blockInfo = await blockfrostAPI.blocks(tx.block);
             const txUtxos = await blockfrostAPI.txsUtxos(hash);
 
             return resolve({
               txData: tx,
               txUtxos,
-              blockInfo,
             });
           } catch (err) {
             return reject(err);
@@ -61,7 +59,6 @@ export const txIdsToTransactions = async (
                 amount: output.amount.map(asset => transformAsset(asset)),
               })),
             },
-            blockInfo: data.blockInfo,
             txHash: p.txHash,
           });
         })
