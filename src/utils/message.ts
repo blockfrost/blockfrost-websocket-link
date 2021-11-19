@@ -1,9 +1,4 @@
-import {
-  BlockfrostClientError,
-  BlockfrostGenericError,
-  BlockfrostServerError,
-  Responses,
-} from '@blockfrost/blockfrost-js';
+import { BlockfrostClientError, BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import { serializeError } from 'serialize-error';
 import { Messages } from '../types/message';
 import * as TxTypes from '../types/transactions';
@@ -23,7 +18,6 @@ export const prepareErrorMessage = (id: number, error: unknown): string => {
   if (
     error instanceof BlockfrostClientError ||
     error instanceof BlockfrostServerError ||
-    error instanceof BlockfrostGenericError ||
     error instanceof Error
   ) {
     return JSON.stringify({
