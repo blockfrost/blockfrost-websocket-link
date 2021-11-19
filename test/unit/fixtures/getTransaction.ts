@@ -7,6 +7,7 @@ export default [
       block: 'e6369fee087d31192016b1659f1c381e9fc4925339278a4eef6f340c96c1947f',
       block_height: 5040611,
       slot: 15650536,
+      block_time: 12,
       index: 0,
       output_amount: [{ unit: 'lovelace', quantity: '701374004958' }],
       fees: '874781',
@@ -33,6 +34,7 @@ export default [
         block: 'e6369fee087d31192016b1659f1c381e9fc4925339278a4eef6f340c96c1947f',
         block_height: 5040611,
         slot: 15650536,
+        block_time: 12,
         index: 0,
         output_amount: [
           {

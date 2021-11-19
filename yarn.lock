@@ -1947,18 +1947,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:3.0.0-beta.1":
-  version: 3.0.0-beta.1
-  resolution: "@blockfrost/blockfrost-js@npm:3.0.0-beta.1"
+"@blockfrost/blockfrost-js@npm:3.0.0-beta.3":
+  version: 3.0.0-beta.3
+  resolution: "@blockfrost/blockfrost-js@npm:3.0.0-beta.3"
   dependencies:
-    "@blockfrost/openapi": 0.1.27
+    "@blockfrost/openapi": 0.1.32
     "@emurgo/cardano-serialization-lib-nodejs": ^8.1.0
     "@emurgo/cip14-js": 2.0.0
-    axios: ^0.21.1
     form-data: ^4.0.0
-    retry-axios: ^2.4.0
+    got: ^11.8.2
+    nock: ^13.2.1
     url-join: ^4.0.1
-  checksum: 84c049bed09c25f04fc1c2ff2c725247042625eb0e499c2981b4f586a620efc3a0abf91984c23cf0f37d511791a8c09738c4a3b41cdbc97c11965bc035a9571c
+  checksum: d15f5b0d6155738e76d11539c952827eaaa0051e8845a2fbab2961baafecdbc9e4eb550b39336a515ba033c2e0131fef14a75cb51ac26c0683b83318da587e6b
   languageName: node
   linkType: hard
 
@@ -1970,7 +1970,7 @@ __metadata:
     "@babel/core": ^7.15.8
     "@babel/preset-env": ^7.15.8
     "@babel/preset-typescript": ^7.15.0
-    "@blockfrost/blockfrost-js": 3.0.0-beta.1
+    "@blockfrost/blockfrost-js": 3.0.0-beta.3
     "@emurgo/cardano-serialization-lib-nodejs": ^9.1.0
     "@sentry/node": ^6.13.3
     "@sentry/tracing": ^6.13.3
@@ -2009,10 +2009,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blockfrost/openapi@npm:0.1.27":
-  version: 0.1.27
-  resolution: "@blockfrost/openapi@npm:0.1.27"
-  checksum: 2c90e41ca64bbd874200139861183d16c97fa9f0d97f5796f839e154157c29dc778d728bad8b367c9ea04797bc747b97b68d23328152aac2960a9a46d146e4db
+"@blockfrost/openapi@npm:0.1.32":
+  version: 0.1.32
+  resolution: "@blockfrost/openapi@npm:0.1.32"
+  checksum: 691b4d37ce2d09f1f9f38cdda0e5d6ba0e2d08f031cc1a4de2df1a979339959d2a17136ba501dd7a932cf0dba999066f0985a72676be38e135d37a40f6a1830a
   languageName: node
   linkType: hard
 
@@ -3198,15 +3198,6 @@ __metadata:
   version: 1.11.0
   resolution: "aws4@npm:1.11.0"
   checksum: 5a00d045fd0385926d20ebebcfba5ec79d4482fe706f63c27b324d489a04c68edb0db99ed991e19eda09cb8c97dc2452059a34d97545cebf591d7a2b5a10999f
-  languageName: node
-  linkType: hard
-
-"axios@npm:^0.21.1":
-  version: 0.21.1
-  resolution: "axios@npm:0.21.1"
-  dependencies:
-    follow-redirects: ^1.10.0
-  checksum: c87915fa0b18c15c63350112b6b3563a3e2ae524d7707de0a73d2e065e0d30c5d3da8563037bc29d4cc1b7424b5a350cb7274fa52525c6c04a615fe561c6ab11
   languageName: node
   linkType: hard
 
@@ -4791,16 +4782,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.10.0":
-  version: 1.13.3
-  resolution: "follow-redirects@npm:1.13.3"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: 4b5aaa91a0f938547a083d001a572da4d6b7586b699f330da8794ae2cf8b0d8628bcde794f9b205fbe6c6dcab30272454e723aed8f5540bf47a41fa8c7e36441
-  languageName: node
-  linkType: hard
-
 "forever-agent@npm:~0.6.1":
   version: 0.6.1
   resolution: "forever-agent@npm:0.6.1"
@@ -6293,7 +6274,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json-stringify-safe@npm:~5.0.1":
+"json-stringify-safe@npm:^5.0.1, json-stringify-safe@npm:~5.0.1":
   version: 5.0.1
   resolution: "json-stringify-safe@npm:5.0.1"
   checksum: 48ec0adad5280b8a96bb93f4563aa1667fd7a36334f79149abd42446d0989f2ddc58274b479f4819f1f00617957e6344c886c55d05a4e15ebb4ab931e4a6a8ee
@@ -6428,6 +6409,13 @@ __metadata:
   version: 4.6.2
   resolution: "lodash.merge@npm:4.6.2"
   checksum: ad580b4bdbb7ca1f7abf7e1bce63a9a0b98e370cf40194b03380a46b4ed799c9573029599caebc1b14e3f24b111aef72b96674a56cfa105e0f5ac70546cdc005
+  languageName: node
+  linkType: hard
+
+"lodash.set@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "lodash.set@npm:4.3.2"
+  checksum: a9122f49eef9f2d0fc9061a33d87f8e5b8c6b23d46e8b9e9ce1529d3588d79741bd1145a3abdfa3b13082703e65af27ff18d8a07bfc22b9be32f3fc36f763f70
   languageName: node
   linkType: hard
 
@@ -6739,6 +6727,18 @@ __metadata:
     just-extend: ^4.0.2
     path-to-regexp: ^1.7.0
   checksum: e3843cc125163ce99b7fb0328edf427b981be32c6c719684582cf0a46fb5206173835a9a14dedac3c4833e415ab0e0493f9f4d4163572a3a0c95db39b093166d
+  languageName: node
+  linkType: hard
+
+"nock@npm:^13.2.1":
+  version: 13.2.1
+  resolution: "nock@npm:13.2.1"
+  dependencies:
+    debug: ^4.1.0
+    json-stringify-safe: ^5.0.1
+    lodash.set: ^4.3.2
+    propagate: ^2.0.0
+  checksum: b401fb8143ca88095ee34c715e2806eda2813dace4f4c4798961ad961c18003d1529f4507a79c429d2c3c768e136632ee19ee9ebfef71f0cb022df152594df1d
   languageName: node
   linkType: hard
 
@@ -7231,6 +7231,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"propagate@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "propagate@npm:2.0.1"
+  checksum: c4febaee2be0979e82fb6b3727878fd122a98d64a7fa3c9d09b0576751b88514a9e9275b1b92e76b364d488f508e223bd7e1dcdc616be4cdda876072fbc2a96c
+  languageName: node
+  linkType: hard
+
 "proxy-addr@npm:~2.0.5":
   version: 2.0.6
   resolution: "proxy-addr@npm:2.0.6"
@@ -7512,15 +7519,6 @@ __metadata:
   dependencies:
     lowercase-keys: ^2.0.0
   checksum: 6a4d32c37d4e88678ae0a9d69fcc90aafa15b1a3eab455bd65c06af3c6c4976afc47d07a0e5a60d277ab041a465f43bf0a581e0d7ab33786e7a7741573f2e487
-  languageName: node
-  linkType: hard
-
-"retry-axios@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "retry-axios@npm:2.4.0"
-  peerDependencies:
-    axios: "*"
-  checksum: 45d1d29230e451bb0f4dcf326a0384cbfad08e6a91e6d75eb0168344eace8cdbaa600286508c26f12d0b08b2c97fcbe3c22872866610c76e2cc77feb1066e21b
   languageName: node
   linkType: hard
 
