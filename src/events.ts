@@ -90,7 +90,9 @@ export const startEmitter = () => {
   console.info('Started block emitter');
   setInterval(
     emitBlock,
-    process.env.BLOCK_LISTEN_INTERVAL ? parseInt(process.env.BLOCK_LISTEN_INTERVAL, 10) : 5000,
+    process.env.BLOCKFROST_BLOCK_LISTEN_INTERVAL
+      ? parseInt(process.env.BLOCKFROST_BLOCK_LISTEN_INTERVAL, 10)
+      : 5000,
   );
 };
 

@@ -117,7 +117,7 @@ wss.on('connection', (ws: Server.Ws) => {
     heartbeat(ws);
   });
 
-  if (!process.env.PROJECT_ID) {
+  if (!process.env.BLOCKFROST_PROJECT_ID) {
     const message = prepareErrorMessage(
       -1,
       `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
@@ -127,7 +127,7 @@ wss.on('connection', (ws: Server.Ws) => {
     return;
   }
 
-  if (!process.env.NETWORK) {
+  if (!process.env.BLOCKFROST_NETWORK) {
     const message = prepareErrorMessage(-1, `Missing NETWORK env variable see: ${REPOSITORY_URL}`);
 
     ws.send(message);
