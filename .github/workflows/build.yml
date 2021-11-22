@@ -19,5 +19,5 @@ jobs:
       - run: yarn
       - run: yarn run lint
       - run: yarn run type-check
-      - run: NETWORK=${{ secrets.NETWORK }} BACKEND_URL=https://cardano-mainnet.blockfrost.io/api/v0 yarn run test
+      - run: BLOCKFROST_NETWORK=${{ secrets.NETWORK }} BLOCKFROST_BACKEND_URL=https://cardano-mainnet.blockfrost.io/api/v0 yarn run test
       - run: yarn run build
