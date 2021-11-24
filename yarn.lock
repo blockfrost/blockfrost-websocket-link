@@ -1947,9 +1947,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:3.0.0-beta.6":
-  version: 3.0.0-beta.6
-  resolution: "@blockfrost/blockfrost-js@npm:3.0.0-beta.6"
+"@blockfrost/blockfrost-js@npm:3.0.0-beta.7":
+  version: 3.0.0-beta.7
+  resolution: "@blockfrost/blockfrost-js@npm:3.0.0-beta.7"
   dependencies:
     "@blockfrost/openapi": "git+https://github.com/blockfrost/openapi.git#c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d"
     "@emurgo/cardano-serialization-lib-nodejs": ^8.1.0
@@ -1958,7 +1958,7 @@ __metadata:
     got: ^11.8.2
     nock: ^13.2.1
     url-join: ^4.0.1
-  checksum: a7610ab59e36a8afdecd23d19aec492adc2f2bccc661282cb19cac9e2b957ca4528dab0fef230c71d2db353993660fc8722532120fee813c56a74799408707da
+  checksum: da7dcef0e454fa9d82a981484462fdef5be0b35cfcba72a5006b8815583ae9050fc808d6f81d413a07721e1c3218d647275a3c766b98d0f364196c8265a5025d
   languageName: node
   linkType: hard
 
@@ -1970,7 +1970,7 @@ __metadata:
     "@babel/core": ^7.15.8
     "@babel/preset-env": ^7.15.8
     "@babel/preset-typescript": ^7.15.0
-    "@blockfrost/blockfrost-js": 3.0.0-beta.6
+    "@blockfrost/blockfrost-js": 3.0.0-beta.7
     "@emurgo/cardano-serialization-lib-nodejs": ^9.1.0
     "@sentry/node": ^6.13.3
     "@sentry/tracing": ^6.13.3
