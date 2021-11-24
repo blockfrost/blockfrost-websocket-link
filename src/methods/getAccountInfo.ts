@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js';
 import * as Messages from '../types/message';
 import {
   discoverAddresses,
-  addressesToBalances,
   addressesToTxIds,
   getAddressesData,
   getStakingData,
@@ -13,7 +12,8 @@ import {
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
-import { transformAsset } from '../utils/asset';
+import { getAssetBalance, transformAsset } from '../utils/asset';
+import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export default async (
   id: number,
@@ -37,45 +37,39 @@ export default async (
   }
 
   try {
-    const [externalAddresses, internalAddresses] = await Promise.all([
-      discoverAddresses(publicKey, 0),
-      discoverAddresses(publicKey, 1),
-    ]);
     const stakeAddress = memoizedDeriveStakeAddress(publicKey);
-
-    const addresses = [...externalAddresses, ...internalAddresses];
-    const [transactionsPerAddressList, stakingData] = await Promise.all([
-      addressesToTxIds(addresses),
+    const [stakeAddressTotal, stakingData] = await Promise.all([
+      blockfrostAPI.accountsAddressesTotal(stakeAddress),
       getStakingData(stakeAddress),
     ]);
+    const txCount = stakeAddressTotal.tx_count;
 
-    const empty = !transactionsPerAddressList.find(txs => txs.data.length > 0);
-    const balances = addressesToBalances(addresses);
-    const lovelaceBalance = balances.find(b => b.unit === 'lovelace');
-    const tokensBalances = balances.filter(b => b.unit !== 'lovelace');
+    const lovelaceBalance = getAssetBalance(
+      'lovelace',
+      stakeAddressTotal.sent_sum,
+      stakeAddressTotal.received_sum,
+    );
+    const balanceWithRewards = lovelaceBalance.plus(stakingData.rewards);
 
-    const uniqueTxIds: ({
-      address: string;
-    } & BackendResponse['address_transactions_content'][number])[] = [];
-    transactionsPerAddressList.forEach(txsPerAddress => {
-      txsPerAddress.data.forEach(addrItem => {
-        if (!uniqueTxIds.find(item => addrItem.tx_hash === item.tx_hash)) {
-          uniqueTxIds.push({ address: txsPerAddress.address, ...addrItem });
-        }
-      });
+    const tokensBalances = stakeAddressTotal.received_sum.map(r => {
+      const received = r.quantity;
+      const sent = stakeAddressTotal.sent_sum.find(s => s.unit === r.unit)?.quantity ?? '0';
+      return {
+        unit: r.unit,
+        quantity: new BigNumber(received).minus(sent).toFixed(),
+      };
     });
 
-    const balanceBig = new BigNumber(lovelaceBalance?.quantity || '0').plus(stakingData.rewards);
-
-    const totalPages = Math.ceil(uniqueTxIds.length / pageSize);
+    const totalPages = Math.ceil(txCount / pageSize);
+    const empty = txCount === 0; // true if account is unused
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
       empty,
-      balance: balanceBig.toString(),
-      availableBalance: lovelaceBalance?.quantity || '0',
+      balance: balanceWithRewards.toFixed(),
+      availableBalance: lovelaceBalance.toFixed(),
       history: {
-        total: uniqueTxIds.length,
+        total: txCount,
         unconfirmed: 0,
       },
       page: {
@@ -97,7 +91,28 @@ export default async (
       accountInfo.tokens = tokensBalances.map(t => transformAsset(t));
     }
 
+    let addressesCount = 0;
     if (details === 'txs' || details === 'txids') {
+      const [externalAddresses, internalAddresses] = await Promise.all([
+        discoverAddresses(publicKey, 0),
+        discoverAddresses(publicKey, 1),
+      ]);
+
+      const addresses = [...externalAddresses, ...internalAddresses];
+      addressesCount = addresses.length;
+      const transactionsPerAddressList = await addressesToTxIds(addresses);
+
+      const uniqueTxIds: ({
+        address: string;
+      } & BackendResponse['address_transactions_content'][number])[] = [];
+      transactionsPerAddressList.forEach(txsPerAddress => {
+        txsPerAddress.data.forEach(addrItem => {
+          if (!uniqueTxIds.find(item => addrItem.tx_hash === item.tx_hash)) {
+            uniqueTxIds.push({ address: txsPerAddress.address, ...addrItem });
+          }
+        });
+      });
+
       const sortedTxIds = uniqueTxIds.sort(
         (first, second) =>
           second.block_height - first.block_height || second.tx_index - first.tx_index,
@@ -142,7 +157,7 @@ export default async (
 
     if (duration > 7) {
       console.warn(
-        `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${uniqueTxIds.length} Addresses: ${addresses.length} Tokens: ${tokensBalances.length} `,
+        `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${addressesCount} Tokens: ${tokensBalances.length} `,
       );
     }
 

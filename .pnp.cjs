@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.15.8"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.8"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.0"],
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.4"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.6"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -3282,11 +3282,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:3.0.0-beta.4", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.0-beta.4-020541471d-9b8507b338.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:3.0.0-beta.6", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.0-beta.6-4da4a617a5-a7610ab59e.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.4"],
-            ["@blockfrost/openapi", "npm:0.1.32"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.6"],
+            ["@blockfrost/openapi", "https://github.com/blockfrost/openapi.git#commit=c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:8.1.0"],
             ["@emurgo/cip14-js", "npm:2.0.0"],
             ["form-data", "npm:4.0.0"],
@@ -3306,7 +3306,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.15.8"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.8"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.0"],
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.4"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.6"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -3347,10 +3347,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/openapi", [
-        ["npm:0.1.32", {
-          "packageLocation": "./.yarn/cache/@blockfrost-openapi-npm-0.1.32-3c68986a8c-691b4d37ce.zip/node_modules/@blockfrost/openapi/",
+        ["https://github.com/blockfrost/openapi.git#commit=c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d", {
+          "packageLocation": "./.yarn/cache/@blockfrost-openapi-https-98b37aa0ad-6fe2f46abb.zip/node_modules/@blockfrost/openapi/",
           "packageDependencies": [
-            ["@blockfrost/openapi", "npm:0.1.32"]
+            ["@blockfrost/openapi", "https://github.com/blockfrost/openapi.git#commit=c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d"]
           ],
           "linkType": "HARD",
         }]
