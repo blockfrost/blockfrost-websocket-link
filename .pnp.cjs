@@ -62,7 +62,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:4.0.0"],
             ["eslint-plugin-promise", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:5.1.1"],
             ["express", "npm:4.17.1"],
-            ["got", "npm:11.8.2"],
+            ["got", "npm:11.8.3"],
             ["jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.3.1"],
             ["memoizee", "npm:0.4.15"],
             ["prettier", "npm:2.4.1"],
@@ -3329,7 +3329,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:4.0.0"],
             ["eslint-plugin-promise", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:5.1.1"],
             ["express", "npm:4.17.1"],
-            ["got", "npm:11.8.2"],
+            ["got", "npm:11.8.3"],
             ["jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.3.1"],
             ["memoizee", "npm:0.4.15"],
             ["prettier", "npm:2.4.1"],
@@ -6998,24 +6998,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["got", [
-        ["npm:11.8.2", {
-          "packageLocation": "./.yarn/cache/got-npm-11.8.2-c1eb105458-41ad7bf74f.zip/node_modules/got/",
-          "packageDependencies": [
-            ["got", "npm:11.8.2"],
-            ["@sindresorhus/is", "npm:4.0.1"],
-            ["@szmarczak/http-timer", "npm:4.0.6"],
-            ["@types/cacheable-request", "npm:6.0.2"],
-            ["@types/responselike", "npm:1.0.0"],
-            ["cacheable-lookup", "npm:5.0.4"],
-            ["cacheable-request", "npm:7.0.2"],
-            ["decompress-response", "npm:6.0.0"],
-            ["http2-wrapper", "npm:1.0.3"],
-            ["lowercase-keys", "npm:2.0.0"],
-            ["p-cancelable", "npm:2.1.1"],
-            ["responselike", "npm:2.0.0"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:11.8.3", {
           "packageLocation": "./.yarn/cache/got-npm-11.8.3-caf98d599b-3b6db107d9.zip/node_modules/got/",
           "packageDependencies": [
