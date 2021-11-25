@@ -1947,18 +1947,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:3.0.0-beta.8":
-  version: 3.0.0-beta.8
-  resolution: "@blockfrost/blockfrost-js@npm:3.0.0-beta.8"
+"@blockfrost/blockfrost-js@npm:3.0.0-beta.10":
+  version: 3.0.0-beta.10
+  resolution: "@blockfrost/blockfrost-js@npm:3.0.0-beta.10"
   dependencies:
-    "@blockfrost/openapi": "git+https://github.com/blockfrost/openapi.git#c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d"
+    "@blockfrost/openapi": 0.1.33
     "@emurgo/cardano-serialization-lib-nodejs": ^8.1.0
     "@emurgo/cip14-js": 2.0.0
     form-data: ^4.0.0
-    got: ^11.8.2
+    got: ^11.8.3
     nock: ^13.2.1
     url-join: ^4.0.1
-  checksum: e0139ded886ec66c25f94c2d8c78d88f2387c36265f56128c65f3a8a42ab68fbc8cab66344591a2c6741b770a9558bc9daff011e110381b75ce3367939491547
+  checksum: 1242dc1dfac0449c957f4d8ce138d863497f30f0ab2882f3a05287e92d6c9f1275e11ce6f400460a6cb24679dc11ddd5aaf539f2683526df2420e1a27aed226e
   languageName: node
   linkType: hard
 
@@ -1970,7 +1970,7 @@ __metadata:
     "@babel/core": ^7.15.8
     "@babel/preset-env": ^7.15.8
     "@babel/preset-typescript": ^7.15.0
-    "@blockfrost/blockfrost-js": 3.0.0-beta.8
+    "@blockfrost/blockfrost-js": 3.0.0-beta.10
     "@emurgo/cardano-serialization-lib-nodejs": ^9.1.0
     "@sentry/node": ^6.13.3
     "@sentry/tracing": ^6.13.3
@@ -1993,7 +1993,7 @@ __metadata:
     eslint-plugin-prettier: 4.0.0
     eslint-plugin-promise: ^5.1.1
     express: ^4.17.1
-    got: ^11.8.2
+    got: ^11.8.3
     jest: ^27.3.1
     memoizee: ^0.4.15
     prettier: ^2.4.1
@@ -2009,10 +2009,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blockfrost/openapi@git+https://github.com/blockfrost/openapi.git#c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d":
+"@blockfrost/openapi@npm:0.1.33":
   version: 0.1.33
-  resolution: "@blockfrost/openapi@https://github.com/blockfrost/openapi.git#commit=c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d"
-  checksum: 6fe2f46abbef495024cfda515c295fbc4a0be76d8a893c57db9e1c2a43137f3edc6395f4425773f61c6f072edac18d736b25c6b4f50e186fa60f424ee359acfd
+  resolution: "@blockfrost/openapi@npm:0.1.33"
+  checksum: ca705c49fb2dc36aea946a11778ae1aaac9e6ba8cd14a16212dd647912a84b3dfddc451dbc0d6c6480f2e59fef2540bac1ee32fa8ea0d6a7c0c08ec82125feab
   languageName: node
   linkType: hard
 
@@ -3507,7 +3507,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cacheable-request@npm:^7.0.1":
+"cacheable-request@npm:^7.0.2":
   version: 7.0.2
   resolution: "cacheable-request@npm:7.0.2"
   dependencies:
@@ -5046,22 +5046,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^11.8.2":
-  version: 11.8.2
-  resolution: "got@npm:11.8.2"
+"got@npm:^11.8.3":
+  version: 11.8.3
+  resolution: "got@npm:11.8.3"
   dependencies:
     "@sindresorhus/is": ^4.0.0
     "@szmarczak/http-timer": ^4.0.5
     "@types/cacheable-request": ^6.0.1
     "@types/responselike": ^1.0.0
     cacheable-lookup: ^5.0.3
-    cacheable-request: ^7.0.1
+    cacheable-request: ^7.0.2
     decompress-response: ^6.0.0
     http2-wrapper: ^1.0.0-beta.5.2
     lowercase-keys: ^2.0.0
     p-cancelable: ^2.0.0
     responselike: ^2.0.0
-  checksum: 41ad7bf74f7ec18bca81997ea0a6c8b6b75405cc3ba76d49c5d9d4658cad200d5a9fa7b0a13058458d0df6bed217baabd122d5d351c6bc6996514a5e428744bb
+  checksum: 3b6db107d9765470b18e4cb22f7c7400381be7425b9be5823f0168d6c21b5d6b28b023c0b3ee208f73f6638c3ce251948ca9b54a1e8f936d3691139ac202d01b
   languageName: node
   linkType: hard
 

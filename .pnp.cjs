@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.15.8"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.8"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.0"],
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.8"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.10"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -62,7 +62,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:4.0.0"],
             ["eslint-plugin-promise", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:5.1.1"],
             ["express", "npm:4.17.1"],
-            ["got", "npm:11.8.2"],
+            ["got", "npm:11.8.3"],
             ["jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.3.1"],
             ["memoizee", "npm:0.4.15"],
             ["prettier", "npm:2.4.1"],
@@ -3282,15 +3282,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:3.0.0-beta.8", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.0-beta.8-f9fa582232-e0139ded88.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:3.0.0-beta.10", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.0-beta.10-761f68bc6b-1242dc1dfa.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.8"],
-            ["@blockfrost/openapi", "https://github.com/blockfrost/openapi.git#commit=c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.10"],
+            ["@blockfrost/openapi", "npm:0.1.33"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:8.1.0"],
             ["@emurgo/cip14-js", "npm:2.0.0"],
             ["form-data", "npm:4.0.0"],
-            ["got", "npm:11.8.2"],
+            ["got", "npm:11.8.3"],
             ["nock", "npm:13.2.1"],
             ["url-join", "npm:4.0.1"]
           ],
@@ -3306,7 +3306,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.15.8"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.8"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.0"],
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.8"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.10"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -3329,7 +3329,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:4.0.0"],
             ["eslint-plugin-promise", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:5.1.1"],
             ["express", "npm:4.17.1"],
-            ["got", "npm:11.8.2"],
+            ["got", "npm:11.8.3"],
             ["jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.3.1"],
             ["memoizee", "npm:0.4.15"],
             ["prettier", "npm:2.4.1"],
@@ -3347,10 +3347,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/openapi", [
-        ["https://github.com/blockfrost/openapi.git#commit=c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d", {
-          "packageLocation": "./.yarn/cache/@blockfrost-openapi-https-98b37aa0ad-6fe2f46abb.zip/node_modules/@blockfrost/openapi/",
+        ["npm:0.1.33", {
+          "packageLocation": "./.yarn/cache/@blockfrost-openapi-npm-0.1.33-8c53b0a63b-ca705c49fb.zip/node_modules/@blockfrost/openapi/",
           "packageDependencies": [
-            ["@blockfrost/openapi", "https://github.com/blockfrost/openapi.git#commit=c568a7d3ac69ac7cf5ff2c093c69f5771f8b2c3d"]
+            ["@blockfrost/openapi", "npm:0.1.33"]
           ],
           "linkType": "HARD",
         }]
@@ -6998,10 +6998,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["got", [
-        ["npm:11.8.2", {
-          "packageLocation": "./.yarn/cache/got-npm-11.8.2-c1eb105458-41ad7bf74f.zip/node_modules/got/",
+        ["npm:11.8.3", {
+          "packageLocation": "./.yarn/cache/got-npm-11.8.3-caf98d599b-3b6db107d9.zip/node_modules/got/",
           "packageDependencies": [
-            ["got", "npm:11.8.2"],
+            ["got", "npm:11.8.3"],
             ["@sindresorhus/is", "npm:4.0.1"],
             ["@szmarczak/http-timer", "npm:4.0.6"],
             ["@types/cacheable-request", "npm:6.0.2"],
