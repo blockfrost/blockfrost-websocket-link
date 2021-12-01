@@ -336,3 +336,25 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
     throw error;
   }
 };
+
+export const getStakingAccountTotal = async (
+  stakeAddress: string,
+): Promise<Responses['account_addresses_total']> => {
+  try {
+    const total = await blockfrostAPI.accountsAddressesTotal(stakeAddress);
+    return total;
+  } catch (error) {
+    console.log('err', error);
+    if (error instanceof BlockfrostServerError) {
+      if (error.status_code === 404) {
+        return {
+          stake_address: stakeAddress,
+          received_sum: [],
+          sent_sum: [],
+          tx_count: 0,
+        };
+      }
+    }
+    throw error;
+  }
+};
