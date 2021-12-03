@@ -61,7 +61,18 @@ export const memoizedDeriveStakeAddress = memoizee(deriveStakeAddress, {
 export const discoverAddresses = async (
   publicKey: string,
   type: Addresses.Type,
+  accountEmpty?: boolean,
 ): Promise<Addresses.Result[]> => {
+  if (accountEmpty) {
+    // just derive first ADDRESS_GAP_LIMIT and treat them as empty addresses
+    const addresses: { address: string; path: string }[] = [];
+    for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
+      const { address, path } = memoizedDeriveAddress(publicKey, i, type);
+      addresses.push({ address, path });
+    }
+    return addresses.map(addr => ({ address: addr.address, data: 'empty', path: addr.path }));
+  }
+
   let lastEmptyCount = 0;
   let addressCount = 0;
 
@@ -284,7 +295,17 @@ export const addressesToTxIds = async (
 
 export const getAddressesData = async (
   addresses: Addresses.Result[],
+  emptyAccount?: boolean,
 ): Promise<Addresses.AddressData[]> => {
+  if (emptyAccount) {
+    return addresses.map(addr => ({
+      address: addr.address,
+      path: addr.path,
+      transfers: 0,
+      received: '0',
+      sum: '0',
+    }));
+  }
   const promises = addresses.map(addr =>
     blockfrostAPI.addressesTotal(addr.address).catch(error => {
       if (error.status_code === 404) {
@@ -344,7 +365,6 @@ export const getStakingAccountTotal = async (
     const total = await blockfrostAPI.accountsAddressesTotal(stakeAddress);
     return total;
   } catch (error) {
-    console.log('err', error);
     if (error instanceof BlockfrostServerError) {
       if (error.status_code === 404) {
         return {

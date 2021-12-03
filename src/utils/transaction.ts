@@ -1,4 +1,4 @@
-import { Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import * as Types from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { transformAsset } from './asset';
@@ -141,8 +141,12 @@ export const getBlockTransactionsByAddresses = async (
         .then(txs => ({ address: p.address, data: txs.map(tx => tx.tx_hash) }))
         .catch(err => {
           // invalid address?
-          console.error(err);
-          throw err;
+          if (err instanceof BlockfrostServerError && err.status_code === 404) {
+            // most likely empty address
+            return { address: p.address, data: [] };
+          } else {
+            throw err;
+          }
         }),
     ),
   );

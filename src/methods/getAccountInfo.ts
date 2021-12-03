@@ -94,24 +94,27 @@ export default async (
     let addressesCount = 0;
     if (details === 'txs' || details === 'txids') {
       const [externalAddresses, internalAddresses] = await Promise.all([
-        discoverAddresses(publicKey, 0),
-        discoverAddresses(publicKey, 1),
+        discoverAddresses(publicKey, 0, empty),
+        discoverAddresses(publicKey, 1, empty),
       ]);
 
       const addresses = [...externalAddresses, ...internalAddresses];
       addressesCount = addresses.length;
-      const transactionsPerAddressList = await addressesToTxIds(addresses);
 
       const uniqueTxIds: ({
         address: string;
       } & BackendResponse['address_transactions_content'][number])[] = [];
-      transactionsPerAddressList.forEach(txsPerAddress => {
-        txsPerAddress.data.forEach(addrItem => {
-          if (!uniqueTxIds.find(item => addrItem.tx_hash === item.tx_hash)) {
-            uniqueTxIds.push({ address: txsPerAddress.address, ...addrItem });
-          }
+
+      if (!empty) {
+        const transactionsPerAddressList = await addressesToTxIds(addresses);
+        transactionsPerAddressList.forEach(txsPerAddress => {
+          txsPerAddress.data.forEach(addrItem => {
+            if (!uniqueTxIds.find(item => addrItem.tx_hash === item.tx_hash)) {
+              uniqueTxIds.push({ address: txsPerAddress.address, ...addrItem });
+            }
+          });
         });
-      });
+      }
 
       const sortedTxIds = uniqueTxIds.sort(
         (first, second) =>
@@ -122,14 +125,17 @@ export default async (
       accountInfo.page.total = totalPages; // number of pages
 
       if (details === 'txs') {
-        const txs = await txIdsToTransactions(
-          requestedPageTxIds.map(item => ({ address: item.address, data: [item.tx_hash] })),
-        );
+        const txs =
+          requestedPageTxIds.length > 0
+            ? await txIdsToTransactions(
+                requestedPageTxIds.map(item => ({ address: item.address, data: [item.tx_hash] })),
+              )
+            : [];
         accountInfo.history.transactions = txs;
         const usedExternalAddresses = externalAddresses.filter(a => a.data !== 'empty');
         const unusedExternalAddresses = externalAddresses.filter(a => a.data === 'empty');
-        const change = await getAddressesData(internalAddresses);
-        const used = await getAddressesData(usedExternalAddresses);
+        const change = await getAddressesData(internalAddresses, empty);
+        const used = await getAddressesData(usedExternalAddresses, empty);
 
         const unused = unusedExternalAddresses.map(addressData => ({
           address: addressData.address,
