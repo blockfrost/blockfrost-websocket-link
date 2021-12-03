@@ -1947,18 +1947,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:3.0.0-beta.10":
-  version: 3.0.0-beta.10
-  resolution: "@blockfrost/blockfrost-js@npm:3.0.0-beta.10"
+"@blockfrost/blockfrost-js@npm:3.0.2":
+  version: 3.0.2
+  resolution: "@blockfrost/blockfrost-js@npm:3.0.2"
   dependencies:
-    "@blockfrost/openapi": 0.1.33
-    "@emurgo/cardano-serialization-lib-nodejs": ^8.1.0
-    "@emurgo/cip14-js": 2.0.0
+    "@emurgo/cardano-serialization-lib-nodejs": ^9.1.2
+    "@emurgo/cip14-js": ^2
     form-data: ^4.0.0
     got: ^11.8.3
-    nock: ^13.2.1
-    url-join: ^4.0.1
-  checksum: 1242dc1dfac0449c957f4d8ce138d863497f30f0ab2882f3a05287e92d6c9f1275e11ce6f400460a6cb24679dc11ddd5aaf539f2683526df2420e1a27aed226e
+  checksum: 36c54c29c4f8feeeefdecf8872b4fd401f7478ec094983767b6fb2eae3a698ae8555d63a1b41fe126dc940dd8e8bba668c16b7bfdd90b6daa7756f1dc3a80246
   languageName: node
   linkType: hard
 
@@ -1970,7 +1967,7 @@ __metadata:
     "@babel/core": ^7.15.8
     "@babel/preset-env": ^7.15.8
     "@babel/preset-typescript": ^7.15.0
-    "@blockfrost/blockfrost-js": 3.0.0-beta.10
+    "@blockfrost/blockfrost-js": 3.0.2
     "@emurgo/cardano-serialization-lib-nodejs": ^9.1.0
     "@sentry/node": ^6.13.3
     "@sentry/tracing": ^6.13.3
@@ -2009,20 +2006,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blockfrost/openapi@npm:0.1.33":
-  version: 0.1.33
-  resolution: "@blockfrost/openapi@npm:0.1.33"
-  checksum: ca705c49fb2dc36aea946a11778ae1aaac9e6ba8cd14a16212dd647912a84b3dfddc451dbc0d6c6480f2e59fef2540bac1ee32fa8ea0d6a7c0c08ec82125feab
-  languageName: node
-  linkType: hard
-
-"@emurgo/cardano-serialization-lib-nodejs@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:8.1.0"
-  checksum: bb806e0dd1f8b8f73359575d56c77c6f0131df390da7b8104e216adc5f26402ce0307c263ce29855339454db5f08859b13a7a0f1db9c739db87ec487e0308100
-  languageName: node
-  linkType: hard
-
 "@emurgo/cardano-serialization-lib-nodejs@npm:^9.1.0":
   version: 9.1.0
   resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:9.1.0"
@@ -2030,7 +2013,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emurgo/cip14-js@npm:2.0.0":
+"@emurgo/cardano-serialization-lib-nodejs@npm:^9.1.2":
+  version: 9.1.2
+  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:9.1.2"
+  checksum: babd47a6f36d5772ade34277595a6c4e819f4028e15852db7f92209ab165e16d6c5d19fdedaa50d5bbad6a8d3f42599382a87b47f82c9a2d5c726bc19d8d484b
+  languageName: node
+  linkType: hard
+
+"@emurgo/cip14-js@npm:^2":
   version: 2.0.0
   resolution: "@emurgo/cip14-js@npm:2.0.0"
   dependencies:
@@ -6274,7 +6264,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json-stringify-safe@npm:^5.0.1, json-stringify-safe@npm:~5.0.1":
+"json-stringify-safe@npm:~5.0.1":
   version: 5.0.1
   resolution: "json-stringify-safe@npm:5.0.1"
   checksum: 48ec0adad5280b8a96bb93f4563aa1667fd7a36334f79149abd42446d0989f2ddc58274b479f4819f1f00617957e6344c886c55d05a4e15ebb4ab931e4a6a8ee
@@ -6409,13 +6399,6 @@ __metadata:
   version: 4.6.2
   resolution: "lodash.merge@npm:4.6.2"
   checksum: ad580b4bdbb7ca1f7abf7e1bce63a9a0b98e370cf40194b03380a46b4ed799c9573029599caebc1b14e3f24b111aef72b96674a56cfa105e0f5ac70546cdc005
-  languageName: node
-  linkType: hard
-
-"lodash.set@npm:^4.3.2":
-  version: 4.3.2
-  resolution: "lodash.set@npm:4.3.2"
-  checksum: a9122f49eef9f2d0fc9061a33d87f8e5b8c6b23d46e8b9e9ce1529d3588d79741bd1145a3abdfa3b13082703e65af27ff18d8a07bfc22b9be32f3fc36f763f70
   languageName: node
   linkType: hard
 
@@ -6727,18 +6710,6 @@ __metadata:
     just-extend: ^4.0.2
     path-to-regexp: ^1.7.0
   checksum: e3843cc125163ce99b7fb0328edf427b981be32c6c719684582cf0a46fb5206173835a9a14dedac3c4833e415ab0e0493f9f4d4163572a3a0c95db39b093166d
-  languageName: node
-  linkType: hard
-
-"nock@npm:^13.2.1":
-  version: 13.2.1
-  resolution: "nock@npm:13.2.1"
-  dependencies:
-    debug: ^4.1.0
-    json-stringify-safe: ^5.0.1
-    lodash.set: ^4.3.2
-    propagate: ^2.0.0
-  checksum: b401fb8143ca88095ee34c715e2806eda2813dace4f4c4798961ad961c18003d1529f4507a79c429d2c3c768e136632ee19ee9ebfef71f0cb022df152594df1d
   languageName: node
   linkType: hard
 
@@ -7228,13 +7199,6 @@ __metadata:
     kleur: ^3.0.3
     sisteransi: ^1.0.5
   checksum: 05bf4865870665067b14fc54ced6c96e353f58f57658351e16bb8c12c017402582696fb42d97306b7c98efc0e2cc1ebf27ab573448d5a5da2ac18991cc9e4cad
-  languageName: node
-  linkType: hard
-
-"propagate@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "propagate@npm:2.0.1"
-  checksum: c4febaee2be0979e82fb6b3727878fd122a98d64a7fa3c9d09b0576751b88514a9e9275b1b92e76b364d488f508e223bd7e1dcdc616be4cdda876072fbc2a96c
   languageName: node
   linkType: hard
 
@@ -8425,13 +8389,6 @@ typescript@^4.4.4:
   dependencies:
     punycode: ^2.1.0
   checksum: 7167432de6817fe8e9e0c9684f1d2de2bb688c94388f7569f7dbdb1587c9f4ca2a77962f134ec90be0cc4d004c939ff0d05acc9f34a0db39a3c797dada262633
-  languageName: node
-  linkType: hard
-
-"url-join@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "url-join@npm:4.0.1"
-  checksum: f74e868bf25dbc8be6a8d7237d4c36bb5b6c62c72e594d5ab1347fe91d6af7ccd9eb5d621e30152e4da45c2e9a26bec21390e911ab54a62d4d82e76028374ee5
   languageName: node
   linkType: hard
 
