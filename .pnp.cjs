@@ -39,7 +39,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.15.8"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.8"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.0"],
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.10"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -3282,17 +3282,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:3.0.0-beta.10", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.0-beta.10-761f68bc6b-1242dc1dfa.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:3.0.2", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.2-fee9d35cdc-36c54c29c4.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.10"],
-            ["@blockfrost/openapi", "npm:0.1.33"],
-            ["@emurgo/cardano-serialization-lib-nodejs", "npm:8.1.0"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.2"],
+            ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.2"],
             ["@emurgo/cip14-js", "npm:2.0.0"],
             ["form-data", "npm:4.0.0"],
-            ["got", "npm:11.8.3"],
-            ["nock", "npm:13.2.1"],
-            ["url-join", "npm:4.0.1"]
+            ["got", "npm:11.8.3"]
           ],
           "linkType": "HARD",
         }]
@@ -3306,7 +3303,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.15.8"],
             ["@babel/preset-env", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.8"],
             ["@babel/preset-typescript", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:7.15.0"],
-            ["@blockfrost/blockfrost-js", "npm:3.0.0-beta.10"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -3346,27 +3343,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "SOFT",
         }]
       ]],
-      ["@blockfrost/openapi", [
-        ["npm:0.1.33", {
-          "packageLocation": "./.yarn/cache/@blockfrost-openapi-npm-0.1.33-8c53b0a63b-ca705c49fb.zip/node_modules/@blockfrost/openapi/",
-          "packageDependencies": [
-            ["@blockfrost/openapi", "npm:0.1.33"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
       ["@emurgo/cardano-serialization-lib-nodejs", [
-        ["npm:8.1.0", {
-          "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-8.1.0-6a795df826-bb806e0dd1.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",
-          "packageDependencies": [
-            ["@emurgo/cardano-serialization-lib-nodejs", "npm:8.1.0"]
-          ],
-          "linkType": "HARD",
-        }],
         ["npm:9.1.0", {
           "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-9.1.0-a02b8601db-7381557b65.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",
           "packageDependencies": [
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:9.1.2", {
+          "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-9.1.2-7bcae3b90f-babd47a6f3.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",
+          "packageDependencies": [
+            ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.2"]
           ],
           "linkType": "HARD",
         }]
@@ -8539,15 +8527,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["lodash.set", [
-        ["npm:4.3.2", {
-          "packageLocation": "./.yarn/cache/lodash.set-npm-4.3.2-7586c942c2-a9122f49ee.zip/node_modules/lodash.set/",
-          "packageDependencies": [
-            ["lodash.set", "npm:4.3.2"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
       ["lowercase-keys", [
         ["npm:2.0.0", {
           "packageLocation": "./.yarn/cache/lowercase-keys-npm-2.0.0-1876065a32-24d7ebd56c.zip/node_modules/lowercase-keys/",
@@ -8891,19 +8870,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@sinonjs/text-encoding", "npm:0.7.1"],
             ["just-extend", "npm:4.2.1"],
             ["path-to-regexp", "npm:1.8.0"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["nock", [
-        ["npm:13.2.1", {
-          "packageLocation": "./.yarn/cache/nock-npm-13.2.1-93bbd63b82-b401fb8143.zip/node_modules/nock/",
-          "packageDependencies": [
-            ["nock", "npm:13.2.1"],
-            ["debug", "virtual:904b3fada4a3265c4dfeed8c42d6542b5b497582d17441c86eea102109bfc3b9e1825aad904bc43dd1b94603ff4820b8cb2ebcf24cfbaf45ecee04e5bc1076b8#npm:4.3.2"],
-            ["json-stringify-safe", "npm:5.0.1"],
-            ["lodash.set", "npm:4.3.2"],
-            ["propagate", "npm:2.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -9458,15 +9424,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["prompts", "npm:2.4.1"],
             ["kleur", "npm:3.0.3"],
             ["sisteransi", "npm:1.0.5"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["propagate", [
-        ["npm:2.0.1", {
-          "packageLocation": "./.yarn/cache/propagate-npm-2.0.1-2074bf76d3-c4febaee2b.zip/node_modules/propagate/",
-          "packageDependencies": [
-            ["propagate", "npm:2.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -10804,15 +10761,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["uri-js", "npm:4.4.1"],
             ["punycode", "npm:2.1.1"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["url-join", [
-        ["npm:4.0.1", {
-          "packageLocation": "./.yarn/cache/url-join-npm-4.0.1-e1f4415722-f74e868bf2.zip/node_modules/url-join/",
-          "packageDependencies": [
-            ["url-join", "npm:4.0.1"]
           ],
           "linkType": "HARD",
         }]

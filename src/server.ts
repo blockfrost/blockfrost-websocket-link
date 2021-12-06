@@ -11,7 +11,7 @@ import packageJson from '../package.json';
 import * as Server from './types/server';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
-import { jsonToPrometheus } from './utils/prometheus';
+import { MetricsCollector } from './utils/prometheus';
 import { events, onBlock, startEmitter } from './events';
 import getServerInfo from './methods/getServerInfo';
 import getAccountInfo from './methods/getAccountInfo';
@@ -60,19 +60,12 @@ app.get('/status', (_req, res) => {
   });
 });
 
+const metricsCollector = new MetricsCollector(wss, 20000);
+
 // metrics route
 app.get('/metrics', (_req, res) => {
-  const metrics = {
-    websocket_link_clients: wss.clients.size,
-    // https://nodejs.org/api/process.html#processmemoryusage
-    websocket_link_rss: process.memoryUsage().rss,
-    websocket_link_heap_total: process.memoryUsage().heapTotal,
-    websocket_link_heap_used: process.memoryUsage().heapUsed,
-    websocket_link_external: process.memoryUsage().external,
-    websocket_link_array_buffers: process.memoryUsage().arrayBuffers,
-  };
   res.setHeader('Content-Type', 'text/plain');
-  res.send(jsonToPrometheus(metrics));
+  res.send(metricsCollector.toJson());
 });
 
 const heartbeat = (ws: Server.Ws) => {
