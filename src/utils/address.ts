@@ -358,3 +358,21 @@ export const getStakingAccountTotal = async (
     throw error;
   }
 };
+
+export const filterUtxoByAddress = (addresses: string[], utxos: Responses['tx_content_utxo'][]) => {
+  // Returns utxos that contain given addresses in their inputs or outputs
+  const result: { address: string; utxo: Responses['tx_content_utxo'] }[] = [];
+
+  for (const utxo of utxos) {
+    const inputAddresses = utxo.inputs.map(i => i.address);
+    const outputAddresses = utxo.outputs.map(o => o.address);
+    const utxoAddresses = [...inputAddresses, ...outputAddresses];
+
+    for (const utxoAddress of utxoAddresses) {
+      if (addresses.includes(utxoAddress)) {
+        result.push({ address: utxoAddress, utxo });
+      }
+    }
+  }
+  return result;
+};

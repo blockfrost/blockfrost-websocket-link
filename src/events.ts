@@ -1,10 +1,10 @@
 import EventEmitter from 'events';
 import * as Server from './types/server';
 import { prepareMessage } from './utils/message';
-import { getBlockTransactionsByAddresses } from './utils/transaction';
 import { blockfrostAPI } from './utils/blockfrostAPI';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { promiseTimeout } from './utils/common';
+import { filterUtxoByAddress } from './utils/address';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;
@@ -57,6 +57,7 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
 export const onBlock = async (
   ws: Server.Ws,
   latestBlock: Responses['block_content'],
+  utxos: Responses['tx_content_utxo'][],
   activeSubscriptions: Server.Subscription[] | undefined,
   addressesSubscribed: string[] | undefined,
 ) => {
@@ -65,7 +66,6 @@ export const onBlock = async (
 
   if (activeBlockSub) {
     const message = prepareMessage(activeBlockSub.id, latestBlock);
-
     ws.send(message);
   }
 
@@ -75,11 +75,20 @@ export const onBlock = async (
     const activeAddressSub = activeSubscriptions[activeAddressesSubIndex];
 
     if (activeAddressSub && activeAddressSub.type === 'addresses') {
-      const tsxInBlock = await getBlockTransactionsByAddresses(latestBlock, addressesSubscribed);
+      const utxosForAffectedAddresses = filterUtxoByAddress(addressesSubscribed, utxos);
 
+      const txsPromises = utxosForAffectedAddresses.map(item =>
+        blockfrostAPI.txs(item.utxo.hash).then(data => ({
+          address: item.address,
+          txHash: data.hash,
+          txData: data,
+          txUtxos: item.utxo,
+        })),
+      );
+      const txs = await Promise.all(txsPromises); // TODO: fetch in batches
       // do not send empty notification
-      if (tsxInBlock.length > 0) {
-        const message = prepareMessage(activeAddressSub.id, tsxInBlock);
+      if (utxosForAffectedAddresses.length > 0) {
+        const message = prepareMessage(activeAddressSub.id, txs);
         ws.send(message);
       }
     }
