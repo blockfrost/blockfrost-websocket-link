@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - use one global newBlock listener instead of one per each connection
-- fetch only transactions from current block in `onBlock` callback called on `newBlock` event
+- logic in `onBlock` callback called on `newBlock` event
 
 ### Changed
 

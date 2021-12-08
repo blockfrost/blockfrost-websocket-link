@@ -81,6 +81,36 @@ export const txIdsToTransactions = async (
   return sortedTxs;
 };
 
+export const getBlockTransactionsUtxos = async (
+  blockHeight: number | null,
+): Promise<Responses['tx_content_utxo'][]> => {
+  if (blockHeight === null) {
+    throw new Error('Cannot fetch block transactions. Invalid block height.');
+  }
+  const txids = await blockfrostAPI.blocksTxsAll(blockHeight);
+  const txsUtxo: Responses['tx_content_utxo'][] = [];
+
+  const getPromiseBundle = (startIndex: number, batchSize: number) => {
+    const promises = [...Array.from({ length: batchSize }).keys()].map(i => {
+      const txid = txids[startIndex + i];
+      return txid ? blockfrostAPI.txsUtxos(txid) : undefined;
+    });
+    return promises.filter(p => Boolean(p)) as unknown as Responses['tx_content_utxo'][];
+  };
+
+  const batch_size = 100;
+  // TODO: this will get rate limited for 3rd parties using websocket-link if the amount of txs is too high
+  // Blockfrost API allows burst of 500 request, then we can only make 10 requests per second
+  for (let i = 0; i < txids.length; i += batch_size) {
+    const promiseSlice = getPromiseBundle(i, batch_size);
+
+    // eslint-disable-next-line no-await-in-loop
+    const partialResults = await Promise.all(promiseSlice);
+    txsUtxo.push(...partialResults);
+  }
+  return txsUtxo;
+};
+
 export const getBlockTransactionsByAddresses = async (
   block: Responses['block_content'],
   addresses: string[],
