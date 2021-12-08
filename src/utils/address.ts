@@ -62,7 +62,7 @@ export const discoverAddresses = async (
   publicKey: string,
   type: Addresses.Type,
   accountEmpty?: boolean,
-): Promise<Addresses.Result[]> => {
+): Promise<Addresses.Address[]> => {
   if (accountEmpty) {
     // just derive first ADDRESS_GAP_LIMIT and treat them as empty addresses
     const addresses: { address: string; path: string }[] = [];
@@ -76,7 +76,7 @@ export const discoverAddresses = async (
   let lastEmptyCount = 0;
   let addressCount = 0;
 
-  const result: Addresses.Result[] = [];
+  const result: Addresses.Address[] = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
     const promisesBundle: Addresses.Bundle = [];
@@ -259,7 +259,7 @@ export const utxosWithBlocks = async (
 };
 
 export const addressesToTxIds = async (
-  addresses: Addresses.Result[],
+  addresses: Addresses.Address[],
 ): Promise<{ address: string; data: Responses['address_transactions_content'] }[]> => {
   const promisesBundle: {
     address: string;
@@ -294,7 +294,7 @@ export const addressesToTxIds = async (
 };
 
 export const getAddressesData = async (
-  addresses: Addresses.Result[],
+  addresses: Addresses.Address[],
   emptyAccount?: boolean,
 ): Promise<Addresses.AddressData[]> => {
   if (emptyAccount) {

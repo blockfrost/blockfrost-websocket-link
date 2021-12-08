@@ -1,7 +1,7 @@
 import { Responses } from '@blockfrost/blockfrost-js';
 import { AssetBalance } from './response';
 
-export type Result = {
+export type Address = {
   address: string;
   path: string;
   data: Responses['address_content'] | 'empty';
