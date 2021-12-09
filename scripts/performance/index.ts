@@ -1,5 +1,5 @@
 import { allSeed } from './constants';
-import { deriveAddressedForXpub, generateRandomAccounts, randomIntFromInterval } from './utils';
+import { deriveAddressesForXpub, generateRandomAccounts, randomIntFromInterval } from './utils';
 import { TestClient } from './websocket';
 
 interface TestSuiteMetrics {
@@ -31,7 +31,7 @@ class TestSuite {
 
     const addresses: string[] = []; // for all user's accounts (xpubs)
     for (const xpub of xpubs) {
-      addresses.push(...deriveAddressedForXpub(xpub));
+      addresses.push(...deriveAddressesForXpub(xpub));
 
       // initial account discovery with txs
       await c.sendAndWait('GET_ACCOUNT_INFO', {

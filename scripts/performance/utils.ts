@@ -1,5 +1,5 @@
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
-import { deriveAddress } from '@blockfrost/blockfrost-js/lib/account';
+import { deriveAddress } from '@blockfrost/blockfrost-js';
 
 export class Deferred {
   promise: Promise<unknown>;
@@ -33,7 +33,7 @@ export const generateRandomAccounts = (count: number) => {
   return xpubs;
 };
 
-export const deriveAddressedForXpub = (xpub: string, count = 20) => {
+export const deriveAddressesForXpub = (xpub: string, count = 20) => {
   const addresses: string[] = [];
   for (let i = 0; i < count; i++) {
     const addr = deriveAddress(xpub, 0, i, true);

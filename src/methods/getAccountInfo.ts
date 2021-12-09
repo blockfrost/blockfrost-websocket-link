@@ -4,8 +4,8 @@ import * as Messages from '../types/message';
 import {
   discoverAddresses,
   getStakingData,
-  memoizedDeriveStakeAddress,
   getStakingAccountTotal,
+  memoizedDeriveAddress,
 } from '../utils/address';
 import { getAccountTxids, getAccountAddressesData } from '../utils/account';
 import { txIdsToTransactions } from '../utils/transaction';
@@ -36,7 +36,7 @@ export default async (
   }
 
   try {
-    const stakeAddress = memoizedDeriveStakeAddress(publicKey);
+    const { address: stakeAddress } = memoizedDeriveAddress(publicKey, 2, 0);
     const [stakeAddressTotal, stakingData] = await Promise.all([
       getStakingAccountTotal(stakeAddress),
       getStakingData(stakeAddress),
