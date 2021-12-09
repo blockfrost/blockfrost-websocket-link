@@ -7,7 +7,7 @@ import {
   memoizedDeriveStakeAddress,
   getStakingAccountTotal,
 } from '../utils/address';
-import { getAccountTxids, getAccountAddressesData } from 'utils/account';
+import { getAccountTxids, getAccountAddressesData } from '../utils/account';
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
