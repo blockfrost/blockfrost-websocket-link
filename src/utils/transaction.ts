@@ -1,10 +1,20 @@
-import { Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import * as Types from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { transformAsset } from './asset';
 
+export const sortTransactionsCmp = <
+  T extends {
+    index: number;
+    block_height: number;
+  },
+>(
+  a: T,
+  b: T,
+): number => b.block_height - a.block_height || b.index - a.index;
+
 export const txIdsToTransactions = async (
-  addresses: {
+  txidsPerAddress: {
     address: string;
     data: string[];
   }[],
@@ -12,7 +22,9 @@ export const txIdsToTransactions = async (
   const promisesBundle: Types.TxIdsToTransactionsPromises[] = [];
   const result: Types.TxIdsToTransactionsResponse[] = [];
 
-  addresses.forEach(item => {
+  if (txidsPerAddress.length === 0) return [];
+
+  txidsPerAddress.forEach(item => {
     item.data.forEach(hash => {
       const promise = new Promise<Types.Data>((resolve, reject) => {
         (async () => {
@@ -72,11 +84,7 @@ export const txIdsToTransactions = async (
     ),
   );
 
-  const sortedTxs = result.sort(
-    (first, second) =>
-      second.txData.block_height - first.txData.block_height ||
-      second.txData.index - first.txData.index,
-  );
+  const sortedTxs = result.sort((a, b) => sortTransactionsCmp(a.txData, b.txData));
 
   return sortedTxs;
 };
@@ -141,8 +149,12 @@ export const getBlockTransactionsByAddresses = async (
         .then(txs => ({ address: p.address, data: txs.map(tx => tx.tx_hash) }))
         .catch(err => {
           // invalid address?
-          console.error(err);
-          throw err;
+          if (err instanceof BlockfrostServerError && err.status_code === 404) {
+            // most likely empty address
+            return { address: p.address, data: [] };
+          } else {
+            throw err;
+          }
         }),
     ),
   );

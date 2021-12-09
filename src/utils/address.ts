@@ -61,11 +61,22 @@ export const memoizedDeriveStakeAddress = memoizee(deriveStakeAddress, {
 export const discoverAddresses = async (
   publicKey: string,
   type: Addresses.Type,
-): Promise<Addresses.Result[]> => {
+  accountEmpty?: boolean,
+): Promise<Addresses.Address[]> => {
+  if (accountEmpty) {
+    // just derive first ADDRESS_GAP_LIMIT and treat them as empty addresses
+    const addresses: { address: string; path: string }[] = [];
+    for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
+      const { address, path } = memoizedDeriveAddress(publicKey, i, type);
+      addresses.push({ address, path });
+    }
+    return addresses.map(addr => ({ address: addr.address, data: 'empty', path: addr.path }));
+  }
+
   let lastEmptyCount = 0;
   let addressCount = 0;
 
-  const result: Addresses.Result[] = [];
+  const result: Addresses.Address[] = [];
 
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
     const promisesBundle: Addresses.Bundle = [];
@@ -248,7 +259,7 @@ export const utxosWithBlocks = async (
 };
 
 export const addressesToTxIds = async (
-  addresses: Addresses.Result[],
+  addresses: Addresses.Address[],
 ): Promise<{ address: string; data: Responses['address_transactions_content'] }[]> => {
   const promisesBundle: {
     address: string;
@@ -283,8 +294,18 @@ export const addressesToTxIds = async (
 };
 
 export const getAddressesData = async (
-  addresses: Addresses.Result[],
+  addresses: Addresses.Address[],
+  emptyAccount?: boolean,
 ): Promise<Addresses.AddressData[]> => {
+  if (emptyAccount) {
+    return addresses.map(addr => ({
+      address: addr.address,
+      path: addr.path,
+      transfers: 0,
+      received: '0',
+      sum: '0',
+    }));
+  }
   const promises = addresses.map(addr =>
     blockfrostAPI.addressesTotal(addr.address).catch(error => {
       if (error.status_code === 404) {
@@ -344,7 +365,6 @@ export const getStakingAccountTotal = async (
     const total = await blockfrostAPI.accountsAddressesTotal(stakeAddress);
     return total;
   } catch (error) {
-    console.log('err', error);
     if (error instanceof BlockfrostServerError) {
       if (error.status_code === 404) {
         return {

@@ -1,15 +1,13 @@
 import * as Responses from '../types/response';
-import { Responses as BackendResponse } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import * as Messages from '../types/message';
 import {
   discoverAddresses,
-  addressesToTxIds,
-  getAddressesData,
   getStakingData,
   memoizedDeriveStakeAddress,
   getStakingAccountTotal,
 } from '../utils/address';
+import { getAccountTxids, getAccountAddressesData } from 'utils/account';
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
@@ -22,6 +20,7 @@ export default async (
   page = 1,
   pageSize = 25,
 ): Promise<string> => {
+  let _addressesCount = 0;
   const tStart = new Date().getTime();
   const pageSizeNumber = Number(pageSize);
   const pageIndex = Number(page) - 1;
@@ -61,11 +60,11 @@ export default async (
     });
 
     const totalPages = Math.ceil(txCount / pageSize);
-    const empty = txCount === 0; // true if account is unused
+    const accountEmpty = txCount === 0; // true if account is unused
 
     const accountInfo: Responses.AccountInfo = {
       descriptor: publicKey,
-      empty,
+      empty: accountEmpty,
       balance: balanceWithRewards.toFixed(),
       availableBalance: lovelaceBalance.toFixed(),
       history: {
@@ -87,67 +86,45 @@ export default async (
       },
     };
 
-    if (details !== 'basic') {
+    if (details === 'basic') {
+      // for every level of details except basic set token balances
       accountInfo.tokens = tokensBalances.map(t => transformAsset(t));
     }
 
-    let addressesCount = 0;
     if (details === 'txs' || details === 'txids') {
       const [externalAddresses, internalAddresses] = await Promise.all([
-        discoverAddresses(publicKey, 0),
-        discoverAddresses(publicKey, 1),
+        discoverAddresses(publicKey, 0, accountEmpty),
+        discoverAddresses(publicKey, 1, accountEmpty),
       ]);
 
       const addresses = [...externalAddresses, ...internalAddresses];
-      addressesCount = addresses.length;
-      const transactionsPerAddressList = await addressesToTxIds(addresses);
+      _addressesCount = addresses.length; // just a debug helper
 
-      const uniqueTxIds: ({
-        address: string;
-      } & BackendResponse['address_transactions_content'][number])[] = [];
-      transactionsPerAddressList.forEach(txsPerAddress => {
-        txsPerAddress.data.forEach(addrItem => {
-          if (!uniqueTxIds.find(item => addrItem.tx_hash === item.tx_hash)) {
-            uniqueTxIds.push({ address: txsPerAddress.address, ...addrItem });
-          }
-        });
-      });
-
-      const sortedTxIds = uniqueTxIds.sort(
-        (first, second) =>
-          second.block_height - first.block_height || second.tx_index - first.tx_index,
-      );
-      const paginatedTxsIds = paginate(sortedTxIds, pageSizeNumber);
+      const txids = await getAccountTxids(addresses, accountEmpty);
+      const paginatedTxsIds = paginate(txids, pageSizeNumber);
       const requestedPageTxIds = paginatedTxsIds[pageIndex] ?? [];
-      accountInfo.page.total = totalPages; // number of pages
 
-      if (details === 'txs') {
+      if (details === 'txids') {
+        // set only txids
+        accountInfo.history.txids = requestedPageTxIds.map(t => t.tx_hash);
+      } else if (details === 'txs') {
+        // fetch full transaction objects and set account.history.transactions
         const txs = await txIdsToTransactions(
           requestedPageTxIds.map(item => ({ address: item.address, data: [item.tx_hash] })),
         );
         accountInfo.history.transactions = txs;
-        const usedExternalAddresses = externalAddresses.filter(a => a.data !== 'empty');
-        const unusedExternalAddresses = externalAddresses.filter(a => a.data === 'empty');
-        const change = await getAddressesData(internalAddresses);
-        const used = await getAddressesData(usedExternalAddresses);
 
-        const unused = unusedExternalAddresses.map(addressData => ({
-          address: addressData.address,
-          path: addressData.path,
-          transfers: 0,
-          received: '0',
-          sent: '0',
-        }));
-
+        // fetch data for each address and set account.addresses
+        const accountAddresses = await getAccountAddressesData(
+          externalAddresses,
+          internalAddresses,
+          accountEmpty,
+        );
         accountInfo.addresses = {
-          change,
-          used,
-          unused,
+          change: accountAddresses.change,
+          used: accountAddresses.used,
+          unused: accountAddresses.unused,
         };
-      }
-
-      if (details === 'txids') {
-        accountInfo.history.txids = requestedPageTxIds.map(t => t.tx_hash);
       }
     }
 
@@ -157,7 +134,7 @@ export default async (
 
     if (duration > 7) {
       console.warn(
-        `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${addressesCount} Tokens: ${tokensBalances.length} `,
+        `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} Tokens: ${tokensBalances.length} `,
       );
     }
 
