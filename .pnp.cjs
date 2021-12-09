@@ -35,7 +35,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {
           "packageLocation": "./",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:3.0.2"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.3-beta.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -1120,12 +1120,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:3.0.2", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.2-fee9d35cdc-36c54c29c4.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:3.0.3-beta.2", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-3.0.3-beta.2-571628d65d-e1908cb16c.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:3.0.2"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.3-beta.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.2"],
-            ["@emurgo/cip14-js", "npm:2.0.0"],
+            ["@emurgo/cip14-js", "npm:3.0.1"],
             ["form-data", "npm:4.0.0"],
             ["got", "npm:11.8.3"]
           ],
@@ -1137,7 +1137,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",
           "packageDependencies": [
             ["@blockfrost/blockfrost-websocket-link", "workspace:."],
-            ["@blockfrost/blockfrost-js", "npm:3.0.2"],
+            ["@blockfrost/blockfrost-js", "npm:3.0.3-beta.2"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -1194,10 +1194,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@emurgo/cip14-js", [
-        ["npm:2.0.0", {
-          "packageLocation": "./.yarn/cache/@emurgo-cip14-js-npm-2.0.0-3500cc6e4a-1b07171cd2.zip/node_modules/@emurgo/cip14-js/",
+        ["npm:3.0.1", {
+          "packageLocation": "./.yarn/cache/@emurgo-cip14-js-npm-3.0.1-6011030ea2-9eaf312410.zip/node_modules/@emurgo/cip14-js/",
           "packageDependencies": [
-            ["@emurgo/cip14-js", "npm:2.0.0"],
+            ["@emurgo/cip14-js", "npm:3.0.1"],
             ["bech32", "npm:2.0.0"],
             ["blake2b", "npm:2.1.3"]
           ],

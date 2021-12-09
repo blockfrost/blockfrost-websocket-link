@@ -1,59 +1,34 @@
 import { ADDRESS_GAP_LIMIT } from '../constants';
 import * as Addresses from '../types/address';
-import { getNetworkId } from '../utils/common';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
-import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
+import {
+  BlockfrostServerError,
+  deriveAddress as sdkDeriveAddress,
+  Responses,
+} from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import memoizee from 'memoizee';
-import {
-  Bip32PublicKey,
-  BaseAddress,
-  RewardAddress,
-  StakeCredential,
-} from '@emurgo/cardano-serialization-lib-nodejs';
 import { transformAsset } from './asset';
 
 const deriveAddress = (
   publicKey: string,
-  addressIndex: number,
   type: number,
+  addressIndex: number,
 ): { address: string; path: string } => {
-  const networkId = getNetworkId();
-  const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
-  const utxoPubKey = accountKey.derive(type).derive(addressIndex);
-  const stakeKey = accountKey.derive(2).derive(0);
-  const baseAddr = BaseAddress.new(
-    networkId,
-    StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
-    StakeCredential.from_keyhash(stakeKey.to_raw_key().hash()),
+  const { address } = sdkDeriveAddress(
+    publicKey,
+    type,
+    addressIndex,
+    !!blockfrostAPI.options.isTestnet,
   );
 
   return {
-    address: baseAddr.to_address().to_bech32(),
+    address: address,
     path: `m/1852'/1815'/i'/${type}/${addressIndex}`,
   };
 };
 
 export const memoizedDeriveAddress = memoizee(deriveAddress, {
-  maxAge: 30 * 60 * 1000, // 30 mins
-  primitive: true,
-});
-
-const deriveStakeAddress = (publicKey: string): string => {
-  const accountKey = Bip32PublicKey.from_bytes(Buffer.from(publicKey, 'hex'));
-  const networkId = getNetworkId();
-  const stakeKey = accountKey.derive(2).derive(0);
-  const rewardAddr = RewardAddress.new(
-    networkId,
-    StakeCredential.from_keyhash(stakeKey.to_raw_key().hash()),
-  )
-    .to_address()
-    .to_bech32();
-
-  return rewardAddr;
-};
-
-export const memoizedDeriveStakeAddress = memoizee(deriveStakeAddress, {
   maxAge: 30 * 60 * 1000, // 30 mins
   primitive: true,
 });
@@ -67,7 +42,7 @@ export const discoverAddresses = async (
     // just derive first ADDRESS_GAP_LIMIT and treat them as empty addresses
     const addresses: { address: string; path: string }[] = [];
     for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
-      const { address, path } = memoizedDeriveAddress(publicKey, i, type);
+      const { address, path } = memoizedDeriveAddress(publicKey, type, i);
       addresses.push({ address, path });
     }
     return addresses.map(addr => ({ address: addr.address, data: 'empty', path: addr.path }));
@@ -82,7 +57,7 @@ export const discoverAddresses = async (
     const promisesBundle: Addresses.Bundle = [];
 
     for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
-      const { address, path } = memoizedDeriveAddress(publicKey, addressCount, type);
+      const { address, path } = memoizedDeriveAddress(publicKey, type, addressCount);
       addressCount++;
       const promise = blockfrostAPI.addresses(address);
       promisesBundle.push({ address, promise, path });
