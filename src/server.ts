@@ -21,7 +21,7 @@ import getTransaction from './methods/getTransaction';
 import submitTransaction from './methods/pushTransaction';
 import estimateFee from './methods/estimateFee';
 import getBalanceHistory from './methods/getBalanceHistory';
-import { getBlockTransactionsUtxos } from './utils/transaction';
+import { getAffectedAddresses } from './utils/address';
 
 const app = express();
 
@@ -47,7 +47,7 @@ const clients: Array<{
   clientId: string;
   newBlockCallback: (
     latestBlock: Responses['block_content'],
-    utxos: Responses['tx_content_utxo'][],
+    affectedAddresses: Responses['block_content_addresses'],
   ) => Promise<void>;
 }> = [];
 
@@ -94,8 +94,8 @@ const interval = setInterval(() => {
 startEmitter();
 // this event is triggered with every new block see events.ts
 events.on('newBlock', async (latestBlock: Responses['block_content']) => {
-  const utxos = await getBlockTransactionsUtxos(latestBlock.height);
-  clients.forEach(client => client.newBlockCallback(latestBlock, utxos));
+  const affectedAddresses = await getAffectedAddresses(latestBlock.height);
+  clients.forEach(client => client.newBlockCallback(latestBlock, affectedAddresses));
 });
 
 wss.on('connection', (ws: Server.Ws) => {
@@ -105,8 +105,14 @@ wss.on('connection', (ws: Server.Ws) => {
   activeSubscriptions[clientId] = [];
   clients.push({
     clientId,
-    newBlockCallback: (latestBlock, utxos) =>
-      onBlock(ws, latestBlock, utxos, activeSubscriptions[clientId], addressesSubscribed[clientId]),
+    newBlockCallback: (latestBlock, affectedAddresses) =>
+      onBlock(
+        ws,
+        latestBlock,
+        affectedAddresses,
+        activeSubscriptions[clientId],
+        addressesSubscribed[clientId],
+      ),
   });
 
   ws.isAlive = true;

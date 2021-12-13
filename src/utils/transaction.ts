@@ -1,4 +1,4 @@
-import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
+import { Responses } from '@blockfrost/blockfrost-js';
 import * as Types from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { transformAsset } from './asset';
@@ -89,76 +89,36 @@ export const txIdsToTransactions = async (
   return sortedTxs;
 };
 
-export const getBlockTransactionsUtxos = async (
-  blockHeight: number | null,
-): Promise<Responses['tx_content_utxo'][]> => {
-  if (blockHeight === null) {
-    throw new Error('Cannot fetch block transactions. Invalid block height.');
-  }
-  const txids = await blockfrostAPI.blocksTxsAll(blockHeight);
-  const txsUtxo: Responses['tx_content_utxo'][] = [];
+export const getTransactionsWithUtxo = async (txids: string[]) => {
+  const result: { txData: Responses['tx_content']; txUtxos: Responses['tx_content_utxo'] }[] = [];
 
   const getPromiseBundle = (startIndex: number, batchSize: number) => {
     const promises = [...Array.from({ length: batchSize }).keys()].map(i => {
       const txid = txids[startIndex + i];
-      return txid ? blockfrostAPI.txsUtxos(txid) : undefined;
+      return txid
+        ? { txUtxoPromise: blockfrostAPI.txsUtxos(txid), txPromise: blockfrostAPI.txs(txid) }
+        : undefined;
     });
-    return promises.filter(p => Boolean(p)) as unknown as Responses['tx_content_utxo'][];
+    return promises.filter(p => Boolean(p)) as unknown as {
+      txPromise: Responses['tx_content'];
+      txUtxoPromise: Responses['tx_content_utxo'];
+    }[];
   };
 
-  const batch_size = 100;
-  // TODO: this will get rate limited for 3rd parties using websocket-link if the amount of txs is too high
-  // Blockfrost API allows burst of 500 request, then we can only make 10 requests per second
+  const batch_size = 10;
   for (let i = 0; i < txids.length; i += batch_size) {
     const promiseSlice = getPromiseBundle(i, batch_size);
 
     // eslint-disable-next-line no-await-in-loop
-    const partialResults = await Promise.all(promiseSlice);
-    txsUtxo.push(...partialResults);
-  }
-  return txsUtxo;
-};
+    const txResults = await Promise.all(promiseSlice.map(p => p?.txPromise));
+    const txUtxoResults = await Promise.all(promiseSlice.map(p => p?.txUtxoPromise));
 
-export const getBlockTransactionsByAddresses = async (
-  block: Responses['block_content'],
-  addresses: string[],
-): Promise<Types.TxIdsToTransactionsResponse[]> => {
-  const blockHeight = block.height;
-  if (blockHeight === null) {
-    throw new Error('Cannot fetch block transactions. Invalid block height.');
+    const partialResults = txResults.map((tx, i) => ({
+      txData: tx,
+      txUtxos: txUtxoResults[i],
+    }));
+    result.push(...partialResults);
   }
 
-  const promisesBundle = addresses.map(address => {
-    // we are lowering batchSize (number of pages that are fetched at the same time)
-    // with the quite safe assumption that most addresses will have just a few transactions (or none) in a given block.
-    // One page includes 100 txs by default, default batchSize is 10.
-    const promise = blockfrostAPI.addressesTransactionsAll(
-      address,
-      { batchSize: 1 },
-      {
-        from: blockHeight.toString(),
-        to: blockHeight.toString(),
-      },
-    );
-    return { address, promise };
-  });
-
-  const txsData = await Promise.all(
-    promisesBundle.map(p =>
-      p.promise
-        .then(txs => ({ address: p.address, data: txs.map(tx => tx.tx_hash) }))
-        .catch(err => {
-          // invalid address?
-          if (err instanceof BlockfrostServerError && err.status_code === 404) {
-            // most likely empty address
-            return { address: p.address, data: [] };
-          } else {
-            throw err;
-          }
-        }),
-    ),
-  );
-
-  const result = await txIdsToTransactions(txsData);
   return result;
 };
