@@ -88,7 +88,7 @@ export const onBlock = async (
     const txIdsSet = new Set<string>();
     for (const address of affectedAddresses) {
       for (const tx of address.transactions) {
-        txIdsSet.add(tx.tx_hash!); // bug in ts types, tx_hash is required
+        txIdsSet.add(tx.tx_hash); // bug in ts types, tx_hash is required
       }
     }
     // fetch txs that include client's address with their utxo data
@@ -100,17 +100,18 @@ export const onBlock = async (
     for (const address of affectedAddresses) {
       for (const tx of address.transactions) {
         // find tx's data for a given tx_hash; it's
-        const enhancedTx = txs.find(t => t.txData.hash === tx.tx_hash!)!;
+        const enhancedTx = txs.find(t => t.txData.hash === tx.tx_hash);
         if (!enhancedTx) {
           // should not happen
-          console.error(`onBlock: Could not find tx data for ${tx.tx_hash!}`);
+          console.error(`onBlock: Could not find tx data for ${tx.tx_hash}`);
+        } else {
+          notifications.push({
+            address: address.address,
+            txData: enhancedTx.txData,
+            txUtxos: enhancedTx.txUtxos,
+            txHash: enhancedTx.txData.hash,
+          });
         }
-        notifications.push({
-          address: address.address,
-          txData: enhancedTx.txData,
-          txUtxos: enhancedTx.txUtxos,
-          txHash: enhancedTx.txData.hash,
-        });
       }
     }
 
