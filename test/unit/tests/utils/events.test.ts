@@ -1,7 +1,11 @@
 import sinon from 'sinon';
 import { blockfrostAPI } from 'utils/blockfrostAPI';
-import { emitBlock, events, _resetPreviousBlock } from '../../../../src/events';
+import { emitBlock, events, onBlock, _resetPreviousBlock } from '../../../../src/events';
+import { Subscription, Ws } from '../../../../src/types/server';
+import * as txUtils from '../../../../src/utils/transaction';
+
 import * as fixtures from '../../fixtures/events';
+import { Responses } from '@blockfrost/blockfrost-js';
 
 describe('events', () => {
   fixtures.emitBlock.forEach(fixture => {
@@ -63,7 +67,7 @@ describe('events', () => {
         .onCall(0)
         // @ts-ignore
         .resolves(fixture.latestBlocks[0]);
-        blockLatestMock
+      blockLatestMock
         .onCall(1)
         // @ts-ignore
         .resolves(fixture.latestBlocks[1]);
@@ -75,22 +79,20 @@ describe('events', () => {
         .onCall(0)
         // @ts-ignore
         .resolves(fixture.missedBlocks[0]);
-        blockMock
-        .onCall(1)
-        .returns(
-          new Promise(resolve => {
-            setTimeout(() => {
-              // @ts-ignore
-              resolve(fixture.missedBlocks[1]);
-            }, 5000);
-          }),
-        ); // delay 2nd response by 5s, which should trigger timeout
+      blockMock.onCall(1).returns(
+        new Promise(resolve => {
+          setTimeout(() => {
+            // @ts-ignore
+            resolve(fixture.missedBlocks[1]);
+          }, 5000);
+        }),
+      ); // delay 2nd response by 5s, which should trigger timeout
 
       await emitBlock();
       expect(callback).toBeCalledTimes(1);
       expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0]);
 
-      await emitBlock({fetchTimeoutMs: 4000});
+      await emitBlock({ fetchTimeoutMs: 4000 });
       expect(callback).toBeCalledTimes(3); // one time from the first emit, 3 times from 2nd emit (2 missed blocks + latest)
       expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0]);
       expect(callback).toHaveBeenNthCalledWith(3, fixture.latestBlocks[1]);
@@ -98,6 +100,65 @@ describe('events', () => {
       blockMock.restore();
       events.removeAllListeners();
       _resetPreviousBlock();
+    });
+  });
+
+  fixtures.onBlock.forEach(fixture => {
+    test(`onBlock: ${fixture.description}`, async () => {
+      const mockedSend = jest.fn((payload: string) => {
+        // console.log('payload', JSON.parse(payload));
+        return payload;
+      });
+
+      const wsClientMock = {
+        send: (msg: string) => mockedSend(msg),
+      };
+
+      jest.spyOn(txUtils, 'getTransactionsWithUtxo').mockImplementation((txids: string[]) => {
+        return new Promise(resolve => {
+          // sanity check that the test really wanted to fetch transactions that we expected
+          for (const mockedTx of fixture.mocks.txsWithUtxo) {
+            if (!txids.find(txid => mockedTx.txData.hash === txid)) {
+              throw Error('Unexpected list of affected addresses');
+            }
+          }
+          resolve(
+            fixture.mocks.txsWithUtxo as unknown as {
+              txData: Responses['tx_content'];
+              txUtxos: Responses['tx_content_utxo'];
+            }[],
+          );
+        });
+      });
+
+      // subscribe both to block and addresses
+      const subscription = [
+        {
+          id: 0,
+          type: 'addresses',
+        },
+        {
+          id: 1,
+          type: 'block',
+        },
+      ] as Subscription[];
+
+      await onBlock(
+        wsClientMock as unknown as Ws,
+        fixture.mocks.block,
+        fixture.mocks.addressesAffectedInBlock,
+        subscription,
+        fixture.subscribedAddresses,
+      );
+
+      expect(mockedSend).toHaveBeenCalledTimes(fixture.result.length);
+
+      for (const [index, notificationFixture] of fixture.result.entries()) {
+        expect(mockedSend).toHaveBeenNthCalledWith(index + 1, JSON.stringify(notificationFixture));
+      }
+
+      jest.resetAllMocks();
+      jest.restoreAllMocks();
     });
   });
 });

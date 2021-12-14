@@ -89,7 +89,9 @@ export const txIdsToTransactions = async (
   return sortedTxs;
 };
 
-export const getTransactionsWithUtxo = async (txids: string[]) => {
+export const getTransactionsWithUtxo = async (
+  txids: string[],
+): Promise<{ txData: Responses['tx_content']; txUtxos: Responses['tx_content_utxo'] }[]> => {
   const result: { txData: Responses['tx_content']; txUtxos: Responses['tx_content_utxo'] }[] = [];
 
   const getPromiseBundle = (startIndex: number, batchSize: number) => {
