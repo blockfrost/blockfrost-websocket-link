@@ -4,7 +4,8 @@ import { prepareMessage } from './utils/message';
 import { blockfrostAPI } from './utils/blockfrostAPI';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { promiseTimeout } from './utils/common';
-import { filterUtxoByAddress } from './utils/address';
+import { getTransactionsWithUtxo } from './utils/transaction';
+import { TxNotification } from 'types/response';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;
@@ -57,41 +58,65 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
 export const onBlock = async (
   ws: Server.Ws,
   latestBlock: Responses['block_content'],
-  utxos: Responses['tx_content_utxo'][],
+  affectedAddressesInBlock: Responses['block_content_addresses'],
   activeSubscriptions: Server.Subscription[] | undefined,
-  addressesSubscribed: string[] | undefined,
+  subscribedAddresses: string[] | undefined,
 ) => {
-  // block subscriptions
-  const activeBlockSub = activeSubscriptions?.find(i => i.type === 'block');
+  // client has no subscription
+  if (!activeSubscriptions) return;
 
+  // block subscription
+  const activeBlockSub = activeSubscriptions?.find(i => i.type === 'block');
   if (activeBlockSub) {
     const message = prepareMessage(activeBlockSub.id, latestBlock);
     ws.send(message);
   }
 
-  // address subscriptions
-  if (activeSubscriptions && addressesSubscribed) {
-    const activeAddressesSubIndex = activeSubscriptions.findIndex(i => i.type === 'addresses');
-    const activeAddressSub = activeSubscriptions[activeAddressesSubIndex];
+  // address subscription
+  const activeAddressSub = activeSubscriptions.find(i => i.type === 'addresses');
+  if (activeAddressSub && subscribedAddresses) {
+    const affectedAddresses = affectedAddressesInBlock.filter(a =>
+      subscribedAddresses.includes(a.address),
+    );
 
-    if (activeAddressSub && activeAddressSub.type === 'addresses') {
-      const utxosForAffectedAddresses = filterUtxoByAddress(addressesSubscribed, utxos);
+    if (affectedAddresses.length === 0) {
+      // none of client's addresses was affected
+      return;
+    }
 
-      const txsPromises = utxosForAffectedAddresses.map(item =>
-        blockfrostAPI.txs(item.utxo.hash).then(data => ({
-          address: item.address,
-          txHash: data.hash,
-          txData: data,
-          txUtxos: item.utxo,
-        })),
-      );
-      const txs = await Promise.all(txsPromises); // TODO: fetch in batches
-      // do not send empty notification
-      if (utxosForAffectedAddresses.length > 0) {
-        const message = prepareMessage(activeAddressSub.id, txs);
-        ws.send(message);
+    // get list of unique txids (same tx could affect multiple client's addresses, but we want to fetch it only once)
+    const txIdsSet = new Set<string>();
+    for (const address of affectedAddresses) {
+      for (const tx of address.transactions) {
+        txIdsSet.add(tx.tx_hash); // bug in ts types, tx_hash is required
       }
     }
+    // fetch txs that include client's address with their utxo data
+    const txs = await getTransactionsWithUtxo(Array.from(txIdsSet));
+
+    const notifications: TxNotification[] = [];
+
+    // prepare array of notifications. 1 item per transaction
+    for (const address of affectedAddresses) {
+      for (const tx of address.transactions) {
+        // find tx's data for a given tx_hash; it's
+        const enhancedTx = txs.find(t => t.txData.hash === tx.tx_hash);
+        if (!enhancedTx) {
+          // should not happen
+          console.error(`onBlock: Could not find tx data for ${tx.tx_hash}`);
+        } else {
+          notifications.push({
+            address: address.address,
+            txData: enhancedTx.txData,
+            txUtxos: enhancedTx.txUtxos,
+            txHash: enhancedTx.txData.hash,
+          });
+        }
+      }
+    }
+
+    const message = prepareMessage(activeAddressSub.id, notifications);
+    ws.send(message);
   }
 };
 

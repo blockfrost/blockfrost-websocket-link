@@ -1,3 +1,4 @@
+import { Responses } from '@blockfrost/blockfrost-js';
 import { Balance, AddressData } from './address';
 import { TxIdsToTransactionsResponse } from './transactions';
 
@@ -50,4 +51,11 @@ export interface AccountInfo {
       poolId: string | null;
     };
   };
+}
+
+export interface TxNotification {
+  address: string;
+  txHash: string;
+  txData: Responses['tx_content'];
+  txUtxos: Responses['tx_content_utxo'];
 }

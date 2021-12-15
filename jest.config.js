@@ -14,4 +14,11 @@ module.exports = {
     '^(sql)(.*)$': '<rootDir>/src/sql/$2',
   },
   preset: 'ts-jest',
+  // globals: {
+  //   'ts-jest': {
+  //     diagnostics: {
+  //       warnOnly: true, // run tests even with TS errors
+  //     },
+  //   },
+  // },
 };
