@@ -19,7 +19,7 @@ export const getAccountInfo = async (
   details: Messages.Details,
   page = 1,
   pageSize = 25,
-) => {
+): Promise<Responses.AccountInfo> => {
   let _addressesCount = 0;
   const tStart = new Date().getTime();
   const pageSizeNumber = Number(pageSize);
