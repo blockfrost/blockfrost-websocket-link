@@ -10,17 +10,13 @@ import BigNumber from 'bignumber.js';
 import memoizee from 'memoizee';
 import { transformAsset } from './asset';
 
-const deriveAddress = (
+export const deriveAddress = (
   publicKey: string,
   type: number,
   addressIndex: number,
+  isTestnet: boolean,
 ): { address: string; path: string } => {
-  const { address } = sdkDeriveAddress(
-    publicKey,
-    type,
-    addressIndex,
-    !!blockfrostAPI.options.isTestnet,
-  );
+  const { address } = sdkDeriveAddress(publicKey, type, addressIndex, isTestnet);
 
   return {
     address: address,
@@ -42,7 +38,12 @@ export const discoverAddresses = async (
     // just derive first ADDRESS_GAP_LIMIT and treat them as empty addresses
     const addresses: { address: string; path: string }[] = [];
     for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
-      const { address, path } = memoizedDeriveAddress(publicKey, type, i);
+      const { address, path } = memoizedDeriveAddress(
+        publicKey,
+        type,
+        i,
+        !!blockfrostAPI.options.isTestnet,
+      );
       addresses.push({ address, path });
     }
     return addresses.map(addr => ({ address: addr.address, data: 'empty', path: addr.path }));
@@ -57,7 +58,12 @@ export const discoverAddresses = async (
     const promisesBundle: Addresses.Bundle = [];
 
     for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
-      const { address, path } = memoizedDeriveAddress(publicKey, type, addressCount);
+      const { address, path } = memoizedDeriveAddress(
+        publicKey,
+        type,
+        addressCount,
+        !!blockfrostAPI.options.isTestnet,
+      );
       addressCount++;
       const promise = blockfrostAPI.addresses(address);
       promisesBundle.push({ address, promise, path });
