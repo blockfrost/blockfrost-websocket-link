@@ -1,4 +1,4 @@
-import * as addressUtils from 'utils/address';
+import * as addressUtils from '../../../../src/utils/address';
 import * as fixtures from '../../fixtures/address';
 
 describe('address utils', () => {

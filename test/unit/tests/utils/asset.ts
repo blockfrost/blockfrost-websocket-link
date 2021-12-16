@@ -1,4 +1,4 @@
-import * as assetUtils from 'utils/asset';
+import * as assetUtils from '../../../../src/utils/asset';
 import * as fixtures from '../../fixtures/asset';
 
 describe('asset utils', () => {
