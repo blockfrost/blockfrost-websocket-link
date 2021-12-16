@@ -222,3 +222,54 @@ export const transformTransactionUtxo = [
     },
   },
 ];
+
+export const sortTransactionsCmp = [
+  {
+    description: 'txs sorting by block height and tx index',
+    tx1: {
+      block_height: 1,
+      index: 0,
+    },
+    tx2: {
+      block_height: 2,
+      index: 0,
+    },
+    result: 1,
+  },
+  {
+    description: 'txs sorting by block height and tx index',
+    tx1: {
+      block_height: 1,
+      index: 2,
+    },
+    tx2: {
+      block_height: 2,
+      index: 0,
+    },
+    result: 1,
+  },
+  {
+    description: 'txs sorting by block height and tx index',
+    tx1: {
+      block_height: 2,
+      index: 1,
+    },
+    tx2: {
+      block_height: 2,
+      index: 0,
+    },
+    result: -1,
+  },
+  {
+    description: 'txs sorting by block height and tx index',
+    tx1: {
+      block_height: 1,
+      index: 1,
+    },
+    tx2: {
+      block_height: 1,
+      index: 1,
+    },
+    result: 0,
+  },
+];

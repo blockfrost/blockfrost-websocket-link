@@ -13,4 +13,12 @@ describe('transaction utils', () => {
       expect(transactionUtils.transformTransactionUtxo(fixture.utxo)).toStrictEqual(fixture.result);
     });
   });
+
+  fixtures.sortTransactionsCmp.forEach(fixture => {
+    test(fixture.description, () => {
+      expect(transactionUtils.sortTransactionsCmp(fixture.tx1, fixture.tx2)).toStrictEqual(
+        fixture.result,
+      );
+    });
+  });
 });
