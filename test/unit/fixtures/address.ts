@@ -50,3 +50,46 @@ export const deriveAddress = [
     },
   },
 ];
+
+export const transformUtxo = [
+  {
+    description: 'transformUtxo',
+    utxo: {
+      tx_hash: '2b5075d8a7b7a30c886204000d1c0da2ca6ad3b9e31bd7d3606be0d42dc03adc',
+      tx_index: 0,
+      output_index: 0,
+      amount: [
+        {
+          unit: 'lovelace',
+          quantity: '1000000000',
+        },
+        {
+          unit: '00000002df633853f6a47465c9496721d2d5b1291b8398016c0e87ae6e7574636f696e',
+          quantity: '2',
+        },
+      ],
+      block: '2e83c622461fe5a2ef075091ade3d9deb7428d20616772adaf50b482bb1899cf',
+      data_hash: null,
+    },
+    result: {
+      tx_hash: '2b5075d8a7b7a30c886204000d1c0da2ca6ad3b9e31bd7d3606be0d42dc03adc',
+      tx_index: 0,
+      output_index: 0,
+      amount: [
+        {
+          unit: 'lovelace',
+          quantity: '1000000000',
+          decimals: 6,
+        },
+        {
+          unit: '00000002df633853f6a47465c9496721d2d5b1291b8398016c0e87ae6e7574636f696e',
+          quantity: '2',
+          fingerprint: 'asset12h3p5l3nd5y26lr22am7y7ga3vxghkhf57zkhd',
+          decimals: 0,
+        },
+      ],
+      block: '2e83c622461fe5a2ef075091ade3d9deb7428d20616772adaf50b482bb1899cf',
+      data_hash: null,
+    },
+  },
+];

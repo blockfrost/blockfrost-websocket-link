@@ -44,6 +44,7 @@ export interface Utxo {
     quantity: string;
   }[];
   block: string;
+  data_hash: string | null;
 }
 
 export interface TransformedUtxo extends Omit<Utxo, 'amount'> {

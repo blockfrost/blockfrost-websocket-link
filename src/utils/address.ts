@@ -226,7 +226,7 @@ export const utxosWithBlocks = async (
           result.push({
             address: p.address,
             path: p.path,
-            utxoData: p.utxoData,
+            utxoData: transformUtxo(p.utxoData),
             blockInfo: data,
           });
         })
@@ -368,4 +368,11 @@ export const getAffectedAddresses = async (
   }
   const addresses = await blockfrostAPI.blocksAddressesAll(blockHeight);
   return addresses;
+};
+
+export const transformUtxo = (utxo: Responses['address_utxo_content'][number]) => {
+  return {
+    ...utxo,
+    amount: utxo.amount.map(a => transformAsset(a)),
+  };
 };
