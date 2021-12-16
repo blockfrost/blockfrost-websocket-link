@@ -39,10 +39,7 @@ export interface Utxo {
   tx_hash: string;
   tx_index: number;
   output_index: number;
-  amount: {
-    unit: string;
-    quantity: string;
-  }[];
+  amount: AssetBalance[];
   block: string;
   data_hash: string | null;
 }
