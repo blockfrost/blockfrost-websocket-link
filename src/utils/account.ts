@@ -1,4 +1,4 @@
-import { Address } from 'types/address';
+import { Address } from '../types/address';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { addressesToTxIds, getAddressesData } from './address';
 

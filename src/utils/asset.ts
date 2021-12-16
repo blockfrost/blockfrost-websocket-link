@@ -1,7 +1,7 @@
 import { parseAsset, Responses } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
-import { Balance } from 'types/address';
-import { AssetBalance } from 'types/response';
+import { Balance } from '../types/address';
+import { AssetBalance } from '../types/response';
 
 export const transformAsset = (token: Balance): AssetBalance => {
   if (token.unit === 'lovelace') {

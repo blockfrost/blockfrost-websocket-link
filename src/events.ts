@@ -5,7 +5,7 @@ import { blockfrostAPI } from './utils/blockfrostAPI';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { promiseTimeout } from './utils/common';
 import { getTransactionsWithUtxo } from './utils/transaction';
-import { TxNotification } from 'types/response';
+import { TxNotification } from './types/response';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;

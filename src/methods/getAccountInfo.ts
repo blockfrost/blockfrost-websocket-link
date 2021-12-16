@@ -12,7 +12,7 @@ import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
 import { getAssetBalance, transformAsset } from '../utils/asset';
-import { blockfrostAPI } from 'utils/blockfrostAPI';
+import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export default async (
   id: number,

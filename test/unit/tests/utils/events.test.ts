@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import { blockfrostAPI } from 'utils/blockfrostAPI';
+import { blockfrostAPI } from '../../../../src/utils/blockfrostAPI';
 import { emitBlock, events, onBlock, _resetPreviousBlock } from '../../../../src/events';
 import { Subscription, Ws } from '../../../../src/types/server';
 import * as txUtils from '../../../../src/utils/transaction';

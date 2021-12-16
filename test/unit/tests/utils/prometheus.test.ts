@@ -1,4 +1,4 @@
-import { jsonToPrometheus } from 'utils/prometheus';
+import { jsonToPrometheus } from '../../../../src/utils/prometheus';
 
 describe('prometheus utils', () => {
   test('jsonToPrometheus', () => {
