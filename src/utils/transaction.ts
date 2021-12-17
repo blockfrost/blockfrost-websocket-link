@@ -1,4 +1,4 @@
-import { Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
@@ -63,7 +63,8 @@ export const txIdsToTransactions = async (
           });
         })
         .catch(err => {
-          if (err.status === 404) {
+          if (err instanceof BlockfrostServerError && err.status_code === 404) {
+            console.log(`Tx ${p.txHash} not found.`);
             return;
           }
 
