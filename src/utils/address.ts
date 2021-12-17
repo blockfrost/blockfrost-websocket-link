@@ -9,6 +9,7 @@ import {
 import BigNumber from 'bignumber.js';
 import memoizee from 'memoizee';
 import { transformAsset } from './asset';
+import { AccountInfo } from '../types/response';
 
 export const deriveAddress = (
   publicKey: string,
@@ -375,4 +376,16 @@ export const transformUtxo = (utxo: Responses['address_utxo_content'][number]) =
     ...utxo,
     amount: utxo.amount.map(a => transformAsset(a)),
   };
+};
+
+export const accountAddressesToArray = (addresses: AccountInfo['addresses']) => {
+  if (!addresses) {
+    return [];
+  }
+
+  return [
+    ...addresses.used.map(a => a.address),
+    ...addresses.change.map(a => a.address),
+    ...addresses.unused.map(a => a.address),
+  ];
 };
