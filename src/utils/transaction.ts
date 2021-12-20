@@ -65,10 +65,9 @@ export const txIdsToTransactions = async (
         .catch(err => {
           if (err instanceof BlockfrostServerError && err.status_code === 404) {
             console.log(`Tx ${p.txHash} not found.`);
-            return;
           }
 
-          throw Error(err);
+          throw err;
         }),
     ),
   );
