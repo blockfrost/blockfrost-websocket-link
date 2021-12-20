@@ -13,19 +13,19 @@ export class RedisCache {
     this.subscriber.connect();
   }
 
-  setAddressListener = async (address: string, publicKey: string) => {
-    // TODO resubscribe to all addresses after start
-    // EITHER invalidate stale accounts on start or just remove all accounts on every start
-    // OR don't use pub/sub since the validity could be checked on each request without additional overhead
+  // setAddressListener = async (address: string, publicKey: string) => {
+  //   // TODO resubscribe to all addresses after start
+  //   // EITHER invalidate stale accounts on start or just remove all accounts on every start
+  //   // OR don't use pub/sub since the validity could be checked on each request without additional overhead
 
-    const channelName = `affectedAddress-${address}`;
-    console.log('subscribing to', channelName);
+  //   const channelName = `affectedAddress-${address}`;
+  //   console.log('subscribing to', channelName);
 
-    await this.subscriber.subscribe(channelName, addr => {
-      console.log('affected addr', addr, 'in account', publicKey); // 'message'
-      this.removeAccount(publicKey);
-    });
-  };
+  //   await this.subscriber.subscribe(channelName, addr => {
+  //     console.log('affected addr', addr, 'in account', publicKey); // 'message'
+  //     this.removeAccount(publicKey);
+  //   });
+  // };
 
   storeAccount = async (
     account: AccountInfo,
@@ -37,11 +37,11 @@ export class RedisCache {
     // store list of all tx hashes for a given account
     await this.client.hSet(account.descriptor, 'txsHashList', JSON.stringify(txHashList));
 
-    const addresses = accountAddressesToArray(account.addresses);
-    for (const address of addresses) {
-      // set listener for every known account's address
-      await this.setAddressListener(address, account.descriptor);
-    }
+    // const addresses = accountAddressesToArray(account.addresses);
+    // for (const address of addresses) {
+    //   // set listener for every known account's address
+    //   await this.setAddressListener(address, account.descriptor);
+    // }
 
     // store already retrieved transaction objects
     for (const tx of account.history?.transactions ?? []) {
@@ -97,21 +97,21 @@ export class RedisCache {
 
 export const redisCache = new RedisCache();
 
-export const invalidateAddresses = async (
-  addresses: {
-    address: string;
-    transactions: {
-      tx_hash: string;
-    }[];
-  }[],
-) => {
-  for (const affectedAddress of addresses) {
-    const channels = await redisCache.client.pubSubChannels('affectedAddress-*');
-    console.log('subscribed channels', channels);
-    redisCache.client
-      .publish(`affectedAddress-${affectedAddress.address}`, affectedAddress.address)
-      .catch(err => {
-        console.log(err);
-      });
-  }
-};
+// export const invalidateAddresses = async (
+//   addresses: {
+//     address: string;
+//     transactions: {
+//       tx_hash: string;
+//     }[];
+//   }[],
+// ) => {
+//   for (const affectedAddress of addresses) {
+//     const channels = await redisCache.client.pubSubChannels('affectedAddress-*');
+//     console.log('subscribed channels', channels);
+//     redisCache.client
+//       .publish(`affectedAddress-${affectedAddress.address}`, affectedAddress.address)
+//       .catch(err => {
+//         console.log(err);
+//       });
+//   }
+// };

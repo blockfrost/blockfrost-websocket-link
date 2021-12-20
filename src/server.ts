@@ -22,7 +22,7 @@ import submitTransaction from './methods/pushTransaction';
 import estimateFee from './methods/estimateFee';
 import getBalanceHistory from './methods/getBalanceHistory';
 import { getAffectedAddresses } from './utils/address';
-import { invalidateAddresses } from './services/redis';
+// import { invalidateAddresses } from './services/redis';
 
 const app = express();
 
@@ -97,7 +97,7 @@ startEmitter();
 events.on('newBlock', async (latestBlock: Responses['block_content']) => {
   const affectedAddresses = await getAffectedAddresses(latestBlock.height);
 
-  invalidateAddresses(affectedAddresses);
+  // invalidateAddresses(affectedAddresses);
 
   clients.forEach(client => client.newBlockCallback(latestBlock, affectedAddresses));
 });
