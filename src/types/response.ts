@@ -1,6 +1,9 @@
-import { Responses } from '@blockfrost/blockfrost-js';
 import { Balance, AddressData } from './address';
-import { TxIdsToTransactionsResponse } from './transactions';
+import {
+  TransformedTransaction,
+  TransformedTransactionUtxo,
+  TxIdsToTransactionsResponse,
+} from './transactions';
 
 export interface ServerInfo {
   name: string;
@@ -56,6 +59,6 @@ export interface AccountInfo {
 export interface TxNotification {
   address: string;
   txHash: string;
-  txData: Responses['tx_content'];
-  txUtxos: Responses['tx_content_utxo'];
+  txData: TransformedTransaction;
+  txUtxos: TransformedTransactionUtxo;
 }

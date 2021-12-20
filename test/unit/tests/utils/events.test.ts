@@ -5,7 +5,10 @@ import { Subscription, Ws } from '../../../../src/types/server';
 import * as txUtils from '../../../../src/utils/transaction';
 
 import * as fixtures from '../../fixtures/events';
-import { Responses } from '@blockfrost/blockfrost-js';
+import {
+  TransformedTransaction,
+  TransformedTransactionUtxo,
+} from '../../../../src/types/transactions';
 
 describe('events', () => {
   fixtures.emitBlock.forEach(fixture => {
@@ -124,8 +127,8 @@ describe('events', () => {
           }
           resolve(
             fixture.mocks.txsWithUtxo as unknown as {
-              txData: Responses['tx_content'];
-              txUtxos: Responses['tx_content_utxo'];
+              txData: TransformedTransaction;
+              txUtxos: TransformedTransactionUtxo;
             }[],
           );
         });

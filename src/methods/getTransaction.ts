@@ -1,14 +1,11 @@
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
-import { transformAsset } from '../utils/asset';
+import { transformTransaction } from '../utils/transaction';
 
 export default async (id: number, txId: string): Promise<string> => {
   try {
     const tx = await blockfrostAPI.txs(txId);
-    const message = prepareMessage(id, {
-      ...tx,
-      output_amount: tx.output_amount.map(asset => transformAsset(asset)),
-    });
+    const message = prepareMessage(id, transformTransaction(tx));
 
     return message;
   } catch (err) {

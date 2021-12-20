@@ -14,4 +14,10 @@ describe('address utils', () => {
       ).toMatchObject(fixture.result);
     });
   });
+
+  fixtures.transformUtxo.forEach(fixture => {
+    test(fixture.description, () => {
+      expect(addressUtils.transformUtxo(fixture.utxo)).toStrictEqual(fixture.result);
+    });
+  });
 });

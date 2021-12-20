@@ -1,5 +1,6 @@
 import { Responses } from '@blockfrost/blockfrost-js';
 import * as Types from '../types/transactions';
+import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { transformAsset } from './asset';
 
@@ -56,21 +57,8 @@ export const txIdsToTransactions = async (
         .then(data => {
           result.push({
             address: p.address,
-            txData: {
-              ...data.txData,
-              output_amount: data.txData.output_amount.map(asset => transformAsset(asset)),
-            },
-            txUtxos: {
-              ...data.txUtxos,
-              inputs: data.txUtxos.inputs.map(input => ({
-                ...input,
-                amount: input.amount.map(asset => transformAsset(asset)),
-              })),
-              outputs: data.txUtxos.outputs.map(output => ({
-                ...output,
-                amount: output.amount.map(asset => transformAsset(asset)),
-              })),
-            },
+            txData: transformTransaction(data.txData),
+            txUtxos: transformTransactionUtxo(data.txUtxos),
             txHash: p.txHash,
           });
         })
@@ -91,8 +79,8 @@ export const txIdsToTransactions = async (
 
 export const getTransactionsWithUtxo = async (
   txids: string[],
-): Promise<{ txData: Responses['tx_content']; txUtxos: Responses['tx_content_utxo'] }[]> => {
-  const result: { txData: Responses['tx_content']; txUtxos: Responses['tx_content_utxo'] }[] = [];
+): Promise<{ txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[]> => {
+  const result: { txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[] = [];
 
   const getPromiseBundle = (startIndex: number, batchSize: number) => {
     const promises = [...Array.from({ length: batchSize }).keys()].map(i => {
@@ -116,11 +104,34 @@ export const getTransactionsWithUtxo = async (
     const txUtxoResults = await Promise.all(promiseSlice.map(p => p?.txUtxoPromise));
 
     const partialResults = txResults.map((tx, i) => ({
-      txData: tx,
-      txUtxos: txUtxoResults[i],
+      txData: transformTransaction(tx),
+      txUtxos: transformTransactionUtxo(txUtxoResults[i]),
     }));
     result.push(...partialResults);
   }
 
   return result;
+};
+
+export const transformTransaction = (tx: Responses['tx_content']): TransformedTransaction => {
+  return {
+    ...tx,
+    output_amount: tx.output_amount.map(a => transformAsset(a)),
+  };
+};
+
+export const transformTransactionUtxo = (
+  utxo: Responses['tx_content_utxo'],
+): TransformedTransactionUtxo => {
+  return {
+    ...utxo,
+    inputs: utxo.inputs.map(i => ({
+      ...i,
+      amount: i.amount.map(a => transformAsset(a)),
+    })),
+    outputs: utxo.outputs.map(o => ({
+      ...o,
+      amount: o.amount.map(a => transformAsset(a)),
+    })),
+  };
 };

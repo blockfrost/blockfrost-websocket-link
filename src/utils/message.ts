@@ -47,7 +47,7 @@ export const prepareMessage = (
     | Responses['block_content']
     | TxTypes.BalanceHistoryItem[]
     | TxTypes.TxIdsToTransactionsResponse[]
-    | Responses['tx_content']
+    | TxTypes.TransformedTransaction
     | UtxosWithBlockResponse[]
     | { subscribed: boolean }
     | { lovelacePerByte: number },
