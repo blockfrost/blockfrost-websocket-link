@@ -62,3 +62,12 @@ export interface TxNotification {
   txData: TransformedTransaction;
   txUtxos: TransformedTransactionUtxo;
 }
+
+export interface BalanceHistoryData {
+  time: number;
+  txs: number;
+  received: string;
+  sent: string;
+  sentToSelf: string;
+  rates: Record<string, number>;
+}

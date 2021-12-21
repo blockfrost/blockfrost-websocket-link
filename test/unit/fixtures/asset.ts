@@ -93,4 +93,85 @@ export const getAssetBalance = [
     ],
     result: '999936',
   },
+  {
+    description: "getAssetBalance - asset that doesn't exist ",
+    asset: '2048c7e09308f9138cef8f1a81733b72e601d016eea5eef759ff2933416d617a696e67436f696e',
+    received_sum: [
+      {
+        unit: 'lovelace',
+        quantity: '158129176564',
+      },
+    ],
+    sent_sum: [
+      {
+        unit: 'lovelace',
+        quantity: '153847996165',
+      },
+    ],
+    result: '0',
+  },
+];
+
+export const sumAssetBalances = [
+  {
+    description: 'sumAssetBalances lovelace',
+    asset: 'lovelace',
+    list: [
+      {
+        amount: [
+          {
+            unit: 'lovelace',
+            quantity: '2000000',
+          },
+          {
+            unit: '2048c7e09308f9138cef8f1a81733b72e601d016eea5eef759ff2933416d617a696e67436f696e',
+            quantity: '7',
+          },
+          {
+            unit: '21c3e7f6f954e606fe90017628b048a0067b561a4f6e2aa0e1aa613156616375756d73',
+            quantity: '10',
+          },
+        ],
+      },
+      {
+        amount: [
+          {
+            unit: 'lovelace',
+            quantity: '1000000',
+          },
+          {
+            unit: '2048c7e09308f9138cef8f1a81733b72e601d016eea5eef759ff2933416d617a696e67436f696e',
+            quantity: '10',
+          },
+          {
+            unit: '21c3e7f6f954e606fe90017628b048a0067b561a4f6e2aa0e1aa613156616375756d73',
+            quantity: '20',
+          },
+          {
+            unit: 'bla',
+            quantity: '20',
+          },
+        ],
+      },
+    ],
+
+    result: [
+      {
+        unit: 'lovelace',
+        quantity: '3000000',
+      },
+      {
+        unit: '2048c7e09308f9138cef8f1a81733b72e601d016eea5eef759ff2933416d617a696e67436f696e',
+        quantity: '17',
+      },
+      {
+        unit: '21c3e7f6f954e606fe90017628b048a0067b561a4f6e2aa0e1aa613156616375756d73',
+        quantity: '30',
+      },
+      {
+        unit: 'bla',
+        quantity: '20',
+      },
+    ],
+  },
 ];

@@ -1,37 +1,112 @@
 import BigNumber from 'bignumber.js';
-import { AssetBalance } from '../types/response';
+import { Address } from '../types/address';
+import { BalanceHistoryData } from '../types/response';
 import { TxIdsToTransactionsResponse } from '../types/transactions';
-import { addressesToTxIds, discoverAddresses } from '../utils/address';
+import { getAccountTransactionIds } from '../utils/account';
+import { sumAssetBalances } from '../utils/asset';
 import { getRatesForDate } from '../utils/common';
 import { prepareErrorMessage, prepareMessage } from '../utils/message';
 import { txIdsToTransactions } from '../utils/transaction';
 
-const sumAssetBalances = (outputs: { amount: AssetBalance[] }[]) => {
-  const balances: AssetBalance[] = [];
-  for (const output of outputs) {
-    for (const asset of output.amount) {
-      const index = balances.findIndex(bAsset => bAsset.unit === asset.unit);
-      if (index > -1) {
-        balances[index].quantity = new BigNumber(balances[index].quantity)
-          .plus(asset.quantity)
-          .toFixed();
-      } else {
-        // new item
-        balances.push(asset);
-      }
+interface BalanceHistoryBin {
+  from: number;
+  to: number;
+  txs: TxIdsToTransactionsResponse[];
+}
+
+export const aggregateTransactionIntervals = async (
+  txs: TxIdsToTransactionsResponse[],
+  addresses: {
+    external: Address[];
+    internal: Address[];
+    all: Address[];
+  },
+  groupBy: number,
+) => {
+  // Put txs into bins with a size of groupBy parameter (from-to)
+  const bins: BalanceHistoryBin[] = [];
+  const firstTxTimestamp = txs[0].txData.block_time ?? 0;
+  let currentBin: BalanceHistoryBin = {
+    from: firstTxTimestamp,
+    to: firstTxTimestamp + groupBy,
+    txs: [],
+  };
+  bins.push(currentBin);
+
+  for (const tx of txs) {
+    if (currentBin.from <= tx.txData.block_time && currentBin.to >= tx.txData.block_time) {
+      // tx fits into a bin's range
+      currentBin.txs.push(tx);
+    } else {
+      // tx doesn't fit into a current bin, let's create a new bin placed in the future
+
+      // forwards several groupBy seconds starting from firstTxTimestamp so distance between every 2 bins is N * groupBy.
+      // number of groupBy's added depends on how many of them we can fit between tx's timestamp and starting point
+      const newFrom =
+        firstTxTimestamp +
+        Math.floor((tx.txData.block_time - firstTxTimestamp) / groupBy) * groupBy;
+      currentBin = {
+        from: newFrom,
+        to: newFrom + groupBy,
+        txs: [tx],
+      };
+      bins.push(currentBin);
     }
   }
-  return balances;
-};
 
-interface BalanceHistoryData {
-  time: number;
-  txs: number;
-  received: string;
-  sent: string;
-  sentToSelf: string;
-  rates: Record<string, number>;
-}
+  const result: Omit<BalanceHistoryData, 'rates'>[] = bins.map(bin => {
+    // aggregate sent, received sums for each bin
+    let sent = new BigNumber(0);
+    let received = new BigNumber(0);
+    let sentToSelf = new BigNumber(0);
+
+    const addressesList = addresses.all.map(a => a.address);
+    for (const tx of bin.txs) {
+      const { inputs, outputs } = tx.txUtxos;
+      const myInputs = inputs.filter(input => addressesList.includes(input.address));
+      const myOutputs = outputs.filter(output => addressesList.includes(output.address));
+      const myInternalOutputs = outputs.filter(output =>
+        addresses.internal.map(a => a.address).includes(output.address),
+      );
+      const internalOutputsAmount = sumAssetBalances(myInternalOutputs);
+
+      if (myInputs.length === inputs.length && myOutputs.length === outputs.length) {
+        // self tx
+        const amount = sumAssetBalances(myOutputs);
+        const internalOutputsAmountLovelace =
+          internalOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
+
+        sentToSelf = sentToSelf
+          .minus(internalOutputsAmountLovelace)
+          .plus(amount.find(a => a.unit === 'lovelace')?.quantity ?? '0');
+      } else if (myInputs.length === 0 && myOutputs.length > 0) {
+        // recv tx
+        const amount = sumAssetBalances(myOutputs);
+        received = received.plus(amount.find(a => a.unit === 'lovelace')?.quantity ?? '0');
+      } else {
+        // sent tx
+
+        const inputsAmount = sumAssetBalances(myInputs);
+        const inputsAmountLovelace = inputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
+        const internalOutputsAmountLovelace =
+          internalOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
+        const amountSpent = new BigNumber(inputsAmountLovelace)
+          .minus(internalOutputsAmountLovelace)
+          .minus(tx.txData.fees);
+        sent = sent.plus(amountSpent);
+      }
+    }
+
+    return {
+      time: bin.from,
+      txs: bin.txs.length,
+      sent: sent.toFixed(),
+      received: received.toFixed(),
+      sentToSelf: sentToSelf.toFixed(),
+    };
+  });
+  return result;
+};
 
 export const getAccountBalanceHistory = async (
   publicKey: string,
@@ -39,13 +114,9 @@ export const getAccountBalanceHistory = async (
   from?: number,
   to?: number,
 ): Promise<BalanceHistoryData[]> => {
-  const externalAddresses = await discoverAddresses(publicKey, 0);
-  const internalAddresses = await discoverAddresses(publicKey, 1);
-  const addresses = [...externalAddresses, ...internalAddresses];
-  const addressesList = addresses.map(a => a.address);
+  const { txIds, addresses } = await getAccountTransactionIds(publicKey);
 
-  const txIds = await addressesToTxIds(addresses);
-
+  // fetch all transactions and filter only those that are from within from-to interval
   const txs = (
     await txIdsToTransactions(
       txIds.map(tx => ({
@@ -56,112 +127,22 @@ export const getAccountBalanceHistory = async (
   )
     .filter(tx => {
       if (typeof from !== 'number' || typeof to !== 'number') return true;
-      console.log(
-        'tx.txData.block_time >= from && tx.txData.block_time <= to',
-        tx.txData.block_time >= from && tx.txData.block_time <= to,
-      );
-      console.log('tx time', tx.txData.block_time);
       return tx.txData.block_time >= from && tx.txData.block_time <= to;
     })
     // txs are sorted from newest to oldest, we need exact opposite
     .reverse();
 
-  // Put txs into bins with a size of groupBy parameter (from-to)
-  interface BalanceHistoryBin {
-    from: number;
-    to: number;
-    txs: TxIdsToTransactionsResponse[];
-  }
-  const bins: BalanceHistoryBin[] = [];
-  // const txsTimeRange = [txs[0].txData.block_time, txs[txs.length - 1].txData.block_time];
-  const firstTxTimestamp = txs[0].txData.block_time ?? 0;
+  const bins = await aggregateTransactionIntervals(txs, addresses, groupBy);
 
-  let currentBin: BalanceHistoryBin = {
-    from: firstTxTimestamp,
-    to: firstTxTimestamp + groupBy,
-    txs: [],
-  };
-  bins.push(currentBin);
-  for (const tx of txs) {
-    console.log('tx', tx.txHash, tx.txData.block_time);
-    if (currentBin.from <= tx.txData.block_time && currentBin.to >= tx.txData.block_time) {
-      // tx fits into a bin's range
-      currentBin.txs.push(tx);
-      console.log('pushing to current bin');
-    } else {
-      // tx doesn't fit into a current bin, let's create a new bin placed more into the future
-
-      // forwards several groupBy seconds starting from firstTxTimestamp so distance between every 2 bins is N * groupBy.
-      // Number of groupBy's added depends on how many of them we can fit between tx's timestamp and starting point
-      const newFrom =
-        firstTxTimestamp +
-        Math.floor((tx.txData.block_time - firstTxTimestamp) / groupBy) * groupBy;
-      currentBin = {
-        from: newFrom,
-        to: newFrom + groupBy,
-        txs: [tx],
-      };
-      console.log('making new bin');
-      bins.push(currentBin);
-    }
-  }
-
-  console.log('bins', bins);
-
-  const binRatesPromises = bins.map(bin => getRatesForDate(bin.from));
-  // TODO: caching, and what to do if data are missing?
+  // fetch fiat rate for each bin
+  const binRatesPromises = bins.map(bin => getRatesForDate(bin.time));
   const binRates = await Promise.all(binRatesPromises);
 
-  const result: BalanceHistoryData[] = bins.map((bin, index) => {
-    // aggregate sent, received sums for each bin
-    let sent = new BigNumber(0);
-    let received = new BigNumber(0);
-    let sentToSelf = new BigNumber(0);
+  const result = bins.map((bin, index) => ({
+    ...bin,
+    rates: binRates[index],
+  }));
 
-    for (const tx of bin.txs) {
-      const { inputs, outputs } = tx.txUtxos;
-      const myInputs = inputs.filter(input => addressesList.includes(input.address));
-      const myOutputs = outputs.filter(output => addressesList.includes(output.address));
-      if (
-        inputs.every(input => addressesList.includes(input.address)) &&
-        outputs.every(output => addressesList.includes(output.address))
-        // TODO: this will probably work too: myInputs.length === inputs.length && myOutputs.length === outputs.length
-      ) {
-        // self tx
-        sentToSelf = sentToSelf.plus(tx.txData.fees);
-      } else if (myInputs.length === 0 && myOutputs.length > 0) {
-        // recv tx
-        const amount = sumAssetBalances(myOutputs);
-        received = received.plus(amount.find(a => a.unit === 'lovelace')?.quantity ?? '0');
-      } else {
-        // sent tx
-        const myInternalOutputs = outputs.filter(output =>
-          internalAddresses.map(a => a.address).includes(output.address),
-        );
-        const inputsAmount = sumAssetBalances(myInputs);
-        const internalOutputsAmount = sumAssetBalances(myInternalOutputs);
-
-        const inputsAmountLovelace = inputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
-        const internalOutputsAmountLovelace =
-          internalOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
-        const amountSent = new BigNumber(inputsAmountLovelace).minus(internalOutputsAmountLovelace);
-        sent = sent.plus(amountSent);
-      }
-    }
-
-    return {
-      time: bin.from,
-      txs: bin.txs.length,
-      // _debug_txs: bin.txs,
-      sent: sent.toFixed(),
-      received: received.toFixed(),
-      sentToSelf: sentToSelf.toFixed(),
-      rates: binRates[index]!, // TODO: we should always have the data, but what if we don't?
-    };
-  });
-
-  console.log('result', JSON.stringify(result, undefined, 4));
-  console.log('txs', txs.length);
   return result;
 };
 
@@ -177,8 +158,6 @@ export default async (
     return message;
   }
 
-  console.log(groupBy, from, to);
-  console.log(typeof groupBy, typeof from, to);
   try {
     const data = await getAccountBalanceHistory(publicKey, groupBy, from, to);
     const message = prepareMessage(id, data);

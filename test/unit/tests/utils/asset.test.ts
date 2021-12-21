@@ -17,4 +17,10 @@ describe('asset utils', () => {
       ).toBe(fixture.result);
     });
   });
+
+  fixtures.sumAssetBalances.forEach(fixture => {
+    test(fixture.description, () => {
+      expect(assetUtils.sumAssetBalances(fixture.list)).toStrictEqual(fixture.result);
+    });
+  });
 });
