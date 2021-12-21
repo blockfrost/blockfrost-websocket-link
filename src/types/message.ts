@@ -16,9 +16,9 @@ export type Messages =
       command: 'GET_BALANCE_HISTORY';
       params: {
         descriptor: string;
+        groupBy: number;
         from: number;
         to: number;
-        groupBy: string;
       };
     }
   | {
