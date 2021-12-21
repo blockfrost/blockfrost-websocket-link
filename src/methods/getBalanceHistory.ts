@@ -14,7 +14,7 @@ interface BalanceHistoryBin {
   txs: TxIdsToTransactionsResponse[];
 }
 
-export const aggregateTransactionIntervals = async (
+export const aggregateTransactions = async (
   txs: TxIdsToTransactionsResponse[],
   addresses: {
     external: Address[];
@@ -69,13 +69,12 @@ export const aggregateTransactionIntervals = async (
         addresses.internal.map(a => a.address).includes(output.address),
       );
       const internalOutputsAmount = sumAssetBalances(myInternalOutputs);
+      const internalOutputsAmountLovelace =
+        internalOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
 
       if (myInputs.length === inputs.length && myOutputs.length === outputs.length) {
         // self tx
         const amount = sumAssetBalances(myOutputs);
-        const internalOutputsAmountLovelace =
-          internalOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
-
         sentToSelf = sentToSelf
           .minus(internalOutputsAmountLovelace)
           .plus(amount.find(a => a.unit === 'lovelace')?.quantity ?? '0');
@@ -85,11 +84,8 @@ export const aggregateTransactionIntervals = async (
         received = received.plus(amount.find(a => a.unit === 'lovelace')?.quantity ?? '0');
       } else {
         // sent tx
-
         const inputsAmount = sumAssetBalances(myInputs);
         const inputsAmountLovelace = inputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
-        const internalOutputsAmountLovelace =
-          internalOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
         const amountSpent = new BigNumber(inputsAmountLovelace)
           .minus(internalOutputsAmountLovelace)
           .minus(tx.txData.fees);
@@ -132,7 +128,7 @@ export const getAccountBalanceHistory = async (
     // txs are sorted from newest to oldest, we need exact opposite
     .reverse();
 
-  const bins = await aggregateTransactionIntervals(txs, addresses, groupBy);
+  const bins = await aggregateTransactions(txs, addresses, groupBy);
 
   // fetch fiat rate for each bin
   const binRatesPromises = bins.map(bin => getRatesForDate(bin.time));

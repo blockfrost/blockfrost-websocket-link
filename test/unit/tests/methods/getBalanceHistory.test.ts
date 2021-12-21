@@ -1,10 +1,10 @@
 import * as fixtures from '../../fixtures/getBalanceHistory';
-import { aggregateTransactionIntervals } from '../../../../src/methods/getBalanceHistory';
+import { aggregateTransactions } from '../../../../src/methods/getBalanceHistory';
 
 describe('getBalanceHistory', () => {
-  fixtures.aggregateTransactionIntervals.forEach(fixture => {
+  fixtures.aggregateTransactions.forEach(fixture => {
     test(fixture.description, async () => {
-      const result = await aggregateTransactionIntervals(
+      const result = await aggregateTransactions(
         fixture.transactions,
         // @ts-ignore
         fixture.addresses,

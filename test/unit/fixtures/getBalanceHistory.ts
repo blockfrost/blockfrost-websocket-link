@@ -1,6 +1,6 @@
-export const aggregateTransactionIntervals = [
+export const aggregateTransactions = [
   {
-    description: 'aggregateTransactionIntervals 4 txs',
+    description: 'aggregateTransactions 4 txs',
     groupBy: 86400,
     addresses: {
       external: [
