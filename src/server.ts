@@ -202,9 +202,9 @@ wss.on('connection', (ws: Server.Ws) => {
         const message = await getBalanceHistory(
           data.id,
           data.params.descriptor,
+          data.params.groupBy,
           data.params.from,
           data.params.to,
-          data.params.groupBy,
         );
 
         ws.send(message);

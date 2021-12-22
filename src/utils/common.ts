@@ -12,30 +12,28 @@ export const paginate = <T>(items: T[], pageSize: number): T[][] => {
   }, [] as T[][]);
 };
 
-export const getTimeFromSlot = (slot: number): number => {
-  return 1596491091 + (slot - 4924800);
-};
-
 const formatCoingeckoTime = (date: number): string => {
-  return format(date * 1000, 'mm-dd-yyyy');
+  return format(date * 1000, 'dd-MM-yyyy');
 };
 
-export const getRatesForDate = async (date: number): Promise<Record<string, number> | null> => {
+export const getRatesForDate = async (date: number): Promise<Record<string, number>> => {
   const coingeckoDateFormat = formatCoingeckoTime(date);
-
   try {
     const response: {
-      market_data: {
+      market_data?: {
         current_price: Record<string, number>;
       };
     } = await got(
       `https://api.coingecko.com/api/v3/coins/cardano/history?date=${coingeckoDateFormat}`,
     ).json();
 
-    return response.market_data.current_price;
+    if (!response?.market_data) {
+      throw Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
+    }
+
+    return response.market_data?.current_price;
   } catch (error) {
-    console.log(error);
-    return null;
+    throw Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
   }
 };
 

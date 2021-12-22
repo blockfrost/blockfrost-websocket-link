@@ -24,3 +24,21 @@ export const getAssetBalance = (
   const sentAsset = sent.find(r => r.unit === asset)?.quantity ?? '0';
   return new BigNumber(receivedAsset).minus(sentAsset);
 };
+
+export const sumAssetBalances = (list: { amount: Pick<AssetBalance, 'quantity' | 'unit'>[] }[]) => {
+  const balances: Pick<AssetBalance, 'quantity' | 'unit'>[] = [];
+  for (const item of list) {
+    for (const asset of item.amount) {
+      const index = balances.findIndex(bAsset => bAsset.unit === asset.unit);
+      if (index > -1) {
+        balances[index].quantity = new BigNumber(balances[index].quantity)
+          .plus(asset.quantity)
+          .toFixed();
+      } else {
+        // new item
+        balances.push(asset);
+      }
+    }
+  }
+  return balances;
+};
