@@ -112,6 +112,9 @@ export const txIdsToTransactions = async (
 
 export const getTransactionsWithUtxo = async (
   txids: string[],
+  options?: {
+    cache?: boolean;
+  },
 ): Promise<{ txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[]> => {
   const result: { txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[] = [];
 
@@ -141,6 +144,15 @@ export const getTransactionsWithUtxo = async (
       txUtxos: transformTransactionUtxo(txUtxoResults[i]),
     }));
     result.push(...partialResults);
+  }
+
+  // TODO: we could also try to retrieve tx from a cache before fetching, but right know this function
+  // is used only to fetch new txs that are sent via notification on new block
+  if (options?.cache) {
+    // cache tx
+    for (const tx of result) {
+      redisCache.storeTransaction({ ...tx, txHash: tx.txData.hash });
+    }
   }
 
   return result;

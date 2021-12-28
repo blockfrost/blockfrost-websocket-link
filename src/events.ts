@@ -88,11 +88,11 @@ export const onBlock = async (
     const txIdsSet = new Set<string>();
     for (const address of affectedAddresses) {
       for (const tx of address.transactions) {
-        txIdsSet.add(tx.tx_hash); // bug in ts types, tx_hash is required
+        txIdsSet.add(tx.tx_hash);
       }
     }
     // fetch txs that include client's address with their utxo data
-    const txs = await getTransactionsWithUtxo(Array.from(txIdsSet));
+    const txs = await getTransactionsWithUtxo(Array.from(txIdsSet), { cache: true });
 
     const notifications: TxNotification[] = [];
 

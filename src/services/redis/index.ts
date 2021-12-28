@@ -3,6 +3,7 @@ import { accountAddressesToArray } from '../../utils/address';
 import { AccountInfo } from '../../types/response';
 import { getKey } from './utils';
 import { TxIdsToTransactionsResponse } from '../../types/transactions';
+import { UtxosWithBlockResponse } from '../../types/address';
 
 type TransactionWithUtxo = Omit<TxIdsToTransactionsResponse, 'address'>;
 export class RedisCache {
@@ -16,20 +17,6 @@ export class RedisCache {
     this.subscriber.connect();
   }
 
-  // setAddressListener = async (address: string, publicKey: string) => {
-  //   // TODO resubscribe to all addresses after start
-  //   // EITHER invalidate stale accounts on start or just remove all accounts on every start
-  //   // OR don't use pub/sub since the validity could be checked on each request without additional overhead
-
-  //   const channelName = `affectedAddress-${address}`;
-  //   console.log('subscribing to', channelName);
-
-  //   await this.subscriber.subscribe(channelName, addr => {
-  //     console.log('affected addr', addr, 'in account', publicKey); // 'message'
-  //     this.removeAccount(publicKey);
-  //   });
-  // };
-
   storeAccount = async (
     account: AccountInfo,
     txHashList: { address: string; txHash: string }[],
@@ -37,15 +24,28 @@ export class RedisCache {
     // store account info
     const accountKey = getKey('account', account.descriptor);
     await this.client.hSet(accountKey, 'data', JSON.stringify(account));
-    await this.client.expire(accountKey, 60 * 60 * 24); // expires whole account after 24 hours
     // store list of all tx hashes for a given account
     await this.client.hSet(accountKey, 'txsHashList', JSON.stringify(txHashList));
+    await this.client.expire(accountKey, 60 * 60 * 24); // expires whole account after 24 hours
 
-    // const addresses = accountAddressesToArray(account.addresses);
-    // for (const address of addresses) {
-    //   // set listener for every known account's address
-    //   await this.setAddressListener(address, account.descriptor);
-    // }
+    // store xpub indexed by an address that was derived from it
+    const addresses = accountAddressesToArray(account.addresses);
+    for (const address of addresses) {
+      const addressKey = getKey('address', address);
+      const data = await this.client.get(addressKey);
+
+      if (!data) {
+        await this.client.set(addressKey, JSON.stringify(account.descriptor));
+      } else {
+        // address already associated with xpub
+        const xpub = JSON.parse(data) as string;
+        if (xpub !== account.descriptor) {
+          console.error('Same address associated with multiple xpubs');
+        } else {
+          console.log(`address already associated with an xpub`);
+        }
+      }
+    }
 
     // store already retrieved transaction objects
     for (const tx of account.history?.transactions ?? []) {
@@ -68,9 +68,28 @@ export class RedisCache {
     }
   };
 
+  storeAccountUtxo = async (publicKey: string, utxo: UtxosWithBlockResponse[]) => {
+    // store account info
+    const accountKey = getKey('account', publicKey);
+    return this.client.hSet(accountKey, 'utxo', JSON.stringify(utxo));
+  };
+
+  getAccountUtxo = async (publicKey: string): Promise<UtxosWithBlockResponse[] | null> => {
+    const accountKey = getKey('account', publicKey);
+    const data = await this.client.hGet(accountKey, 'utxo');
+    if (!data) return null;
+    try {
+      const utxo = JSON.parse(data);
+      return utxo as UtxosWithBlockResponse[];
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
   storeTransaction = async (tx: TransactionWithUtxo) => {
-    // TODO: set sane expiration
     // store transaction
+    // txs have no expiration, they could be evicted only if memory is full
     const txKey = getKey('tx', tx.txHash);
     return this.client.set(txKey, JSON.stringify({ ...tx, address: undefined }));
   };
@@ -104,43 +123,25 @@ export class RedisCache {
 
   removeAccount = async (publicKey: string) => {
     const accountKey = getKey('account', publicKey);
-
     try {
-      const account = await this.getAccount(accountKey);
-      if (account) {
-        const addresses = accountAddressesToArray(account.addresses);
-
-        for (const address of addresses) {
-          await this.subscriber.unsubscribe(`affectedAddress-${address}`);
-        }
-      }
-
-      this.client.hDel(accountKey, 'txHashList');
+      await this.client.hDel(accountKey, 'utxo');
+      await this.client.hDel(accountKey, 'txHashList');
       return this.client.hDel(accountKey, 'data');
     } catch (err) {
       console.error(err);
       return null;
     }
   };
+
+  invalidateAccountByAddress = async (address: string) => {
+    const addressKey = getKey('address', address);
+    const data = await this.client.get(addressKey);
+    if (data) {
+      const publicKey = JSON.parse(data) as string;
+      console.log(`Invalidating account ${publicKey}`);
+      await this.removeAccount(publicKey);
+    }
+  };
 }
 
 export const redisCache = new RedisCache();
-
-// export const invalidateAddresses = async (
-//   addresses: {
-//     address: string;
-//     transactions: {
-//       tx_hash: string;
-//     }[];
-//   }[],
-// ) => {
-//   for (const affectedAddress of addresses) {
-//     const channels = await redisCache.client.pubSubChannels('affectedAddress-*');
-//     console.log('subscribed channels', channels);
-//     redisCache.client
-//       .publish(`affectedAddress-${affectedAddress.address}`, affectedAddress.address)
-//       .catch(err => {
-//         console.log(err);
-//       });
-//   }
-// };
