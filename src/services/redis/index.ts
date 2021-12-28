@@ -1,7 +1,10 @@
 import { createClient } from 'redis';
 import { accountAddressesToArray } from '../../utils/address';
 import { AccountInfo } from '../../types/response';
+import { getKey } from './utils';
+import { TxIdsToTransactionsResponse } from '../../types/transactions';
 
+type TransactionWithUtxo = Omit<TxIdsToTransactionsResponse, 'address'>;
 export class RedisCache {
   client: ReturnType<typeof createClient>;
   subscriber: ReturnType<typeof createClient>;
@@ -32,10 +35,11 @@ export class RedisCache {
     txHashList: { address: string; txHash: string }[],
   ) => {
     // store account info
-    await this.client.hSet(account.descriptor, 'data', JSON.stringify(account));
-    await this.client.expire(account.descriptor, 60 * 60 * 24); // expires whole account after 24 hours
+    const accountKey = getKey('account', account.descriptor);
+    await this.client.hSet(accountKey, 'data', JSON.stringify(account));
+    await this.client.expire(accountKey, 60 * 60 * 24); // expires whole account after 24 hours
     // store list of all tx hashes for a given account
-    await this.client.hSet(account.descriptor, 'txsHashList', JSON.stringify(txHashList));
+    await this.client.hSet(accountKey, 'txsHashList', JSON.stringify(txHashList));
 
     // const addresses = accountAddressesToArray(account.addresses);
     // for (const address of addresses) {
@@ -45,14 +49,15 @@ export class RedisCache {
 
     // store already retrieved transaction objects
     for (const tx of account.history?.transactions ?? []) {
-      await this.client.hSet('transactions', tx.txHash, JSON.stringify(tx));
+      await this.storeTransaction(tx);
     }
   };
 
   getAccountTxHashList = async (
     publicKey: string,
   ): Promise<{ address: string; txHash: string }[] | null> => {
-    const cachedTxHashList = await this.client.hGet(publicKey, 'txsHashList');
+    const accountKey = getKey('account', publicKey);
+    const cachedTxHashList = await this.client.hGet(accountKey, 'txsHashList');
     if (!cachedTxHashList) return null;
     try {
       const txHashList = JSON.parse(cachedTxHashList);
@@ -63,8 +68,30 @@ export class RedisCache {
     }
   };
 
+  storeTransaction = async (tx: TransactionWithUtxo) => {
+    // TODO: set sane expiration
+    // store transaction
+    const txKey = getKey('tx', tx.txHash);
+    return this.client.set(txKey, JSON.stringify({ ...tx, address: undefined }));
+  };
+
+  getTransaction = async (txHash: string): Promise<TransactionWithUtxo | null> => {
+    const txKey = getKey('tx', txHash);
+    const data = await this.client.get(txKey);
+    if (!data) return null;
+    try {
+      const tx = JSON.parse(data);
+      return tx as TransactionWithUtxo;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+
   getAccount = async (publicKey: string): Promise<AccountInfo | null> => {
-    const cachedAccount = await this.client.hGet(publicKey, 'data');
+    const accountKey = getKey('account', publicKey);
+
+    const cachedAccount = await this.client.hGet(accountKey, 'data');
     if (!cachedAccount) return null;
     try {
       const accountInfo = JSON.parse(cachedAccount);
@@ -76,8 +103,10 @@ export class RedisCache {
   };
 
   removeAccount = async (publicKey: string) => {
+    const accountKey = getKey('account', publicKey);
+
     try {
-      const account = await this.getAccount(publicKey);
+      const account = await this.getAccount(accountKey);
       if (account) {
         const addresses = accountAddressesToArray(account.addresses);
 
@@ -86,8 +115,8 @@ export class RedisCache {
         }
       }
 
-      this.client.hDel(publicKey, 'txHashList');
-      return this.client.hDel(publicKey, 'data');
+      this.client.hDel(accountKey, 'txHashList');
+      return this.client.hDel(accountKey, 'data');
     } catch (err) {
       console.error(err);
       return null;

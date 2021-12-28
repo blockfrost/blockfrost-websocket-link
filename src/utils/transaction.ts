@@ -1,4 +1,5 @@
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
+import { redisCache } from '../services/redis';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
@@ -19,6 +20,9 @@ export const txIdsToTransactions = async (
     address: string;
     data: string[];
   }[],
+  options?: {
+    cache?: boolean;
+  },
 ): Promise<Types.TxIdsToTransactionsResponse[]> => {
   const promisesBundle: Types.TxIdsToTransactionsPromises[] = [];
   const result: Types.TxIdsToTransactionsResponse[] = [];
@@ -30,6 +34,19 @@ export const txIdsToTransactions = async (
       const promise = new Promise<Types.Data>((resolve, reject) => {
         (async () => {
           try {
+            if (options?.cache) {
+              // try to retrieve cached tx
+              const tx = await redisCache.getTransaction(hash);
+              if (tx) {
+                console.log(`Retrieving tx ${tx.txHash} from cache`);
+                return resolve({
+                  txData: tx.txData,
+                  txUtxos: tx.txUtxos,
+                  fromCache: true,
+                });
+              }
+            }
+
             const tx = await blockfrostAPI.txs(hash);
             const txUtxos = await blockfrostAPI.txsUtxos(hash);
 
@@ -55,12 +72,28 @@ export const txIdsToTransactions = async (
     promisesBundle.map(p =>
       p.promise
         .then(data => {
-          result.push({
-            address: p.address,
-            txData: transformTransaction(data.txData),
-            txUtxos: transformTransactionUtxo(data.txUtxos),
-            txHash: p.txHash,
-          });
+          if (data.fromCache) {
+            // cached tx is already transformed
+            result.push({
+              address: p.address,
+              txData: data.txData,
+              txUtxos: data.txUtxos,
+              txHash: p.txHash,
+            });
+          } else {
+            const tx = {
+              address: p.address,
+              txData: transformTransaction(data.txData),
+              txUtxos: transformTransactionUtxo(data.txUtxos),
+              txHash: p.txHash,
+            };
+            result.push(tx);
+
+            if (options?.cache) {
+              // cache tx
+              redisCache.storeTransaction(tx);
+            }
+          }
         })
         .catch(err => {
           if (err instanceof BlockfrostServerError && err.status_code === 404) {

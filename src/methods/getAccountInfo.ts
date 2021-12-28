@@ -141,7 +141,7 @@ export const getAccountInfo = async (
 
   if (duration > 7) {
     console.warn(
-      `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} Tokens: ${tokensBalances.length} `,
+      `Warning: getAccountInfo-${details} for ${publicKey} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} Tokens: ${tokensBalances.length} `,
     );
   }
 
@@ -191,12 +191,16 @@ export const getCachedAccount = async (
         const pageIndex = Number(page) - 1;
         const txHashList = await redisCache.getAccountTxHashList(publicKey);
         if (txHashList) {
+          console.log(
+            'txHashList',
+            txHashList.map(tx => tx.txHash),
+          );
           // fetch transactions for a given page
           const paginatedTxsIds = paginate(txHashList, Number(pageSize));
           const requestedPageTxIds = paginatedTxsIds[pageIndex] ?? [];
-          // TODO reuse cached transactions
           const txs = await txIdsToTransactions(
             requestedPageTxIds.map(item => ({ address: item.address, data: [item.txHash] })),
+            { cache: true }, // use cached txs
           );
           cachedData.history.transactions = txs;
           return cachedData;
@@ -206,7 +210,7 @@ export const getCachedAccount = async (
   }
 
   if (cachedData) {
-    console.log('Cached data  stale. Retrieving account info from a backend.');
+    console.log('Cached data stale. Retrieving account info from a backend.');
   } else {
     console.log('Cached data unavailable. Retrieving account info from a backend.');
   }

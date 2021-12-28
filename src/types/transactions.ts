@@ -1,14 +1,21 @@
 import { Responses } from '@blockfrost/blockfrost-js';
 import { AssetBalance } from './response';
 
-export interface Data {
-  txUtxos: Responses['tx_content_utxo'];
-  txData: Responses['tx_content'];
-}
-
-export interface TxIdsToTransactionsResponse {
+export interface TransformedTxData {
   txUtxos: TransformedTransactionUtxo;
   txData: TransformedTransaction;
+}
+
+// cached data are already transformed
+export type Data =
+  | (TransformedTxData & { fromCache: true })
+  | {
+      txUtxos: Responses['tx_content_utxo'];
+      txData: Responses['tx_content'];
+      fromCache?: false;
+    };
+
+export interface TxIdsToTransactionsResponse extends TransformedTxData {
   address: string;
   txHash: string;
 }
