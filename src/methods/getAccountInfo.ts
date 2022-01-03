@@ -69,6 +69,7 @@ export const getAccountInfo = async (
     empty: accountEmpty,
     balance: balanceWithRewards.toFixed(),
     availableBalance: lovelaceBalance.toFixed(),
+    tokens: tokensBalances.map(t => transformAsset(t)),
     history: {
       total: txCount,
       unconfirmed: 0,
@@ -87,11 +88,6 @@ export const getAccountInfo = async (
       },
     },
   };
-
-  if (details === 'basic') {
-    // for every level of details except basic set token balances
-    accountInfo.tokens = tokensBalances.map(t => transformAsset(t));
-  }
 
   if (details === 'txs' || details === 'txids') {
     const [externalAddresses, internalAddresses] = await Promise.all([
