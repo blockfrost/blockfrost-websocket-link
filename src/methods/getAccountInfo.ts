@@ -52,14 +52,16 @@ export const getAccountInfo = async (
   );
   const balanceWithRewards = lovelaceBalance.plus(stakingData.rewards);
 
-  const tokensBalances = stakeAddressTotal.received_sum.map(r => {
-    const received = r.quantity;
-    const sent = stakeAddressTotal.sent_sum.find(s => s.unit === r.unit)?.quantity ?? '0';
-    return {
-      unit: r.unit,
-      quantity: new BigNumber(received).minus(sent).toFixed(),
-    };
-  });
+  const tokensBalances = stakeAddressTotal.received_sum
+    .map(r => {
+      const received = r.quantity;
+      const sent = stakeAddressTotal.sent_sum.find(s => s.unit === r.unit)?.quantity ?? '0';
+      return {
+        unit: r.unit,
+        quantity: new BigNumber(received).minus(sent).toFixed(),
+      };
+    })
+    .filter(b => b.quantity !== '0');
 
   const totalPages = Math.ceil(txCount / pageSize);
   const accountEmpty = txCount === 0; // true if account is unused
