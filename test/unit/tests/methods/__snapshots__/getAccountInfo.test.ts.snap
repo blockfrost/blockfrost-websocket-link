@@ -1146,5 +1146,18 @@ Object {
     "size": 25,
     "total": 1,
   },
+  "tokens": Array [
+    Object {
+      "decimals": 6,
+      "quantity": "27256514",
+      "unit": "lovelace",
+    },
+    Object {
+      "decimals": 0,
+      "fingerprint": "asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06",
+      "quantity": "1",
+      "unit": "2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79",
+    },
+],
 }
 `;
