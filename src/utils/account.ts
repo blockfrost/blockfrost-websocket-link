@@ -2,7 +2,7 @@ import { Address } from '../types/address';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { addressesToTxIds, discoverAddresses, getAddressesData } from './address';
 
-export const getAccountTxids = async (addresses: Address[], accountEmpty: boolean) => {
+export const getTxidsFromAccountAddresses = async (addresses: Address[], accountEmpty: boolean) => {
   const uniqueTxIds: ({
     address: string;
   } & Responses['address_transactions_content'][number])[] = [];
@@ -52,7 +52,7 @@ export const getAccountTransactionIds = async (accountPublicKey: string) => {
   const internalAddresses = await discoverAddresses(accountPublicKey, 1);
   const addresses = [...externalAddresses, ...internalAddresses];
 
-  const txIds = await addressesToTxIds(addresses);
+  const txIds = await getTxidsFromAccountAddresses(addresses, false);
 
   return {
     addresses: {

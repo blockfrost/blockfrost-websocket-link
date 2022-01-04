@@ -259,6 +259,7 @@ export const addressesToTxIds = async (
     data: Responses['address_transactions_content'];
   }[] = [];
 
+  // TODO: don't fire all requests at the same time
   await Promise.all(
     promisesBundle.map(p =>
       p.promise
