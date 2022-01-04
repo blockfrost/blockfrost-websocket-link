@@ -86,8 +86,9 @@ export const aggregateTransactions = async (
         // sent tx
         const inputsAmount = sumAssetBalances(myInputs);
         const inputsAmountLovelace = inputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
+        const myOutputsAmount = sumAssetBalances(myOutputs);
         const amountSpent = new BigNumber(inputsAmountLovelace)
-          .minus(internalOutputsAmountLovelace)
+          .minus(myOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0')
           .minus(tx.txData.fees);
         sent = sent.plus(amountSpent);
       }
