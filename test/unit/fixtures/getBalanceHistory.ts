@@ -1208,6 +1208,66 @@ export const aggregateTransactions = [
         },
         txHash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
       },
+      {
+        address:
+          'addr_test1qru5ktsj5zsmhvwv0ep9zuhfu39x3wyt9wxjnsn3cagsyy59ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usqd9a9q',
+        txData: {
+          hash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
+          block: '3ea1e6aba27bb83fbefa0d6c1685af595e22c549ab8c5982132202ec33f5ad45',
+          block_height: 3170930,
+          block_time: 1659670259,
+          slot: 45380749,
+          index: 33,
+          output_amount: [{ unit: 'lovelace', quantity: '675048004', decimals: 6 }],
+          fees: '168009',
+          deposit: '0',
+          size: 283,
+          invalid_before: null,
+          invalid_hereafter: null,
+          utxo_count: 3,
+          withdrawal_count: 0,
+          mir_cert_count: 0,
+          delegation_count: 0,
+          stake_cert_count: 0,
+          pool_update_count: 0,
+          pool_retire_count: 0,
+          asset_mint_or_burn_count: 0,
+          redeemer_count: 0,
+          valid_contract: true,
+        },
+        txUtxos: {
+          hash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
+          inputs: [
+            {
+              address:
+                'addr_test1qru5ktsj5zsmhvwv0ep9zuhfu39x3wyt9wxjnsn3cagsyy59ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usqd9a9q',
+              amount: [{ unit: 'lovelace', quantity: '675048004', decimals: 6 }],
+              tx_hash: '9bda97c5f198a73bbdc0a77903fc907e3462597ce0d68b8f85e7b017325827b4',
+              output_index: 1,
+              collateral: false,
+              data_hash: null,
+            },
+          ],
+          outputs: [
+            {
+              // 3rd party address
+              address: 'addr_test1qpffff',
+              amount: [{ unit: 'lovelace', quantity: '12345678', decimals: 6 }],
+              output_index: 0,
+              data_hash: null,
+            },
+            {
+              // my external address (not a change address), despite this it should not be included in the sent amount
+              address:
+                'addr_test1qru5ktsj5zsmhvwv0ep9zuhfu39x3wyt9wxjnsn3cagsyy59ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usqd9a9q',
+              amount: [{ unit: 'lovelace', quantity: '662534317', decimals: 6 }],
+              output_index: 1,
+              data_hash: null,
+            },
+          ],
+        },
+        txHash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
+      },
     ],
     result: [
       {
@@ -1230,6 +1290,13 @@ export const aggregateTransactions = [
         sentToSelf: '0',
         time: 1639670259,
         txs: 2,
+      },
+      {
+        received: '0',
+        sent: '12345678',
+        sentToSelf: '0',
+        time: 1659628659,
+        txs: 1,
       },
     ],
   },
