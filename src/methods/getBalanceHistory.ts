@@ -65,40 +65,35 @@ export const aggregateTransactions = async (
       const { inputs, outputs } = tx.txUtxos;
       const myInputs = inputs.filter(input => addressesList.includes(input.address));
       const myOutputs = outputs.filter(output => addressesList.includes(output.address));
-      const myInternalOutputs = outputs.filter(output =>
-        addresses.internal.map(a => a.address).includes(output.address),
-      );
-      const internalOutputsAmount = sumAssetBalances(myInternalOutputs);
-      const internalOutputsAmountLovelace =
-        internalOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
+
+      const inputsAmount = sumAssetBalances(myInputs);
+      const inputsAmountLovelace = inputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
+
+      const myOutputsAmount = sumAssetBalances(myOutputs);
+      const myOutputsAmountLovelace =
+        myOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
 
       if (myInputs.length === inputs.length && myOutputs.length === outputs.length) {
         // self tx
-        const amount = sumAssetBalances(myOutputs);
-        sentToSelf = sentToSelf
-          .minus(internalOutputsAmountLovelace)
-          .plus(amount.find(a => a.unit === 'lovelace')?.quantity ?? '0');
+        sent = sent.plus(inputsAmountLovelace);
+        received = received.plus(myOutputsAmountLovelace);
+        sentToSelf = sentToSelf.plus(myOutputsAmountLovelace);
       } else if (myInputs.length === 0 && myOutputs.length > 0) {
         // recv tx
-        const amount = sumAssetBalances(myOutputs);
-        received = received.plus(amount.find(a => a.unit === 'lovelace')?.quantity ?? '0');
+        received = received.plus(myOutputsAmountLovelace);
       } else {
         // sent tx
-        const inputsAmount = sumAssetBalances(myInputs);
-        const inputsAmountLovelace = inputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
-        const myOutputsAmount = sumAssetBalances(myOutputs);
-        const amountSpent = new BigNumber(inputsAmountLovelace)
-          .minus(myOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0')
-          .minus(tx.txData.fees);
-        sent = sent.plus(amountSpent);
+        sent = sent.plus(inputsAmountLovelace);
+        received = received.plus(myOutputsAmountLovelace);
+        sentToSelf = sentToSelf.plus(myOutputsAmountLovelace);
       }
     }
 
     return {
       time: bin.from,
       txs: bin.txs.length,
-      sent: sent.toFixed(),
-      received: received.toFixed(),
+      sent: sent.toFixed(), // sent including sentToSelf
+      received: received.toFixed(), // received including sentToSelf
       sentToSelf: sentToSelf.toFixed(),
     };
   });
