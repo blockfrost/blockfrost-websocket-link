@@ -7,7 +7,7 @@ import {
   getStakingAccountTotal,
   memoizedDeriveAddress,
 } from '../utils/address';
-import { getAccountTxids, getAccountAddressesData } from '../utils/account';
+import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/account';
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
@@ -100,7 +100,7 @@ export const getAccountInfo = async (
     const addresses = [...externalAddresses, ...internalAddresses];
     _addressesCount = addresses.length; // just a debug helper
 
-    const txids = await getAccountTxids(addresses, accountEmpty);
+    const txids = await getTxidsFromAccountAddresses(addresses, accountEmpty);
     const paginatedTxsIds = paginate(txids, pageSizeNumber);
     const requestedPageTxIds = paginatedTxsIds[pageIndex] ?? [];
 

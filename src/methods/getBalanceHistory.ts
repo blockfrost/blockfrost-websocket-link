@@ -91,7 +91,8 @@ export const aggregateTransactions = async (
 
     return {
       time: bin.from,
-      txs: bin.txs.length,
+      txs: bin.txs.length, // TODO: should be renamed to txCount, but that will break compatibility with trezor/blockchain-link
+      txids: bin.txs.map(tx => tx.txHash),
       sent: sent.toFixed(), // sent including sentToSelf
       received: received.toFixed(), // received including sentToSelf
       sentToSelf: sentToSelf.toFixed(),
@@ -113,7 +114,7 @@ export const getAccountBalanceHistory = async (
     await txIdsToTransactions(
       txIds.map(tx => ({
         address: tx.address,
-        data: tx.data.map(d => d.tx_hash),
+        data: [tx.tx_hash],
       })),
     )
   )
