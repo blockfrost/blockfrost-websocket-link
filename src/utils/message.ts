@@ -3,7 +3,7 @@ import { serializeError } from 'serialize-error';
 import { Messages } from '../types/message';
 import * as TxTypes from '../types/transactions';
 import { UtxosWithBlockResponse } from '../types/address';
-import { AccountInfo, ServerInfo } from '../types/response';
+import { AccountInfo, BalanceHistoryData, ServerInfo } from '../types/response';
 
 export const getMessage = (message: string): Messages | null => {
   try {
@@ -45,7 +45,7 @@ export const prepareMessage = (
     | AccountInfo
     | string
     | Responses['block_content']
-    | TxTypes.BalanceHistoryItem[]
+    | BalanceHistoryData[]
     | TxTypes.TxIdsToTransactionsResponse[]
     | TxTypes.TransformedTransaction
     | UtxosWithBlockResponse[]
