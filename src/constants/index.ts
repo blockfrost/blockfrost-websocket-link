@@ -37,6 +37,4 @@ export const MESSAGES_RESPONSE = {
   CONNECT: 'CONNECT',
 } as const;
 
-export const ADDRESS_GAP_LIMIT = 20;
-
 export const WELCOME_MESSAGE = `Hello there! see: <a href="${REPOSITORY_URL}">${REPOSITORY_URL}</a>`;

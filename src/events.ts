@@ -6,9 +6,11 @@ import { Responses } from '@blockfrost/blockfrost-js';
 import { promiseTimeout } from './utils/common';
 import { getTransactionsWithUtxo } from './utils/transaction';
 import { TxNotification } from './types/response';
+import { EMIT_MAX_MISSED_BLOCKS } from './constants/config';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;
+  maxMissedBlocks?: number;
 }
 
 const events = new EventEmitter();
@@ -22,32 +24,52 @@ export const _resetPreviousBlock = () => {
 export const emitBlock = async (options?: EmitBlockOptions) => {
   try {
     const latestBlock = await blockfrostAPI.blocksLatest();
-    if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
-      // check if we missed some blocks since the last run
-      if (
-        latestBlock.height &&
-        previousBlock?.height &&
-        latestBlock.height - previousBlock.height > 1
-      ) {
-        for (let i = previousBlock.height + 1; i < latestBlock.height; i++) {
-          console.warn(
-            `newBlock emitter: emitting missed block: ${i} (current block: ${latestBlock.height})`,
-          );
+    if ((latestBlock.height ?? 0) < (previousBlock?.height ?? 0)) {
+      // rollback
+      console.warn(
+        `Rollback detected. Previous block height: ${previousBlock?.height}, current block height: ${latestBlock.height}`,
+      );
+      previousBlock = null;
+    }
 
-          // emit previously missed blocks
-          await promiseTimeout(
-            blockfrostAPI.blocks(i).then(missedBlock => {
+    if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
+      if (previousBlock && latestBlock.height && previousBlock.height) {
+        // check if we missed more blocks since the last emit
+        const missedBlocks = latestBlock.height - previousBlock.height;
+        if (missedBlocks > (options?.maxMissedBlocks ?? EMIT_MAX_MISSED_BLOCKS)) {
+          // too many missed blocks, skip emitting
+          console.warn(
+            `newBlock emitter: Emitting skipped. Too many missed blocks: ${
+              previousBlock.height + 1
+            }-${latestBlock.height - 1}`,
+          );
+        } else {
+          for (let i = previousBlock.height + 1; i < latestBlock.height; i++) {
+            // emit previously missed blocks
+            try {
+              const missedBlock = await promiseTimeout(
+                blockfrostAPI.blocks(i),
+                options?.fetchTimeoutMs ?? 2000,
+              );
+              console.warn(
+                `newBlock emitter: Emitting missed block: ${i} (current block: ${latestBlock.height})`,
+              );
               events.emit('newBlock', missedBlock);
-            }),
-            options?.fetchTimeoutMs ?? 2000,
-          ).catch(() => {
-            console.warn(`newBlock emitter: Skipping block ${i}. Fetch takes too long.`);
-          });
+            } catch (err) {
+              if (err instanceof Error && err.message === 'PROMISE_TIMEOUT') {
+                console.warn(`newBlock emitter: Skipping block ${i}. Fetch takes too long.`);
+              } else {
+                console.warn(`newBlock emitter: Skipping block ${i}.`);
+
+                console.warn(err);
+              }
+            }
+          }
         }
       }
 
-      // emit latest block
       previousBlock = latestBlock;
+      // emit latest block
       events.emit('newBlock', latestBlock);
     }
   } catch (err) {
