@@ -695,15 +695,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:3.0.3-beta.5":
-  version: 3.0.3-beta.5
-  resolution: "@blockfrost/blockfrost-js@npm:3.0.3-beta.5"
+"@blockfrost/blockfrost-js@npm:4.0.0":
+  version: 4.0.0
+  resolution: "@blockfrost/blockfrost-js@npm:4.0.0"
   dependencies:
     "@emurgo/cardano-serialization-lib-nodejs": ^9.1.2
     "@emurgo/cip14-js": 3.0.1
     form-data: ^4.0.0
     got: ^11.8.3
-  checksum: 2b95b3b0e72bbf39bb89714bac852d8454fbaf49ec4850ee419b95379e5c0bb5e8350242fcffeba792bdfe0e2b663d16cf2ce0b85c57b00daa98cde9439bd7ed
+  checksum: 6fb1ef63eb42213c2e92ac445ce716427f47edbbdd8bc495e23b5da47f2b1fe9aafdeed9205966c53f1482b898c3ccf4dd033e738a02ba3fa05c4d3a229485c2
   languageName: node
   linkType: hard
 
@@ -711,7 +711,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blockfrost/blockfrost-websocket-link@workspace:."
   dependencies:
-    "@blockfrost/blockfrost-js": 3.0.3-beta.5
+    "@blockfrost/blockfrost-js": 4.0.0
     "@emurgo/cardano-serialization-lib-nodejs": ^9.1.0
     "@sentry/node": ^6.13.3
     "@sentry/tracing": ^6.13.3
