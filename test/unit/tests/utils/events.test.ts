@@ -53,7 +53,7 @@ describe('events', () => {
       expect(callback).toBeCalledTimes(1);
       expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0]);
 
-      await emitBlock();
+      await emitBlock({ maxMissedBlocks: 10 });
       expect(callback).toBeCalledTimes(4); // one time from the first emit, 3 times from 2nd emit (2 missed blocks + latest)
       expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0]);
       expect(callback).toHaveBeenNthCalledWith(3, fixture.missedBlocks[1]);
@@ -87,7 +87,7 @@ describe('events', () => {
           setTimeout(() => {
             // @ts-ignore
             resolve(fixture.missedBlocks[1]);
-          }, 5000);
+          }, 4000);
         }),
       ); // delay 2nd response by 5s, which should trigger timeout
 
@@ -95,8 +95,22 @@ describe('events', () => {
       expect(callback).toBeCalledTimes(1);
       expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0]);
 
-      await emitBlock({ fetchTimeoutMs: 4000 });
-      expect(callback).toBeCalledTimes(3); // one time from the first emit, 3 times from 2nd emit (2 missed blocks + latest)
+      await emitBlock({ fetchTimeoutMs: 3000, maxMissedBlocks: 10 });
+
+      // Following warning is kinda legit:
+      // "A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown."
+      // We are simulating network timeout by returning a value too late (after 5s)
+      // but we will received it in the end. What's important is that such a block wont be emitted.
+      // TODO: it would be super cool to abort the promise so we can stop fetching
+
+      // with additional wait we can be sure that the failed block wont be emitted later
+      await new Promise(resolve => {
+        setTimeout(() => {
+          resolve(true);
+        }, 1500);
+      });
+
+      expect(callback).toBeCalledTimes(3); // one time from the first emit, 2 times from 2nd emit (just 1 missed block (because 2nd block will timeout) + latest block)
       expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0]);
       expect(callback).toHaveBeenNthCalledWith(3, fixture.latestBlocks[1]);
       blockLatestMock.restore();

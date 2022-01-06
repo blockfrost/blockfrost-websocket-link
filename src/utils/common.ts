@@ -50,7 +50,7 @@ export const promiseTimeout = <T>(promise: T, ms: number) => {
   const timeout = new Promise((_resolve, reject) => {
     const id = setTimeout(() => {
       clearTimeout(id);
-      reject('Timed out in ' + ms + 'ms.');
+      reject(Error('PROMISE_TIMEOUT'));
     }, ms);
   });
 

@@ -1,4 +1,4 @@
-import { ADDRESS_GAP_LIMIT } from '../constants';
+import { ADDRESS_GAP_LIMIT } from '../constants/config';
 import * as Addresses from '../types/address';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import {
