@@ -4,7 +4,7 @@ import { BalanceHistoryData } from '../types/response';
 import { TxIdsToTransactionsResponse } from '../types/transactions';
 import { getAccountTransactionIds } from '../utils/account';
 import { sumAssetBalances } from '../utils/asset';
-import { getRatesForDate } from '../utils/common';
+import { getRatesForDate } from '../utils/rates';
 import { prepareErrorMessage, prepareMessage } from '../utils/message';
 import { txIdsToTransactions } from '../utils/transaction';
 
