@@ -11,3 +11,5 @@ export const FIAT_RATES_PROXY = ['https://api.coingecko.com/api/v3/coins/cardano
 
 // Max number of requests per second sent to FIAT_RATES_PROXY, additional requests will be queued
 export const FIAT_RATES_REQUESTS_PER_SEC = 100;
+// Request timeout for fetching single rate for a given day
+export const FIAT_RATES_REQUESTS_TIMEOUT = 1000;

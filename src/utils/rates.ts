@@ -1,7 +1,12 @@
 import { format } from 'date-fns';
 import got from 'got';
-import { FIAT_RATES_REQUESTS_PER_SEC, FIAT_RATES_PROXY } from '../constants/config';
+import {
+  FIAT_RATES_REQUESTS_PER_SEC,
+  FIAT_RATES_PROXY,
+  FIAT_RATES_REQUESTS_TIMEOUT,
+} from '../constants/config';
 import { RateLimiterMemory, RateLimiterQueue } from 'rate-limiter-flexible';
+import { blockfrostAPI } from './blockfrostAPI';
 
 // limit max number of requests per sec to prevent too many opened connections
 const ratesLimiter = new RateLimiterMemory({
@@ -39,7 +44,14 @@ export const getRatesForDateNoLimit = async (date: number): Promise<Record<strin
     for (const [index, proxy] of getFiatRatesProxies().entries()) {
       // iterate through proxies till we have a valid response
       try {
-        response = await got(`${proxy}?date=${coingeckoDateFormat}`).json();
+        response = await got(`${proxy}?date=${coingeckoDateFormat}`, {
+          headers: {
+            'User-Agent': blockfrostAPI.userAgent,
+          },
+          timeout: {
+            request: FIAT_RATES_REQUESTS_TIMEOUT,
+          },
+        }).json();
         if (response?.market_data?.current_price) {
           break;
         }
