@@ -22,7 +22,11 @@ export const aggregateTransactions = async (
     all: Address[];
   },
   groupBy: number,
-) => {
+): Promise<Omit<BalanceHistoryData, 'rates'>[]> => {
+  if (txs.length === 0) {
+    return [];
+  }
+
   // Put txs into bins with a size of groupBy parameter (from-to)
   const bins: BalanceHistoryBin[] = [];
   const firstTxTimestamp = txs[0].txData.block_time ?? 0;
