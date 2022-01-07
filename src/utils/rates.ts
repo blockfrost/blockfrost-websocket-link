@@ -1,25 +1,34 @@
 import { format } from 'date-fns';
 import got from 'got';
-import { COINGECKO_PROXY } from '../constants/config';
+import { FIAT_RATES_REQUESTS_PER_SEC, FIAT_RATES_PROXY } from '../constants/config';
+import { RateLimiterMemory, RateLimiterQueue } from 'rate-limiter-flexible';
+
+// limit max number of requests per sec to prevent too many opened connections
+const ratesLimiter = new RateLimiterMemory({
+  points: FIAT_RATES_REQUESTS_PER_SEC,
+  duration: 1,
+});
+
+const limiterQueue = new RateLimiterQueue(ratesLimiter);
 
 const formatCoingeckoTime = (date: number): string => {
   return format(date * 1000, 'dd-MM-yyyy');
 };
 
 export const getCoingeckoProxies = () => {
-  let proxies = COINGECKO_PROXY;
-  const additional = process.env.BLOCKFROST_COINGECKO_PROXY;
+  let proxies = FIAT_RATES_PROXY;
+  const additional = process.env.BLOCKFROST_FIAT_RATES_PROXY;
   if (additional) {
     const items = additional.split(',');
     const sanitized = items.map(item =>
       item.endsWith('/') ? item.substring(0, item.length - 1) : item,
     ); // remove trailing slash
-    proxies = proxies.concat(sanitized);
+    proxies = sanitized.concat(proxies);
   }
   return proxies;
 };
 
-export const getRatesForDate = async (date: number): Promise<Record<string, number>> => {
+export const getRatesForDateNoLimit = async (date: number): Promise<Record<string, number>> => {
   const coingeckoDateFormat = formatCoingeckoTime(date);
   try {
     let response: {
@@ -29,15 +38,15 @@ export const getRatesForDate = async (date: number): Promise<Record<string, numb
     } = {};
 
     for (const [index, proxy] of getCoingeckoProxies().entries()) {
+      // iterate through proxies till we have a valid response
       try {
-        response = await got(
-          `${proxy}/api/v3/coins/cardano/history?date=${coingeckoDateFormat}`,
-        ).json();
+        response = await got(`${proxy}?date=${coingeckoDateFormat}`).json();
         if (response?.market_data?.current_price) {
           break;
         }
       } catch (err) {
-        if (index === COINGECKO_PROXY.length - 1) {
+        if (index === FIAT_RATES_PROXY.length - 1) {
+          // last proxy thrown error, we don't have the data
           throw err;
         }
       }
@@ -51,4 +60,19 @@ export const getRatesForDate = async (date: number): Promise<Record<string, numb
   } catch (error) {
     throw Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
   }
+};
+
+export const getRatesForDate = async (date: number): Promise<Record<string, number>> => {
+  const t1 = new Date().getTime();
+
+  // wait for a slot
+  await limiterQueue.removeTokens(1);
+
+  const t2 = new Date().getTime();
+  const diff = t2 - t1;
+  if (diff > 1000) {
+    console.warn(`Fiat rates limiter slowed down request for ${diff} ms!`);
+  }
+
+  return getRatesForDateNoLimit(date);
 };

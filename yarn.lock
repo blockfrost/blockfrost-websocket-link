@@ -739,6 +739,7 @@ __metadata:
     memoizee: ^0.4.15
     nock: ^13.2.1
     prettier: ^2.4.1
+    rate-limiter-flexible: ^2.3.6
     rimraf: ^3.0.2
     serialize-error: ^8.1.0
     sinon: ^11.1.2
@@ -5894,6 +5895,13 @@ __metadata:
   version: 1.2.1
   resolution: "range-parser@npm:1.2.1"
   checksum: 0a268d4fea508661cf5743dfe3d5f47ce214fd6b7dec1de0da4d669dd4ef3d2144468ebe4179049eff253d9d27e719c88dae55be64f954e80135a0cada804ec9
+  languageName: node
+  linkType: hard
+
+"rate-limiter-flexible@npm:^2.3.6":
+  version: 2.3.6
+  resolution: "rate-limiter-flexible@npm:2.3.6"
+  checksum: c008c7bcc17832645d4c06caa08a5f52e093108d4f3bcca5df15344150a38fca6b823a6718091a8cf887861989c61fd91d7179426d277d7867fb76b723fd0dbc
   languageName: node
   linkType: hard
 
