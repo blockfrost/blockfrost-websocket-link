@@ -11,18 +11,17 @@ const ratesLimiter = new RateLimiterMemory({
 
 const limiterQueue = new RateLimiterQueue(ratesLimiter);
 
-const formatCoingeckoTime = (date: number): string => {
+export const formatCoingeckoTime = (date: number): string => {
   return format(date * 1000, 'dd-MM-yyyy');
 };
 
-export const getCoingeckoProxies = () => {
+export const getFiatRatesProxies = (additional = process.env.BLOCKFROST_FIAT_RATES_PROXY) => {
   let proxies = FIAT_RATES_PROXY;
-  const additional = process.env.BLOCKFROST_FIAT_RATES_PROXY;
   if (additional) {
     const items = additional.split(',');
-    const sanitized = items.map(item =>
-      item.endsWith('/') ? item.substring(0, item.length - 1) : item,
-    ); // remove trailing slash
+    const sanitized = items
+      .map(item => (item.endsWith('/') ? item.substring(0, item.length - 1) : item))
+      .filter(proxy => proxy.length > 0); // remove trailing slash
     proxies = sanitized.concat(proxies);
   }
   return proxies;
@@ -37,7 +36,7 @@ export const getRatesForDateNoLimit = async (date: number): Promise<Record<strin
       };
     } = {};
 
-    for (const [index, proxy] of getCoingeckoProxies().entries()) {
+    for (const [index, proxy] of getFiatRatesProxies().entries()) {
       // iterate through proxies till we have a valid response
       try {
         response = await got(`${proxy}?date=${coingeckoDateFormat}`).json();
