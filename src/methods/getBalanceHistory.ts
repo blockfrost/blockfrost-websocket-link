@@ -4,7 +4,7 @@ import { BalanceHistoryData } from '../types/response';
 import { TxIdsToTransactionsResponse } from '../types/transactions';
 import { getAccountTransactionIds } from '../utils/account';
 import { sumAssetBalances } from '../utils/asset';
-import { getRatesForDate } from '../utils/common';
+import { getRatesForDate } from '../utils/rates';
 import { prepareErrorMessage, prepareMessage } from '../utils/message';
 import { txIdsToTransactions } from '../utils/transaction';
 
@@ -129,12 +129,15 @@ export const getAccountBalanceHistory = async (
 
   // fetch fiat rate for each bin
   const binRatesPromises = bins.map(bin => getRatesForDate(bin.time));
-  const binRates = await Promise.all(binRatesPromises);
+  const binRates = await Promise.allSettled(binRatesPromises);
 
-  const result = bins.map((bin, index) => ({
-    ...bin,
-    rates: binRates[index],
-  }));
+  const result = bins.map((bin, index) => {
+    const rateForBin = binRates[index];
+    return {
+      ...bin,
+      rates: rateForBin.status === 'fulfilled' ? rateForBin.value : {},
+    };
+  });
 
   return result;
 };
