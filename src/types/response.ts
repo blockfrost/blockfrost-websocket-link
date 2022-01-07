@@ -69,5 +69,5 @@ export interface BalanceHistoryData {
   received: string;
   sent: string;
   sentToSelf: string;
-  rates: { [k: string]: number | undefined };
+  rates?: { [k: string]: number | undefined };
 }
