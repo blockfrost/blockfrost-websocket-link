@@ -86,7 +86,7 @@ export const getAccountInfo = async (
         address: stakeAddress,
         rewards: stakingData.rewards,
         isActive: stakingData.isActive,
-        poolId: stakingData.poolId,
+        poolId: stakingData.poolIdHex,
       },
     },
   };

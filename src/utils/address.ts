@@ -1,6 +1,7 @@
 import { ADDRESS_GAP_LIMIT } from '../constants/config';
 import * as Addresses from '../types/address';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { bech32 } from 'bech32';
 import {
   BlockfrostServerError,
   deriveAddress as sdkDeriveAddress,
@@ -22,6 +23,14 @@ export const deriveAddress = (
     address: address,
     path: `m/1852'/1815'/i'/${type}/${addressIndex}`,
   };
+};
+
+export const bech32PoolToHex = (bech32PoolId: string | null) => {
+  if (!bech32PoolId) return null;
+  const decodedWords = bech32.decode(bech32PoolId, 1000);
+  const payload = bech32.fromWords(decodedWords.words);
+  const decoded = Buffer.from(payload).toString('hex');
+  return decoded;
 };
 
 export const memoizedDeriveAddress = memoizee(deriveAddress, {
@@ -325,6 +334,7 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
       rewards: stakeAddressData.withdrawable_amount,
       isActive: stakeAddressData.active,
       poolId: stakeAddressData.pool_id,
+      poolIdHex: bech32PoolToHex(stakeAddressData.pool_id),
     };
   } catch (error) {
     if (error instanceof BlockfrostServerError) {
@@ -333,6 +343,7 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
           rewards: '0',
           isActive: false,
           poolId: null,
+          poolIdHex: null,
         };
       }
     }

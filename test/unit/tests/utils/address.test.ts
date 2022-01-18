@@ -20,4 +20,10 @@ describe('address utils', () => {
       expect(addressUtils.transformUtxo(fixture.utxo)).toStrictEqual(fixture.result);
     });
   });
+
+  fixtures.bech32PoolToHex.forEach(fixture => {
+    test(`bech32PoolToHex: ${fixture.description}`, () => {
+      expect(addressUtils.bech32PoolToHex(fixture.poolId)).toStrictEqual(fixture.result);
+    });
+  });
 });

@@ -78,4 +78,5 @@ export type StakingData = {
   rewards: string;
   isActive: boolean;
   poolId: string | null;
+  poolIdHex: string | null;
 };

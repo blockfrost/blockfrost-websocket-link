@@ -93,3 +93,11 @@ export const transformUtxo = [
     },
   },
 ];
+
+export const bech32PoolToHex = [
+  {
+    description: 'stkaenuts',
+    poolId: 'pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc',
+    result: '26b17b78de4f035dc0bfce60d1d3c3a8085c38dcce5fb8767e518bed',
+  },
+];
