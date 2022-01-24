@@ -80,10 +80,14 @@ export const aggregateTransactions = async (
         myOutputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
 
       if (myInputs.length === inputs.length && myOutputs.length === outputs.length) {
-        // self tx
+        // self tx (also withdrawal tx)
+        // sent and received amounts are basically sums of all account's inputs/outputs
+        // but some of the account's inputs may be used to fill output to same account - that amount is stored in sentToSelf
+        // tl;dr: The amount that left the account can be computed as sent - sentToSelf
+        // The amount that was received by the account (amount that would be added to account balance) is received - sentToSelf
         sent = sent.plus(inputsAmountLovelace);
-        received = received.plus(myOutputsAmountLovelace);
-        sentToSelf = sentToSelf.plus(myOutputsAmountLovelace);
+        received = received.plus(myOutputsAmountLovelace); // received can include withdrawal amount
+        sentToSelf = sentToSelf.plus(inputsAmountLovelace).minus(tx.txData.fees); // withdrawal amount is not part of sentToSelf
       } else if (myInputs.length === 0 && myOutputs.length > 0) {
         // recv tx
         received = received.plus(myOutputsAmountLovelace);

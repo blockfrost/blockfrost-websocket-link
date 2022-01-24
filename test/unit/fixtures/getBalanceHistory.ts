@@ -6,6 +6,12 @@ export const aggregateTransactions = [
       external: [
         {
           address:
+            'addr_test1qrtynrlrrtvauq9tu76kd8jfhgxgmc5wjfcy239d27a52rgj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsccx72g',
+          path: "m/1852'/1815'/i'/0/13",
+          data: [],
+        },
+        {
+          address:
             'addr_test1qru5ktsj5zsmhvwv0ep9zuhfu39x3wyt9wxjnsn3cagsyy59ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usqd9a9q',
           path: "m/1852'/1815'/i'/0/0",
           data: [],
@@ -248,6 +254,12 @@ export const aggregateTransactions = [
       internal: [
         {
           address:
+            'addr_test1ppfjwtgvl6ku8kz426fu9pdhrh9sn58y40desm0zu55hfxqj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsm0su5k',
+          path: "m/1852'/1815'/i'/1/0",
+          data: [],
+        },
+        {
+          address:
             'addr_test1qpf9jr6e48u63ym65esmrwgle84zspnrsew37gwe88e0zfy9ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6us9cndz8',
           path: "m/1852'/1815'/i'/1/0",
           data: [],
@@ -488,6 +500,18 @@ export const aggregateTransactions = [
         },
       ],
       all: [
+        {
+          address:
+            'addr_test1qrtynrlrrtvauq9tu76kd8jfhgxgmc5wjfcy239d27a52rgj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsccx72g',
+          path: "m/1852'/1815'/i'/0/13",
+          data: [],
+        },
+        {
+          address:
+            'addr_test1ppfjwtgvl6ku8kz426fu9pdhrh9sn58y40desm0zu55hfxqj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsm0su5k',
+          path: "m/1852'/1815'/i'/1/0",
+          data: [],
+        },
         {
           address:
             'addr_test1qru5ktsj5zsmhvwv0ep9zuhfu39x3wyt9wxjnsn3cagsyy59ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usqd9a9q',
@@ -1268,6 +1292,141 @@ export const aggregateTransactions = [
         },
         txHash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
       },
+      // withdrawal
+      {
+        address:
+          'addr_test1qru5ktsj5zsmhvwv0ep9zuhfu39x3wyt9wxjnsn3cagsyy59ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usqd9a9q',
+        txData: {
+          hash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
+          block: '3ea1e6aba27bb83fbefa0d6c1685af595e22c549ab8c5982132202ec33f5ad45',
+          block_height: 3170930,
+          block_time: 1759670259,
+          slot: 45380749,
+          index: 33,
+          output_amount: [{ unit: 'lovelace', quantity: '1831991', decimals: 6 }],
+          fees: '168009',
+          deposit: '0',
+          size: 283,
+          invalid_before: null,
+          invalid_hereafter: null,
+          utxo_count: 3,
+          withdrawal_count: 1,
+          mir_cert_count: 0,
+          delegation_count: 0,
+          stake_cert_count: 0,
+          pool_update_count: 0,
+          pool_retire_count: 0,
+          asset_mint_or_burn_count: 0,
+          redeemer_count: 0,
+          valid_contract: true,
+        },
+        txUtxos: {
+          hash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
+          inputs: [
+            {
+              address:
+                'addr_test1qru5ktsj5zsmhvwv0ep9zuhfu39x3wyt9wxjnsn3cagsyy59ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usqd9a9q',
+              amount: [{ unit: 'lovelace', quantity: '10000000', decimals: 6 }],
+              tx_hash: '9bda97c5f198a73bbdc0a77903fc907e3462597ce0d68b8f85e7b017325827b4',
+              output_index: 1,
+              collateral: false,
+              data_hash: null,
+            },
+          ],
+          outputs: [
+            {
+              // my external address
+              // fake 1 000 000 from withdrawal
+              address:
+                'addr_test1qru5ktsj5zsmhvwv0ep9zuhfu39x3wyt9wxjnsn3cagsyy59ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usqd9a9q',
+              amount: [{ unit: 'lovelace', quantity: '1000000', decimals: 6 }],
+              output_index: 1,
+              data_hash: null,
+            },
+            {
+              // change
+              address:
+                'addr_test1qpf9jr6e48u63ym65esmrwgle84zspnrsew37gwe88e0zfy9ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6us9cndz8',
+              amount: [{ unit: 'lovelace', quantity: '9831991', decimals: 6 }],
+              output_index: 1,
+              data_hash: null,
+            },
+          ],
+        },
+        txHash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
+      },
+      {
+        address:
+          'addr_test1qrtynrlrrtvauq9tu76kd8jfhgxgmc5wjfcy239d27a52rgj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsccx72g',
+        txData: {
+          hash: 'a3c85d7410ddd4ad896934bcac9645e09aaabba83d94c2d5f4870a2c733caff8',
+          block: '6470c18faf529e4120391ceebfa7573333af7ff6b24c9fbd1fe400ca47dd1e8b',
+          block_height: 3234206,
+          block_time: 1842076281,
+          slot: 47707065,
+          index: 7,
+          output_amount: [
+            {
+              unit: 'lovelace',
+              quantity: '63716476',
+              decimals: 6,
+            },
+          ],
+          fees: '171309',
+          deposit: '0',
+          size: 357,
+          invalid_before: null,
+          invalid_hereafter: null,
+          utxo_count: 2,
+          withdrawal_count: 1,
+          mir_cert_count: 0,
+          delegation_count: 0,
+          stake_cert_count: 0,
+          pool_update_count: 0,
+          pool_retire_count: 0,
+          asset_mint_or_burn_count: 0,
+          redeemer_count: 0,
+          valid_contract: true,
+        },
+        txUtxos: {
+          hash: 'a3c85d7410ddd4ad896934bcac9645e09aaabba83d94c2d5f4870a2c733caff8',
+          inputs: [
+            // input on my external (0) address
+            {
+              address:
+                'addr_test1qrtynrlrrtvauq9tu76kd8jfhgxgmc5wjfcy239d27a52rgj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsccx72g',
+              amount: [
+                {
+                  unit: 'lovelace',
+                  quantity: '60000000',
+                  decimals: 6,
+                },
+              ],
+              tx_hash: 'd9b96968e7d5b9a07c3d71bac67fe2941562923ab75daf752bf60f0ada7c2062',
+              output_index: 0,
+              collateral: false,
+              data_hash: null,
+            },
+          ],
+          outputs: [
+            // output to change address
+            {
+              address:
+                'addr_test1ppfjwtgvl6ku8kz426fu9pdhrh9sn58y40desm0zu55hfxqj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsm0su5k',
+              amount: [
+                {
+                  unit: 'lovelace',
+                  quantity: '63716476',
+                  decimals: 6,
+                },
+              ],
+              output_index: 0,
+              data_hash: null,
+            },
+          ],
+        },
+        txHash: 'a3c85d7410ddd4ad896934bcac9645e09aaabba83d94c2d5f4870a2c733caff8',
+      },
     ],
     result: [
       {
@@ -1296,6 +1455,22 @@ export const aggregateTransactions = [
         sent: '675048004',
         sentToSelf: '662534317',
         time: 1659628659,
+        txs: 1,
+      },
+      // withdrawal tx
+      {
+        received: '10831991', // 1 000 000 from withdrawal
+        sent: '10000000',
+        sentToSelf: '9831991',
+        time: 1759593459,
+        txs: 1,
+      },
+      // withdrawal tx
+      {
+        received: '63716476',
+        sent: '60000000',
+        sentToSelf: '59828691',
+        time: 1842019059,
         txs: 1,
       },
     ],
