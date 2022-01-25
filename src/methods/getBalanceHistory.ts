@@ -72,8 +72,9 @@ export const aggregateTransactions = async (
       const myInputs = inputs.filter(input => addressesList.includes(input.address));
       const myOutputs = outputs.filter(output => addressesList.includes(output.address));
 
-      const inputsAmount = sumAssetBalances(myInputs);
-      const inputsAmountLovelace = inputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
+      const myInputsAmount = sumAssetBalances(myInputs);
+      const myInputsAmountLovelace =
+        myInputsAmount.find(a => a.unit === 'lovelace')?.quantity ?? '0';
 
       const myOutputsAmount = sumAssetBalances(myOutputs);
       const myOutputsAmountLovelace =
@@ -85,15 +86,20 @@ export const aggregateTransactions = async (
         // but some of the account's inputs may be used to fill output to same account - that amount is stored in sentToSelf
         // tl;dr: The amount that left the account can be computed as sent - sentToSelf
         // The amount that was received by the account (amount that would be added to account balance) is received - sentToSelf
-        sent = sent.plus(inputsAmountLovelace);
-        received = received.plus(myOutputsAmountLovelace); // received can include withdrawal amount
-        sentToSelf = sentToSelf.plus(inputsAmountLovelace).minus(tx.txData.fees); // withdrawal amount is not part of sentToSelf
+        sent = sent.plus(myInputsAmountLovelace);
+        // received can include withdrawal amount, but it can also lack deposited amount
+        received = received.plus(myOutputsAmountLovelace);
+        // withdrawal and deposit amounts are not part of sentToSelf
+        sentToSelf = sentToSelf
+          .plus(myInputsAmountLovelace)
+          .minus(tx.txData.fees)
+          .minus(tx.txData.deposit);
       } else if (myInputs.length === 0 && myOutputs.length > 0) {
         // recv tx
         received = received.plus(myOutputsAmountLovelace);
       } else {
         // sent tx
-        sent = sent.plus(inputsAmountLovelace);
+        sent = sent.plus(myInputsAmountLovelace);
         received = received.plus(myOutputsAmountLovelace);
         sentToSelf = sentToSelf.plus(myOutputsAmountLovelace);
       }
