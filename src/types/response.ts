@@ -30,6 +30,11 @@ export interface AccountInfo {
     used: AddressData[];
     unused: AddressData[];
   };
+  byronAddresses?: {
+    change: AddressData[];
+    used: AddressData[];
+    unused: AddressData[];
+  };
   empty: boolean;
   availableBalance: string;
   descriptor: string;

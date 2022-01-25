@@ -35,7 +35,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {
           "packageLocation": "./",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:4.0.0"],
+            ["@blockfrost/blockfrost-js", "npm:4.1.0-beta"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -1122,11 +1122,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@blockfrost/blockfrost-js", [
-        ["npm:4.0.0", {
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-4.0.0-7aed32a260-6fb1ef63eb.zip/node_modules/@blockfrost/blockfrost-js/",
+        ["npm:4.1.0-beta", {
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-4.1.0-beta-96866f993e-91bec4e55c.zip/node_modules/@blockfrost/blockfrost-js/",
           "packageDependencies": [
-            ["@blockfrost/blockfrost-js", "npm:4.0.0"],
-            ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.2"],
+            ["@blockfrost/blockfrost-js", "npm:4.1.0-beta"],
+            ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.4"],
             ["@emurgo/cip14-js", "npm:3.0.1"],
             ["form-data", "npm:4.0.0"],
             ["got", "npm:11.8.3"]
@@ -1139,7 +1139,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",
           "packageDependencies": [
             ["@blockfrost/blockfrost-websocket-link", "workspace:."],
-            ["@blockfrost/blockfrost-js", "npm:4.0.0"],
+            ["@blockfrost/blockfrost-js", "npm:4.1.0-beta"],
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.0"],
             ["@sentry/node", "npm:6.13.3"],
             ["@sentry/tracing", "npm:6.13.3"],
@@ -1189,10 +1189,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
-        ["npm:9.1.2", {
-          "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-9.1.2-7bcae3b90f-babd47a6f3.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",
+        ["npm:9.1.4", {
+          "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-9.1.4-407b8829e6-a87619ff6b.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",
           "packageDependencies": [
-            ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.2"]
+            ["@emurgo/cardano-serialization-lib-nodejs", "npm:9.1.4"]
           ],
           "linkType": "HARD",
         }]

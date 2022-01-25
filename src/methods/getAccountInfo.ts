@@ -21,6 +21,7 @@ export const getAccountInfo = async (
   pageSize = 25,
 ): Promise<Responses.AccountInfo> => {
   let _addressesCount = 0;
+  let _byronAddressesCount = 0;
   const tStart = new Date().getTime();
   const pageSizeNumber = Number(pageSize);
   const pageIndex = Number(page) - 1;
@@ -38,6 +39,7 @@ export const getAccountInfo = async (
     2,
     0,
     !!blockfrostAPI.options.isTestnet,
+    false,
   );
   const [stakeAddressTotal, stakingData] = await Promise.all([
     getStakingAccountTotal(stakeAddress),
@@ -97,8 +99,17 @@ export const getAccountInfo = async (
       discoverAddresses(publicKey, 1, accountEmpty),
     ]);
 
+    const [externalAddressesByron, internalAddressesByron] = await Promise.all([
+      discoverAddresses(publicKey, 0, accountEmpty, true),
+      discoverAddresses(publicKey, 1, accountEmpty, true),
+    ]);
+
+    console.log('externalAddressesByron', externalAddressesByron);
+
     const addresses = [...externalAddresses, ...internalAddresses];
+    const byronAddresses = [...externalAddressesByron, ...internalAddressesByron];
     _addressesCount = addresses.length; // just a debug helper
+    _byronAddressesCount = byronAddresses.length; // just a debug helper
 
     const txids = await getTxidsFromAccountAddresses(addresses, accountEmpty);
     const paginatedTxsIds = paginate(txids, pageSizeNumber);
@@ -120,10 +131,24 @@ export const getAccountInfo = async (
         internalAddresses,
         accountEmpty,
       );
+
+      // fetch data for each byron address and set account.byronAddresses
+      const byronAccountAddresses = await getAccountAddressesData(
+        externalAddressesByron,
+        internalAddressesByron,
+        accountEmpty,
+      );
+
       accountInfo.addresses = {
         change: accountAddresses.change,
         used: accountAddresses.used,
         unused: accountAddresses.unused,
+      };
+
+      accountInfo.byronAddresses = {
+        change: byronAccountAddresses.change,
+        used: byronAccountAddresses.used,
+        unused: byronAccountAddresses.unused,
       };
     }
   }
@@ -133,7 +158,7 @@ export const getAccountInfo = async (
 
   if (duration > 7) {
     console.warn(
-      `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} Tokens: ${tokensBalances.length} `,
+      `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} ByronAddresses: ${_byronAddressesCount} Tokens: ${tokensBalances.length} `,
     );
   }
 
