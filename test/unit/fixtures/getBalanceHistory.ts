@@ -1427,6 +1427,76 @@ export const aggregateTransactions = [
         },
         txHash: 'a3c85d7410ddd4ad896934bcac9645e09aaabba83d94c2d5f4870a2c733caff8',
       },
+      {
+        address:
+          'addr_test1ppfjwtgvl6ku8kz426fu9pdhrh9sn58y40desm0zu55hfxqj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsm0su5k',
+        txData: {
+          hash: '9f985ec092505a9a0b742a8eb54a17ac13f4be877f620868c37a5e27d849cdde',
+          block: 'a965447692fbab51b25391b29742ecee92a15cc815b8fddd89c1e19bc2ff55cf',
+          block_height: 2821834,
+          block_time: 1928505459,
+          slot: 34232539,
+          index: 0,
+          output_amount: [
+            {
+              unit: 'lovelace',
+              quantity: '1794743318',
+              decimals: 6,
+            },
+          ],
+          fees: '183990',
+          deposit: '2000000',
+          size: 425,
+          invalid_before: null,
+          invalid_hereafter: '34236081',
+          utxo_count: 2,
+          withdrawal_count: 0,
+          mir_cert_count: 0,
+          delegation_count: 1,
+          stake_cert_count: 1,
+          pool_update_count: 0,
+          pool_retire_count: 0,
+          asset_mint_or_burn_count: 0,
+          redeemer_count: 0,
+          valid_contract: true,
+        },
+        txUtxos: {
+          hash: '9f985ec092505a9a0b742a8eb54a17ac13f4be877f620868c37a5e27d849cdde',
+          inputs: [
+            {
+              address:
+                'addr_test1ppfjwtgvl6ku8kz426fu9pdhrh9sn58y40desm0zu55hfxqj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsm0su5k',
+              amount: [
+                {
+                  unit: 'lovelace',
+                  quantity: '1796927308',
+                  decimals: 6,
+                },
+              ],
+              tx_hash: '13a4786ef8b4a5f2416227f53b77acec5e45572356e05cf349a48cf27ac8617f',
+              output_index: 1,
+              collateral: false,
+              data_hash: null,
+            },
+          ],
+          outputs: [
+            {
+              address:
+                'addr_test1ppfjwtgvl6ku8kz426fu9pdhrh9sn58y40desm0zu55hfxqj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsm0su5k',
+              amount: [
+                {
+                  unit: 'lovelace',
+                  quantity: '1794743318',
+                  decimals: 6,
+                },
+              ],
+              output_index: 0,
+              data_hash: null,
+            },
+          ],
+        },
+        txHash: '9f985ec092505a9a0b742a8eb54a17ac13f4be877f620868c37a5e27d849cdde',
+      },
     ],
     result: [
       {
@@ -1472,6 +1542,14 @@ export const aggregateTransactions = [
         sentToSelf: '59828691',
         time: 1842019059,
         txs: 1,
+      },
+      // deposit
+      {
+        time: 1928505459,
+        txs: 1,
+        sent: '1796927308',
+        received: '1794743318',
+        sentToSelf: '1794743318',
       },
     ],
   },
