@@ -1,4 +1,4 @@
-import { Balance, AddressData } from './address';
+import { Balance, AddressData, Address } from './address';
 import {
   TransformedTransaction,
   TransformedTransactionUtxo,
@@ -29,6 +29,10 @@ export interface AccountInfo {
     change: AddressData[];
     used: AddressData[];
     unused: AddressData[];
+  };
+  byronAddresses?: {
+    change: Pick<Address, 'address' | 'path'>[];
+    external: Pick<Address, 'address' | 'path'>[];
   };
   empty: boolean;
   availableBalance: string;

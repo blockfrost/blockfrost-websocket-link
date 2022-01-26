@@ -192,6 +192,7 @@ wss.on('connection', (ws: Server.Ws) => {
           data.params.details,
           data.params.page,
           data.params.pageSize,
+          data.params.deriveByronAddresses,
         );
 
         ws.send(message);

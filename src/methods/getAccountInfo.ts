@@ -19,8 +19,10 @@ export const getAccountInfo = async (
   details: Messages.Details,
   page = 1,
   pageSize = 25,
+  deriveByronAddresses?: boolean,
 ): Promise<Responses.AccountInfo> => {
   let _addressesCount = 0;
+  let _byronAddressesCount = 0;
   const tStart = new Date().getTime();
   const pageSizeNumber = Number(pageSize);
   const pageIndex = Number(page) - 1;
@@ -38,6 +40,7 @@ export const getAccountInfo = async (
     2,
     0,
     !!blockfrostAPI.options.isTestnet,
+    false,
   );
   const [stakeAddressTotal, stakingData] = await Promise.all([
     getStakingAccountTotal(stakeAddress),
@@ -98,6 +101,7 @@ export const getAccountInfo = async (
     ]);
 
     const addresses = [...externalAddresses, ...internalAddresses];
+
     _addressesCount = addresses.length; // just a debug helper
 
     const txids = await getTxidsFromAccountAddresses(addresses, accountEmpty);
@@ -120,11 +124,26 @@ export const getAccountInfo = async (
         internalAddresses,
         accountEmpty,
       );
+
       accountInfo.addresses = {
         change: accountAddresses.change,
         used: accountAddresses.used,
         unused: accountAddresses.unused,
       };
+
+      if (deriveByronAddresses) {
+        const [externalAddressesByron, internalAddressesByron] = await Promise.all([
+          discoverAddresses(publicKey, 0, accountEmpty, true),
+          discoverAddresses(publicKey, 1, accountEmpty, true),
+        ]);
+
+        _byronAddressesCount = externalAddressesByron.length + internalAddressesByron.length; // just a debug helper
+
+        accountInfo.byronAddresses = {
+          change: internalAddressesByron.map(a => ({ address: a.address, path: a.path })),
+          external: externalAddressesByron.map(a => ({ address: a.address, path: a.path })),
+        };
+      }
     }
   }
 
@@ -133,7 +152,7 @@ export const getAccountInfo = async (
 
   if (duration > 7) {
     console.warn(
-      `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} Tokens: ${tokensBalances.length} `,
+      `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} ByronAddresses: ${_byronAddressesCount} Tokens: ${tokensBalances.length} `,
     );
   }
 
@@ -146,9 +165,16 @@ export default async (
   details: Messages.Details,
   page = 1,
   pageSize = 25,
+  deriveByronAddresses = false,
 ): Promise<string> => {
   try {
-    const accountInfo = await getAccountInfo(publicKey, details, page, pageSize);
+    const accountInfo = await getAccountInfo(
+      publicKey,
+      details,
+      page,
+      pageSize,
+      deriveByronAddresses,
+    );
     const message = prepareMessage(id, accountInfo);
     return message;
   } catch (err) {
