@@ -19,6 +19,7 @@ export const getAccountInfo = async (
   details: Messages.Details,
   page = 1,
   pageSize = 25,
+  deriveByronAddresses?: boolean,
 ): Promise<Responses.AccountInfo> => {
   let _addressesCount = 0;
   let _byronAddressesCount = 0;
@@ -99,17 +100,9 @@ export const getAccountInfo = async (
       discoverAddresses(publicKey, 1, accountEmpty),
     ]);
 
-    const [externalAddressesByron, internalAddressesByron] = await Promise.all([
-      discoverAddresses(publicKey, 0, accountEmpty, true),
-      discoverAddresses(publicKey, 1, accountEmpty, true),
-    ]);
-
-    console.log('externalAddressesByron', externalAddressesByron);
-
     const addresses = [...externalAddresses, ...internalAddresses];
-    const byronAddresses = [...externalAddressesByron, ...internalAddressesByron];
+
     _addressesCount = addresses.length; // just a debug helper
-    _byronAddressesCount = byronAddresses.length; // just a debug helper
 
     const txids = await getTxidsFromAccountAddresses(addresses, accountEmpty);
     const paginatedTxsIds = paginate(txids, pageSizeNumber);
@@ -132,24 +125,25 @@ export const getAccountInfo = async (
         accountEmpty,
       );
 
-      // fetch data for each byron address and set account.byronAddresses
-      const byronAccountAddresses = await getAccountAddressesData(
-        externalAddressesByron,
-        internalAddressesByron,
-        accountEmpty,
-      );
-
       accountInfo.addresses = {
         change: accountAddresses.change,
         used: accountAddresses.used,
         unused: accountAddresses.unused,
       };
 
-      accountInfo.byronAddresses = {
-        change: byronAccountAddresses.change,
-        used: byronAccountAddresses.used,
-        unused: byronAccountAddresses.unused,
-      };
+      if (deriveByronAddresses) {
+        const [externalAddressesByron, internalAddressesByron] = await Promise.all([
+          discoverAddresses(publicKey, 0, accountEmpty, true),
+          discoverAddresses(publicKey, 1, accountEmpty, true),
+        ]);
+
+        _byronAddressesCount = externalAddressesByron.length + internalAddressesByron.length; // just a debug helper
+
+        accountInfo.byronAddresses = {
+          change: internalAddressesByron.map(a => ({ address: a.address, path: a.path })),
+          external: externalAddressesByron.map(a => ({ address: a.address, path: a.path })),
+        };
+      }
     }
   }
 
@@ -171,9 +165,16 @@ export default async (
   details: Messages.Details,
   page = 1,
   pageSize = 25,
+  deriveByronAddresses = false,
 ): Promise<string> => {
   try {
-    const accountInfo = await getAccountInfo(publicKey, details, page, pageSize);
+    const accountInfo = await getAccountInfo(
+      publicKey,
+      details,
+      page,
+      pageSize,
+      deriveByronAddresses,
+    );
     const message = prepareMessage(id, accountInfo);
     return message;
   } catch (err) {
