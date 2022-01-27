@@ -60,6 +60,7 @@ app.get('/', (_req, res) => {
 app.get('/status', (_req, res) => {
   res.send({
     status: 'ok',
+    commit: process.env.BUILD_COMMIT ?? 'BUILD_COMMIT not set',
     version: packageJson.version,
   });
 });
