@@ -1,9 +1,26 @@
 import { parseAsset, Responses } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
+import memoizee from 'memoizee';
+import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { Balance } from '../types/address';
 import { AssetBalance } from '../types/response';
 
-export const transformAsset = (token: Balance): AssetBalance => {
+export const getAssetFromRegistry = memoizee(
+  async (hex: string) => {
+    if (hex === 'lovelace') return undefined;
+    const res = await blockfrostAPI.assetsById(hex);
+    return res;
+  },
+  {
+    maxAge: 30 * 60 * 1000, // each asset is cached in-memory for 30 mins
+    primitive: true,
+  },
+);
+
+export const transformAsset = (
+  token: Balance,
+  tokenRegistryMetadata?: Responses['asset'],
+): AssetBalance => {
   if (token.unit === 'lovelace') {
     return { ...token, decimals: 6 };
   }
@@ -11,7 +28,7 @@ export const transformAsset = (token: Balance): AssetBalance => {
   return {
     ...token,
     fingerprint: parseAsset(token.unit).fingerprint,
-    decimals: 0,
+    decimals: tokenRegistryMetadata?.metadata?.decimals ?? 0,
   };
 };
 

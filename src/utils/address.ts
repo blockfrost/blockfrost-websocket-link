@@ -8,7 +8,7 @@ import {
 } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import memoizee from 'memoizee';
-import { transformAsset } from './asset';
+import { getAssetFromRegistry, transformAsset } from './asset';
 
 export const deriveAddress = (
   publicKey: string,
@@ -135,45 +135,42 @@ export const addressesToBalances = (
 export const addressesToUtxos = async (
   addresses: { address: string; path: string; data: Responses['address_content'] | 'empty' }[],
 ): Promise<{ address: string; path: string; data: Addresses.TransformedUtxo[] | 'empty' }[]> => {
-  const promisesBundle: {
-    address: string;
-    path: string;
-    promise: Promise<Responses['address_utxo_content']>;
-  }[] = [];
-
-  const result: {
-    address: string;
-    path: string;
-    data: Addresses.TransformedUtxo[] | 'empty';
-  }[] = [];
-
-  addresses.forEach(item => {
-    if (item.data === 'empty') return;
-
-    const promise = blockfrostAPI.addressesUtxosAll(item.address);
-    promisesBundle.push({ address: item.address, path: item.path, promise });
-  });
-
-  await Promise.all(
-    promisesBundle.map(p =>
-      p.promise
-        .then(data => {
-          result.push({
-            address: p.address,
-            data: data.map(utxo => ({
-              ...utxo,
-              amount: utxo.amount.map(asset => transformAsset(asset)),
-            })),
-            path: p.path,
-          });
-        })
-        .catch(error => {
-          throw error;
+  const promises = addresses.map(item =>
+    item.data === 'empty'
+      ? []
+      : blockfrostAPI.addressesUtxosAll(item.address).catch(err => {
+          if (err instanceof BlockfrostServerError && err.status_code === 404) {
+            return [];
+          } else {
+            throw err;
+          }
         }),
+  );
+
+  const allUtxos = await Promise.all(promises);
+
+  const assets = new Set<string>();
+  allUtxos.forEach(addressUtxos =>
+    addressUtxos.forEach(utxo =>
+      utxo.amount.forEach(a => (a.unit !== 'lovelace' ? assets.add(a.unit) : undefined)),
     ),
   );
 
-  return result;
+  const tokenMetadata = await Promise.all(Array.from(assets).map(a => getAssetFromRegistry(a)));
+
+  return addresses.map((addr, index) => ({
+    address: addr.address,
+    data: allUtxos[index].map(utxo => ({
+      ...utxo,
+      amount: utxo.amount.map(asset =>
+        transformAsset(
+          asset,
+          tokenMetadata.find(m => m?.asset),
+        ),
+      ),
+    })),
+    path: addr.path,
+  }));
 };
 
 export const isAccountEmpty = async (
@@ -231,7 +228,7 @@ export const utxosWithBlocks = async (
           result.push({
             address: p.address,
             path: p.path,
-            utxoData: transformUtxo(p.utxoData),
+            utxoData: p.utxoData,
             blockInfo: data,
           });
         })
@@ -374,11 +371,4 @@ export const getAffectedAddresses = async (
   }
   const addresses = await blockfrostAPI.blocksAddressesAll(blockHeight);
   return addresses;
-};
-
-export const transformUtxo = (utxo: Responses['address_utxo_content'][number]) => {
-  return {
-    ...utxo,
-    amount: utxo.amount.map(a => transformAsset(a)),
-  };
 };
