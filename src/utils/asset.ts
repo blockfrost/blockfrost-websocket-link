@@ -19,7 +19,7 @@ export const getAssetFromRegistry = memoizee(
 
 export const transformAsset = (
   token: Balance,
-  tokenRegistryMetadata?: Responses['asset'],
+  tokenRegistryMetadata: Responses['asset'] | undefined,
 ): AssetBalance => {
   if (token.unit === 'lovelace') {
     return { ...token, decimals: 6 };

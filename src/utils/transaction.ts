@@ -1,4 +1,6 @@
 import { Responses } from '@blockfrost/blockfrost-js';
+import pLimit from 'p-limit';
+import { PROMISE_CONCURRENCY } from '../constants/config';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
@@ -21,28 +23,21 @@ export const txIdsToTransactions = async (
   }[],
 ): Promise<Types.TxIdsToTransactionsResponse[]> => {
   if (txidsPerAddress.length === 0) return [];
-
+  const limit = pLimit(PROMISE_CONCURRENCY);
   const promisesBundle = txidsPerAddress
     .map(item =>
-      item.data.map(hash => {
-        return new Promise<Types.TxIdsToTransactionsResponse>((resolve, reject) => {
-          (async () => {
-            try {
-              const txData = await transformTransactionData(await blockfrostAPI.txs(hash));
-              const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(hash));
-
-              return resolve({
-                txData,
-                txUtxos,
-                address: item.address,
-                txHash: hash,
-              });
-            } catch (err) {
-              return reject(err);
-            }
-          })();
-        });
-      }),
+      item.data.map(hash =>
+        limit(async () => {
+          const txData = await transformTransactionData(await blockfrostAPI.txs(hash));
+          const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(hash));
+          return {
+            txData,
+            txUtxos,
+            address: item.address,
+            txHash: hash,
+          };
+        }),
+      ),
     )
     .flat();
 
@@ -64,45 +59,32 @@ export const txIdsToTransactions = async (
 export const getTransactionsWithUtxo = async (
   txids: string[],
 ): Promise<{ txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[]> => {
-  const result: { txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[] = [];
+  const limit = pLimit(PROMISE_CONCURRENCY);
 
-  const getPromiseBundle = (startIndex: number, batchSize: number) => {
-    const promises = [...Array.from({ length: batchSize }).keys()].map(i => {
-      const txid = txids[startIndex + i];
-      return txid
-        ? { txUtxoPromise: blockfrostAPI.txsUtxos(txid), txPromise: blockfrostAPI.txs(txid) }
-        : undefined;
-    });
-    return promises.filter(p => Boolean(p)) as unknown as {
-      txPromise: Responses['tx_content'];
-      txUtxoPromise: Responses['tx_content_utxo'];
-    }[];
-  };
+  const txsData = await Promise.all(
+    txids.map(txid =>
+      limit(() => blockfrostAPI.txs(txid).then(data => transformTransactionData(data))),
+    ),
+  );
+  const txsUtxo = await Promise.all(
+    txids.map(txid =>
+      limit(() => blockfrostAPI.txsUtxos(txid).then(data => transformTransactionUtxo(data))),
+    ),
+  );
 
-  const batch_size = 10;
-  for (let i = 0; i < txids.length; i += batch_size) {
-    const promiseSlice = getPromiseBundle(i, batch_size);
-
-    // eslint-disable-next-line no-await-in-loop
-    const txResults = await Promise.all(promiseSlice.map(p => p?.txPromise));
-    const txUtxoResults = await Promise.all(promiseSlice.map(p => p?.txUtxoPromise));
-
-    const partialResultsPromises = txResults.map(async (tx, i) => ({
-      txData: await transformTransactionData(tx),
-      txUtxos: await transformTransactionUtxo(txUtxoResults[i]),
-    }));
-    const partialResults = await Promise.all(partialResultsPromises);
-    result.push(...partialResults);
-  }
-
-  return result;
+  return txids.map((_txid, index) => ({
+    txData: txsData[index],
+    txUtxos: txsUtxo[index],
+  }));
 };
 
 export const transformTransactionData = async (
   tx: Responses['tx_content'],
 ): Promise<Types.TransformedTransaction> => {
+  const limit = pLimit(PROMISE_CONCURRENCY);
+
   const assetsMetadata = await Promise.all(
-    tx.output_amount.map(asset => getAssetFromRegistry(asset.unit)),
+    tx.output_amount.map(asset => limit(() => getAssetFromRegistry(asset.unit))),
   );
   return {
     ...tx,
@@ -113,6 +95,7 @@ export const transformTransactionData = async (
 export const transformTransactionUtxo = async (
   utxo: Responses['tx_content_utxo'],
 ): Promise<Types.TransformedTransactionUtxo> => {
+  const limit = pLimit(10);
   const assets = new Set<string>();
   utxo.inputs.forEach(input => input.amount.forEach(a => assets.add(a.unit)));
   utxo.outputs.forEach(output => output.amount.forEach(a => assets.add(a.unit)));
@@ -120,7 +103,7 @@ export const transformTransactionUtxo = async (
   const assetsMetadata = await Promise.all(
     Array.from(assets)
       .filter(asset => asset !== 'lovelace')
-      .map(asset => blockfrostAPI.assetsById(asset)),
+      .map(asset => limit(() => blockfrostAPI.assetsById(asset))),
   );
 
   return {
@@ -131,7 +114,12 @@ export const transformTransactionUtxo = async (
     })),
     outputs: utxo.outputs.map(o => ({
       ...o,
-      amount: o.amount.map(a => transformAsset(a, assetsMetadata.find(m => m.asset === a.unit)!)),
+      amount: o.amount.map(a =>
+        transformAsset(
+          a,
+          assetsMetadata.find(m => m.asset === a.unit),
+        ),
+      ),
     })),
   };
 };

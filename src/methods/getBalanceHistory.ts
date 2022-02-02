@@ -183,6 +183,7 @@ export default async (
     return message;
   }
 
+  const t1 = new Date().getTime();
   try {
     const data = await getAccountBalanceHistory(publicKey, groupBy, from, to, deriveByronAddresses);
     const message = prepareMessage(id, data);
@@ -191,5 +192,9 @@ export default async (
     console.error(err);
     const message = prepareErrorMessage(id, err);
     return message;
+  } finally {
+    const t2 = new Date().getTime();
+    const diff = t2 - t1;
+    console.log(`getBalanceHistory for public key ${publicKey} took ${diff} ms`);
   }
 };

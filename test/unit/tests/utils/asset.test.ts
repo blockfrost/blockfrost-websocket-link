@@ -4,7 +4,7 @@ import * as fixtures from '../../fixtures/asset';
 describe('asset utils', () => {
   fixtures.transformAsset.forEach(fixture => {
     test(fixture.description, () => {
-      expect(assetUtils.transformAsset(fixture.input)).toMatchObject(fixture.result);
+      expect(assetUtils.transformAsset(fixture.input, undefined)).toMatchObject(fixture.result);
     });
   });
 
