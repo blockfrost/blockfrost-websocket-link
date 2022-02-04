@@ -32,10 +32,16 @@ export const transformAsset = (
     return { ...token, decimals: 6 };
   }
 
+  let decimals = 0;
+  const metadataDecimals = tokenRegistryMetadata?.metadata?.decimals;
+  if (metadataDecimals && typeof metadataDecimals === 'number') {
+    decimals = metadataDecimals;
+  }
+
   return {
     ...token,
     fingerprint: parseAsset(token.unit).fingerprint,
-    decimals: tokenRegistryMetadata?.metadata?.decimals ?? 0,
+    decimals,
   };
 };
 
