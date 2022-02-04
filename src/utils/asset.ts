@@ -1,15 +1,22 @@
-import { parseAsset, Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostServerError, parseAsset, Responses } from '@blockfrost/blockfrost-js';
 import BigNumber from 'bignumber.js';
 import memoizee from 'memoizee';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { Balance } from '../types/address';
 import { AssetBalance } from '../types/response';
 
-export const getAssetFromRegistry = memoizee(
+export const getAssetData = memoizee(
   async (hex: string) => {
     if (hex === 'lovelace') return undefined;
-    const res = await blockfrostAPI.assetsById(hex);
-    return res;
+    try {
+      const res = await blockfrostAPI.assetsById(hex);
+      return res;
+    } catch (error) {
+      if (error instanceof BlockfrostServerError && error.status_code === 404) {
+        console.warn(`Fetching asset ${hex} failed. Asset not found.`);
+      }
+      throw error;
+    }
   },
   {
     maxAge: 30 * 60 * 1000, // each asset is cached in-memory for 30 mins

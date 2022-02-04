@@ -4,7 +4,7 @@ import { PROMISE_CONCURRENCY } from '../constants/config';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
-import { getAssetFromRegistry, transformAsset } from './asset';
+import { getAssetData, transformAsset } from './asset';
 
 export const sortTransactionsCmp = <
   T extends {
@@ -27,7 +27,7 @@ export const txIdsToTransactions = async (
   const promisesBundle = txidsPerAddress
     .map(item =>
       item.data.map(hash =>
-        limit(async () => {
+        limit(async hash => {
           const txData = await transformTransactionData(await blockfrostAPI.txs(hash));
           const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(hash));
           return {
@@ -36,7 +36,7 @@ export const txIdsToTransactions = async (
             address: item.address,
             txHash: hash,
           };
-        }),
+        }, hash),
       ),
     )
     .flat();
@@ -63,12 +63,15 @@ export const getTransactionsWithUtxo = async (
 
   const txsData = await Promise.all(
     txids.map(txid =>
-      limit(() => blockfrostAPI.txs(txid).then(data => transformTransactionData(data))),
+      limit(txid => blockfrostAPI.txs(txid).then(data => transformTransactionData(data)), txid),
     ),
   );
   const txsUtxo = await Promise.all(
     txids.map(txid =>
-      limit(() => blockfrostAPI.txsUtxos(txid).then(data => transformTransactionUtxo(data))),
+      limit(
+        txid => blockfrostAPI.txsUtxos(txid).then(data => transformTransactionUtxo(data)),
+        txid,
+      ),
     ),
   );
 
@@ -84,7 +87,7 @@ export const transformTransactionData = async (
   const limit = pLimit(PROMISE_CONCURRENCY);
 
   const assetsMetadata = await Promise.all(
-    tx.output_amount.map(asset => limit(() => getAssetFromRegistry(asset.unit))),
+    tx.output_amount.map(asset => limit(unit => getAssetData(unit), asset.unit)),
   );
   return {
     ...tx,
@@ -103,21 +106,26 @@ export const transformTransactionUtxo = async (
   const assetsMetadata = await Promise.all(
     Array.from(assets)
       .filter(asset => asset !== 'lovelace')
-      .map(asset => limit(() => blockfrostAPI.assetsById(asset))),
+      .map(asset => limit(asset => getAssetData(asset), asset)),
   );
 
   return {
     ...utxo,
     inputs: utxo.inputs.map(i => ({
       ...i,
-      amount: i.amount.map(a => transformAsset(a, assetsMetadata.find(m => m.asset === a.unit)!)),
+      amount: i.amount.map(a =>
+        transformAsset(
+          a,
+          assetsMetadata.find(m => m?.asset === a.unit),
+        ),
+      ),
     })),
     outputs: utxo.outputs.map(o => ({
       ...o,
       amount: o.amount.map(a =>
         transformAsset(
           a,
-          assetsMetadata.find(m => m.asset === a.unit),
+          assetsMetadata.find(m => m?.asset === a.unit),
         ),
       ),
     })),

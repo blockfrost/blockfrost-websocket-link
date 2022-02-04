@@ -11,7 +11,7 @@ import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
-import { getAssetBalance, getAssetFromRegistry, transformAsset } from '../utils/asset';
+import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export const getAccountInfo = async (
@@ -66,7 +66,7 @@ export const getAccountInfo = async (
     })
     .filter(b => b.quantity !== '0' && b.unit !== 'lovelace');
 
-  const tokenMetadataPromises = tokensBalances.map(token => getAssetFromRegistry(token.unit));
+  const tokenMetadataPromises = tokensBalances.map(token => getAssetData(token.unit));
   const tokenMetadata = await Promise.all(tokenMetadataPromises);
 
   const totalPages = Math.ceil(txCount / pageSize);
