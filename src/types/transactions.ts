@@ -1,22 +1,9 @@
-import { Responses } from '@blockfrost/blockfrost-js';
 import { AssetBalance } from './response';
-
-export interface Data {
-  txUtxos: Responses['tx_content_utxo'];
-  txData: Responses['tx_content'];
-}
-
 export interface TxIdsToTransactionsResponse {
   txUtxos: TransformedTransactionUtxo;
   txData: TransformedTransaction;
   address: string;
   txHash: string;
-}
-
-export interface TxIdsToTransactionsPromises {
-  address: string;
-  txHash: string;
-  promise: Promise<Data>;
 }
 
 export interface TransformedTransactionUtxo {

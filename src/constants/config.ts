@@ -17,3 +17,6 @@ export const FIAT_RATES_REQUESTS_TIMEOUT = 1000;
 
 // Whether to return fiat rates in getBalanceHistory on cardano testnet network
 export const FIAT_RATES_ENABLE_ON_TESTNET = false;
+
+// Limits concurrency of Promise.all(); per client per call (one client can still use more http requests by sending multiple ws messages)
+export const PROMISE_CONCURRENCY = 50;

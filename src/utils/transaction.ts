@@ -1,8 +1,10 @@
 import { Responses } from '@blockfrost/blockfrost-js';
+import pLimit from 'p-limit';
+import { PROMISE_CONCURRENCY } from '../constants/config';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
-import { transformAsset } from './asset';
+import { getAssetData, transformAsset } from './asset';
 
 export const sortTransactionsCmp = <
   T extends {
@@ -20,57 +22,34 @@ export const txIdsToTransactions = async (
     data: string[];
   }[],
 ): Promise<Types.TxIdsToTransactionsResponse[]> => {
-  const promisesBundle: Types.TxIdsToTransactionsPromises[] = [];
-  const result: Types.TxIdsToTransactionsResponse[] = [];
-
   if (txidsPerAddress.length === 0) return [];
+  const limit = pLimit(PROMISE_CONCURRENCY);
+  const promisesBundle = txidsPerAddress
+    .map(item =>
+      item.data.map(hash =>
+        limit(async hash => {
+          const txData = await transformTransactionData(await blockfrostAPI.txs(hash));
+          const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(hash));
+          return {
+            txData,
+            txUtxos,
+            address: item.address,
+            txHash: hash,
+          };
+        }, hash),
+      ),
+    )
+    .flat();
 
-  txidsPerAddress.forEach(item => {
-    item.data.forEach(hash => {
-      const promise = new Promise<Types.Data>((resolve, reject) => {
-        (async () => {
-          try {
-            const tx = await blockfrostAPI.txs(hash);
-            const txUtxos = await blockfrostAPI.txsUtxos(hash);
+  const result = await Promise.all(promisesBundle);
+  // TODO: rollbacked tx could return 404
+  // .catch(err => {
+  //   if (err instanceof BlockfrostServerError && err.status_code === 404) {
+  //     return;
+  //   }
 
-            return resolve({
-              txData: tx,
-              txUtxos,
-            });
-          } catch (err) {
-            return reject(err);
-          }
-        })();
-      });
-
-      promisesBundle.push({
-        address: item.address,
-        promise,
-        txHash: hash,
-      });
-    });
-  });
-
-  await Promise.all(
-    promisesBundle.map(p =>
-      p.promise
-        .then(data => {
-          result.push({
-            address: p.address,
-            txData: transformTransaction(data.txData),
-            txUtxos: transformTransactionUtxo(data.txUtxos),
-            txHash: p.txHash,
-          });
-        })
-        .catch(err => {
-          if (err.status === 404) {
-            return;
-          }
-
-          throw Error(err);
-        }),
-    ),
-  );
+  //   throw Error(err);
+  // }),
 
   const sortedTxs = result.sort((a, b) => sortTransactionsCmp(a.txData, b.txData));
 
@@ -80,58 +59,75 @@ export const txIdsToTransactions = async (
 export const getTransactionsWithUtxo = async (
   txids: string[],
 ): Promise<{ txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[]> => {
-  const result: { txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[] = [];
+  const limit = pLimit(PROMISE_CONCURRENCY);
 
-  const getPromiseBundle = (startIndex: number, batchSize: number) => {
-    const promises = [...Array.from({ length: batchSize }).keys()].map(i => {
-      const txid = txids[startIndex + i];
-      return txid
-        ? { txUtxoPromise: blockfrostAPI.txsUtxos(txid), txPromise: blockfrostAPI.txs(txid) }
-        : undefined;
-    });
-    return promises.filter(p => Boolean(p)) as unknown as {
-      txPromise: Responses['tx_content'];
-      txUtxoPromise: Responses['tx_content_utxo'];
-    }[];
-  };
+  const txsData = await Promise.all(
+    txids.map(txid =>
+      limit(txid => blockfrostAPI.txs(txid).then(data => transformTransactionData(data)), txid),
+    ),
+  );
+  const txsUtxo = await Promise.all(
+    txids.map(txid =>
+      limit(
+        txid => blockfrostAPI.txsUtxos(txid).then(data => transformTransactionUtxo(data)),
+        txid,
+      ),
+    ),
+  );
 
-  const batch_size = 10;
-  for (let i = 0; i < txids.length; i += batch_size) {
-    const promiseSlice = getPromiseBundle(i, batch_size);
-
-    // eslint-disable-next-line no-await-in-loop
-    const txResults = await Promise.all(promiseSlice.map(p => p?.txPromise));
-    const txUtxoResults = await Promise.all(promiseSlice.map(p => p?.txUtxoPromise));
-
-    const partialResults = txResults.map((tx, i) => ({
-      txData: transformTransaction(tx),
-      txUtxos: transformTransactionUtxo(txUtxoResults[i]),
-    }));
-    result.push(...partialResults);
-  }
-
-  return result;
+  return txids.map((_txid, index) => ({
+    txData: txsData[index],
+    txUtxos: txsUtxo[index],
+  }));
 };
 
-export const transformTransaction = (tx: Responses['tx_content']): TransformedTransaction => {
+export const transformTransactionData = async (
+  tx: Responses['tx_content'],
+): Promise<Types.TransformedTransaction> => {
+  const limit = pLimit(PROMISE_CONCURRENCY);
+
+  const assetsMetadata = await Promise.all(
+    tx.output_amount.map(asset => limit(unit => getAssetData(unit), asset.unit)),
+  );
   return {
     ...tx,
-    output_amount: tx.output_amount.map(a => transformAsset(a)),
+    output_amount: tx.output_amount.map((a, index) => transformAsset(a, assetsMetadata[index])),
   };
 };
 
-export const transformTransactionUtxo = (
+export const transformTransactionUtxo = async (
   utxo: Responses['tx_content_utxo'],
-): TransformedTransactionUtxo => {
+): Promise<Types.TransformedTransactionUtxo> => {
+  const limit = pLimit(10);
+  const assets = new Set<string>();
+  utxo.inputs.forEach(input => input.amount.forEach(a => assets.add(a.unit)));
+  utxo.outputs.forEach(output => output.amount.forEach(a => assets.add(a.unit)));
+
+  const assetsMetadata = await Promise.all(
+    Array.from(assets)
+      .filter(asset => asset !== 'lovelace')
+      .map(asset => limit(asset => getAssetData(asset), asset)),
+  );
+
   return {
     ...utxo,
     inputs: utxo.inputs.map(i => ({
       ...i,
-      amount: i.amount.map(a => transformAsset(a)),
+      amount: i.amount.map(a =>
+        transformAsset(
+          a,
+          assetsMetadata.find(m => m?.asset === a.unit),
+        ),
+      ),
     })),
     outputs: utxo.outputs.map(o => ({
       ...o,
-      amount: o.amount.map(a => transformAsset(a)),
+      amount: o.amount.map(a =>
+        transformAsset(
+          a,
+          assetsMetadata.find(m => m?.asset === a.unit),
+        ),
+      ),
     })),
   };
 };

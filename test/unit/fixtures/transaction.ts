@@ -1,6 +1,6 @@
-export const transformTransaction = [
+export const transformTransactionData = [
   {
-    description: 'transformTransaction',
+    description: 'transformTransactionData',
     tx: {
       hash: '115293f3a35ca4f4fc01fb0e083f85dde7e77435d53dc15f0a38fa591858bb99',
       block: '31df233d137e13dfc1b5d3722e44f366109830aa2e0b06c36c037ae4d8ab2d54',
@@ -14,7 +14,7 @@ export const transformTransaction = [
           quantity: '9277036205016',
         },
         {
-          unit: '00000002df633853f6a47465c9496721d2d5b1291b8398016c0e87ae6e7574636f696e',
+          unit: '805fe1efcdea11f1e959eff4f422f118aa76dca2d0d797d184e487da706f6f6c6c70',
           quantity: '2',
         },
       ],
@@ -48,10 +48,10 @@ export const transformTransaction = [
           decimals: 6,
         },
         {
-          unit: '00000002df633853f6a47465c9496721d2d5b1291b8398016c0e87ae6e7574636f696e',
+          unit: '805fe1efcdea11f1e959eff4f422f118aa76dca2d0d797d184e487da706f6f6c6c70',
           quantity: '2',
-          fingerprint: 'asset12h3p5l3nd5y26lr22am7y7ga3vxghkhf57zkhd',
-          decimals: 0,
+          fingerprint: 'asset1xr68e08krns3536nnrts3mkrmy0mc843207423',
+          decimals: 10,
         },
       ],
       fees: '169021',
@@ -87,7 +87,7 @@ export const transformTransactionUtxo = [
               quantity: '2000000',
             },
             {
-              unit: '57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54',
+              unit: 'ba67df0243550334c2c6bad5601fd541a852c488d05492dc3902c39143554259',
               quantity: '17179831767',
             },
           ],
@@ -105,7 +105,7 @@ export const transformTransactionUtxo = [
               quantity: '2000000',
             },
             {
-              unit: '4fc16c94d066e949e771c5581235f8090ad6aaffaf373a426445ca5173636f6f7020970a',
+              unit: '5c2433514783ee382f28d03665fb612bea4964f5cf8a1e653284d3534e61697261',
               quantity: '1',
             },
           ],
@@ -124,11 +124,11 @@ export const transformTransactionUtxo = [
               quantity: '2000000',
             },
             {
-              unit: '57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54',
+              unit: 'ba67df0243550334c2c6bad5601fd541a852c488d05492dc3902c39143554259',
               quantity: '19559831766',
             },
             {
-              unit: '57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259',
+              unit: '805fe1efcdea11f1e959eff4f422f118aa76dca2d0d797d184e487da706f6f6c6c70',
               quantity: '6756387014',
             },
             {
@@ -153,9 +153,9 @@ export const transformTransactionUtxo = [
               decimals: 6,
             },
             {
-              unit: '57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54',
+              unit: 'ba67df0243550334c2c6bad5601fd541a852c488d05492dc3902c39143554259',
               quantity: '17179831767',
-              fingerprint: 'asset15gvggz5s3ptfadt3x6d8p7n5x3petfhrqeps6n',
+              fingerprint: 'asset1wvfdjgcz0zap92uczuvdfqxs403kth8gxv90g8',
               decimals: 0,
             },
           ],
@@ -174,11 +174,11 @@ export const transformTransactionUtxo = [
               decimals: 6,
             },
             {
-              unit: '4fc16c94d066e949e771c5581235f8090ad6aaffaf373a426445ca5173636f6f7020970a',
+              unit: '5c2433514783ee382f28d03665fb612bea4964f5cf8a1e653284d3534e61697261',
               quantity: '1',
-              fingerprint: 'asset15dyeej5tee286vcwxmhax920s0djr6gn3qt3ny',
+              fingerprint: 'asset17hm68cv0achk4wwmsvcenudnf4j2urqrceh0ta',
 
-              decimals: 0,
+              decimals: 10,
             },
           ],
           tx_hash: 'c14446fc2966e1ed3239a184beafbca7708950784d0ec0c8b3af7e17b8881054',
@@ -197,15 +197,15 @@ export const transformTransactionUtxo = [
               decimals: 6,
             },
             {
-              unit: '57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54',
+              unit: 'ba67df0243550334c2c6bad5601fd541a852c488d05492dc3902c39143554259',
               quantity: '19559831766',
-              fingerprint: 'asset15gvggz5s3ptfadt3x6d8p7n5x3petfhrqeps6n',
+              fingerprint: 'asset1wvfdjgcz0zap92uczuvdfqxs403kth8gxv90g8',
               decimals: 0,
             },
             {
-              unit: '57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522524245525259',
+              unit: '805fe1efcdea11f1e959eff4f422f118aa76dca2d0d797d184e487da706f6f6c6c70',
               quantity: '6756387014',
-              fingerprint: 'asset19mgmrp86u726wwewrrzx62uf5uje26cyw43mm5',
+              fingerprint: 'asset1xr68e08krns3536nnrts3mkrmy0mc843207423',
               decimals: 0,
             },
             {

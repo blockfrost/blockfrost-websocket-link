@@ -11,7 +11,7 @@ import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/
 import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
-import { getAssetBalance, transformAsset } from '../utils/asset';
+import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 
 export const getAccountInfo = async (
@@ -64,7 +64,10 @@ export const getAccountInfo = async (
         quantity: new BigNumber(received).minus(sent).toFixed(),
       };
     })
-    .filter(b => b.quantity !== '0');
+    .filter(b => b.quantity !== '0' && b.unit !== 'lovelace');
+
+  const tokenMetadataPromises = tokensBalances.map(token => getAssetData(token.unit));
+  const tokenMetadata = await Promise.all(tokenMetadataPromises);
 
   const totalPages = Math.ceil(txCount / pageSize);
   const accountEmpty = txCount === 0; // true if account is unused
@@ -74,7 +77,7 @@ export const getAccountInfo = async (
     empty: accountEmpty,
     balance: balanceWithRewards.toFixed(),
     availableBalance: lovelaceBalance.toFixed(),
-    tokens: tokensBalances.map(t => transformAsset(t)),
+    tokens: tokensBalances.map((t, index) => transformAsset(t, tokenMetadata[index])),
     history: {
       total: txCount,
       unconfirmed: 0,
