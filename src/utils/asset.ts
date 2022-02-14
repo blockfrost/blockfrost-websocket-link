@@ -21,6 +21,7 @@ export const getAssetData = memoizee(
   {
     maxAge: 30 * 60 * 1000, // each asset is cached in-memory for 30 mins
     primitive: true,
+    promise: true,
   },
 );
 
