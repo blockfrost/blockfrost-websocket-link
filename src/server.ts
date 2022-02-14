@@ -25,14 +25,16 @@ import { getAffectedAddresses } from './utils/address';
 
 const app = express();
 
-Sentry.init({
-  dsn: 'https://19ef87c9068a4a78b7a53e4c57b6677f@o508102.ingest.sentry.io/5889476',
-  integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    new Tracing.Integrations.Express({ app }),
-  ],
-  tracesSampleRate: 0.5,
-});
+if (String(process.env.IS_PRODUCTION) === 'true') {
+  Sentry.init({
+    dsn: process.env.BLOCKFROST_SENTRY_DSN,
+    integrations: [
+      new Sentry.Integrations.Http({ tracing: true }),
+      new Tracing.Integrations.Express({ app }),
+    ],
+    tracesSampleRate: 0.5,
+  });
+}
 
 const port = process.env.PORT || 3005;
 const server = http.createServer(app);
