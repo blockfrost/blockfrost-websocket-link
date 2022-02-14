@@ -25,7 +25,7 @@ import { getAffectedAddresses } from './utils/address';
 
 const app = express();
 
-if (String(process.env.IS_PRODUCTION) === 'true') {
+if (process.env.BLOCKFROST_SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.BLOCKFROST_SENTRY_DSN,
     integrations: [
