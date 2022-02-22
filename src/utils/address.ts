@@ -22,7 +22,7 @@ export const deriveAddress = (
 
   return {
     address: address,
-    path: `m/${purpose}'/1815'/i'/${type}/${addressIndex}`,
+    path: `m/${purpose}'/${isTestnet ? '1' : '1815'}'/i'/${type}/${addressIndex}`,
   };
 };
 
