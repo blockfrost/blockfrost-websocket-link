@@ -18,5 +18,8 @@
   "eslint.nodePath": ".yarn/sdks",
   "prettier.prettierPath": ".yarn/sdks/prettier/index.js",
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-action.json": "file:///Users/vladimirvolek/blockfrost/blockfrost-websocket-link/.github/workflows/build.yml"
+  }
 }
