@@ -28,6 +28,7 @@ const app = express();
 if (process.env.BLOCKFROST_SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.BLOCKFROST_SENTRY_DSN,
+    release: `websocket-link@${packageJson.version}`,
     integrations: [
       new Sentry.Integrations.Http({ tracing: true }),
       new Tracing.Integrations.Express({ app }),
