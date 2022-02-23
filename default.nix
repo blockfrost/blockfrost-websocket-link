@@ -9,11 +9,11 @@
 rec {
   blockfrost-websocket-link =
   let
-    src = pkgs.lib.cleanSource ./.;
-
     project = pkgs.callPackage ./yarn-project.nix {
       nodejs = pkgs.nodejs-16_x;
-    } src;
+    }{
+      src = pkgs.lib.cleanSource ./.;
+    };
   in project.overrideAttrs (oldAttrs: rec {
 
     name = "blockfrost-websocket-link";
