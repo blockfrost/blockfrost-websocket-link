@@ -34,7 +34,7 @@ export const deriveAddress = [
     result: {
       address:
         'addr_test1qzq0nckg3ekgzuqg7w5p9mvgnd9ym28qh5grlph8xd2z92sj922xhxkn6twlq2wn4q50q352annk3903tj00h45mgfmsu8d9w5',
-      path: `m/1852'/1'/i'/0/0`,
+      path: `m/1852'/1815'/i'/0/0`,
     },
   },
   {
@@ -46,7 +46,7 @@ export const deriveAddress = [
     isTestnet: true,
     result: {
       address: 'stake_test1uqfz49rtntfa9h0s98f6s28sg69weemgjhc4e8hm66d5yac643znq',
-      path: `m/1852'/1'/i'/2/0`,
+      path: `m/1852'/1815'/i'/2/0`,
     },
   },
 ];
