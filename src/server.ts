@@ -100,7 +100,7 @@ startEmitter();
 // this event is triggered with every new block see events.ts
 events.on('newBlock', async (latestBlock: Responses['block_content']) => {
   logger.info(
-    `Retrieving affectted addressed for newBlock ${latestBlock.hash} ${latestBlock.height}`,
+    `Retrieving affected addressed for newBlock ${latestBlock.hash} ${latestBlock.height}`,
   );
   const affectedAddresses = await getAffectedAddresses(latestBlock.height);
   logger.debug(`Running newBlock callback for ${clients.length} clients`);
@@ -110,7 +110,7 @@ events.on('newBlock', async (latestBlock: Responses['block_content']) => {
 wss.on('connection', (ws: Server.Ws) => {
   // generate unique client ID and set callbacks
   const clientId = uuidv4();
-  logger.debug(`Client ${clientId} connected`);
+  logger.info(`Client ${clientId} connected`);
   addressesSubscribed[clientId] = [];
   activeSubscriptions[clientId] = [];
   clients.push({
