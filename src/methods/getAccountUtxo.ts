@@ -1,5 +1,6 @@
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { discoverAddresses, addressesToUtxos, utxosWithBlocks } from '../utils/address';
+import { logger } from '../utils/logger';
 
 export default async (id: number, publicKey: string): Promise<string> => {
   if (!publicKey) {
@@ -19,7 +20,7 @@ export default async (id: number, publicKey: string): Promise<string> => {
     const message = prepareMessage(id, utxosBlocks);
     return message;
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     const message = prepareErrorMessage(id, err);
     return message;
   }

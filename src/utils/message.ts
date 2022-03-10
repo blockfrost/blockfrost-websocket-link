@@ -4,6 +4,7 @@ import { Messages } from '../types/message';
 import * as TxTypes from '../types/transactions';
 import { UtxosWithBlockResponse } from '../types/address';
 import { AccountInfo, BalanceHistoryData, ServerInfo } from '../types/response';
+import { logger } from './logger';
 
 export const getMessage = (message: string): Messages | null => {
   try {
@@ -52,5 +53,7 @@ export const prepareMessage = (
     | { subscribed: boolean }
     | { lovelacePerByte: number },
 ): string => {
-  return JSON.stringify({ id, type: 'message', data });
+  const msg = JSON.stringify({ id, type: 'message', data });
+  logger.debug(`Prepared response for id ${id} with length ${msg.length}`);
+  return msg;
 };

@@ -1,10 +1,11 @@
-import { Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import pLimit from 'p-limit';
 import { PROMISE_CONCURRENCY } from '../constants/config';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { getAssetData, transformAsset } from './asset';
+import { logger } from './logger';
 
 export const sortTransactionsCmp = <
   T extends {
@@ -23,33 +24,38 @@ export const txIdsToTransactions = async (
   }[],
 ): Promise<Types.TxIdsToTransactionsResponse[]> => {
   if (txidsPerAddress.length === 0) return [];
+
   const limit = pLimit(PROMISE_CONCURRENCY);
   const promisesBundle = txidsPerAddress
     .map(item =>
       item.data.map(hash =>
         limit(async hash => {
-          const txData = await transformTransactionData(await blockfrostAPI.txs(hash));
-          const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(hash));
-          return {
-            txData,
-            txUtxos,
-            address: item.address,
-            txHash: hash,
-          };
+          try {
+            const txData = await transformTransactionData(await blockfrostAPI.txs(hash));
+            const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(hash));
+            return {
+              txData,
+              txUtxos,
+              address: item.address,
+              txHash: hash,
+            };
+          } catch (error) {
+            // WARNING: this will omit txs that returned 404, caller should be well aware of this fact
+            if (error instanceof BlockfrostServerError && error.status_code === 404) {
+              logger.error(`Fetching tx ${hash} failed with status code ${error.status_code}`);
+              return;
+            } else {
+              throw error;
+            }
+          }
         }, hash),
       ),
     )
     .flat();
 
-  const result = await Promise.all(promisesBundle);
-  // TODO: rollbacked tx could return 404
-  // .catch(err => {
-  //   if (err instanceof BlockfrostServerError && err.status_code === 404) {
-  //     return;
-  //   }
-
-  //   throw Error(err);
-  // }),
+  const result = (await Promise.all(
+    promisesBundle.filter(p => p !== undefined),
+  )) as Types.TxIdsToTransactionsResponse[];
 
   const sortedTxs = result.sort((a, b) => sortTransactionsCmp(a.txData, b.txData));
 

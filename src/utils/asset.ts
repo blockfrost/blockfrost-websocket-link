@@ -4,6 +4,7 @@ import memoizee from 'memoizee';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { Balance } from '../types/address';
 import { AssetBalance } from '../types/response';
+import { logger } from './logger';
 
 export const getAssetData = memoizee(
   async (hex: string) => {
@@ -13,7 +14,7 @@ export const getAssetData = memoizee(
       return res;
     } catch (error) {
       if (error instanceof BlockfrostServerError && error.status_code === 404) {
-        console.warn(`Fetching asset ${hex} failed. Asset not found.`);
+        logger.warn(`Fetching asset ${hex} failed. Asset not found.`);
       }
       throw error;
     }

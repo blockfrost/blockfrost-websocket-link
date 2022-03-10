@@ -7,6 +7,7 @@ import {
 } from '../constants/config';
 import { RateLimiterMemory, RateLimiterQueue } from 'rate-limiter-flexible';
 import { blockfrostAPI } from './blockfrostAPI';
+import { logger } from './logger';
 
 // limit max number of requests per sec to prevent too many opened connections
 const ratesLimiter = new RateLimiterMemory({
@@ -82,7 +83,7 @@ export const getRatesForDate = async (date: number): Promise<Record<string, numb
   const t2 = new Date().getTime();
   const diff = t2 - t1;
   if (diff > 1000) {
-    console.warn(`Fiat rates limiter slowed down request for ${diff} ms!`);
+    logger.warn(`Fiat rates limiter slowed down request for ${diff} ms!`);
   }
 
   return getRatesForDateNoLimit(date);

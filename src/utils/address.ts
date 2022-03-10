@@ -9,6 +9,7 @@ import {
 } from '@blockfrost/blockfrost-js';
 import memoizee from 'memoizee';
 import { getAssetData, transformAsset } from './asset';
+import { logger } from './logger';
 
 export const deriveAddress = (
   publicKey: string,
@@ -198,10 +199,22 @@ export const addressesToTxIds = async (
       address =>
         // 1 page (100 txs) per address at a time should be more efficient default value
         // compared to fetching 10 pages (1000 txs) per address
-        blockfrostAPI.addressesTransactionsAll(address, { batchSize: 1 }).then(data => ({
-          address: address,
-          data,
-        })),
+        blockfrostAPI
+          .addressesTransactionsAll(address, { batchSize: 1 })
+          .then(data => ({
+            address: address,
+            data,
+          }))
+          .catch(error => {
+            if (error instanceof BlockfrostServerError && error.status_code === 404) {
+              return {
+                address: address,
+                data: [],
+              };
+            } else {
+              throw error;
+            }
+          }),
       item.address,
     );
     promisesBundle.push(promise);
@@ -310,11 +323,11 @@ export const getAffectedAddresses = async (
     throw new Error('Cannot fetch block transactions. Invalid block height.');
   }
   try {
-    const addresses = await blockfrostAPI.blocksAddressesAll(blockHeight);
+    const addresses = await blockfrostAPI.blocksAddressesAll(blockHeight, { batchSize: 2 });
     return addresses;
   } catch (error) {
     if (error instanceof BlockfrostServerError && error.status_code === 404) {
-      console.warn(`Failed to fetch addresses for a block ${blockHeight}. Block not found.`);
+      logger.warn(`Failed to fetch addresses for a block ${blockHeight}. Block not found.`);
     }
     throw error;
   }

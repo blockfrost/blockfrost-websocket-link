@@ -1,5 +1,6 @@
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { logger } from '../utils/logger';
 
 export default async (id: number): Promise<string> => {
   try {
@@ -13,7 +14,7 @@ export default async (id: number): Promise<string> => {
     const message = prepareMessage(id, result);
     return message;
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     const message = prepareErrorMessage(id, err);
     return message;
   }

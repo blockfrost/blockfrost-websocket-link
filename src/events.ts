@@ -7,6 +7,7 @@ import { promiseTimeout } from './utils/common';
 import { getTransactionsWithUtxo } from './utils/transaction';
 import { TxNotification } from './types/response';
 import { EMIT_MAX_MISSED_BLOCKS } from './constants/config';
+import { logger } from './utils/logger';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;
@@ -26,59 +27,65 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
     const latestBlock = await blockfrostAPI.blocksLatest();
     if ((latestBlock.height ?? 0) < (previousBlock?.height ?? 0)) {
       // rollback
-      console.warn(
+      logger.warn(
         `Rollback detected. Previous block height: ${previousBlock?.height}, current block height: ${latestBlock.height}`,
       );
       previousBlock = null;
     }
 
-    if (!previousBlock || previousBlock.hash !== latestBlock.hash) {
-      if (previousBlock && latestBlock.height && previousBlock.height) {
+    const currentPreviousBlock = previousBlock;
+    // update previousBlock ASAP (before fetching missing blocks)) so next run won't have stale data
+    previousBlock = latestBlock;
+
+    if (!currentPreviousBlock || currentPreviousBlock.hash !== latestBlock.hash) {
+      if (currentPreviousBlock && latestBlock.height && currentPreviousBlock.height) {
         // check if we missed more blocks since the last emit
-        const missedBlocks = latestBlock.height - previousBlock.height;
+
+        const missedBlocks = latestBlock.height - currentPreviousBlock.height;
         if (missedBlocks > (options?.maxMissedBlocks ?? EMIT_MAX_MISSED_BLOCKS)) {
           // too many missed blocks, skip emitting
-          console.warn(
+          logger.warn(
             `newBlock emitter: Emitting skipped. Too many missed blocks: ${
-              previousBlock.height + 1
+              currentPreviousBlock.height + 1
             }-${latestBlock.height - 1}`,
           );
         } else {
-          for (let i = previousBlock.height + 1; i < latestBlock.height; i++) {
+          for (let i = currentPreviousBlock.height + 1; i < latestBlock.height; i++) {
             // emit previously missed blocks
             try {
               const missedBlock = await promiseTimeout(
                 blockfrostAPI.blocks(i),
                 options?.fetchTimeoutMs ?? 2000,
               );
-              console.warn(
+              logger.warn(
                 `newBlock emitter: Emitting missed block: ${i} (current block: ${latestBlock.height})`,
               );
               events.emit('newBlock', missedBlock);
             } catch (err) {
               if (err instanceof Error && err.message === 'PROMISE_TIMEOUT') {
-                console.warn(`newBlock emitter: Skipping block ${i}. Fetch takes too long.`);
+                logger.warn(`newBlock emitter: Skipping block ${i}. Fetch takes too long.`);
               } else {
-                console.warn(`newBlock emitter: Skipping block ${i}.`);
+                logger.warn(`newBlock emitter: Skipping block ${i}.`);
 
-                console.warn(err);
+                logger.warn(err);
               }
             }
           }
         }
       }
 
-      previousBlock = latestBlock;
+      logger.info(`Emitting new block ${latestBlock.hash} (${latestBlock.height})`);
       // emit latest block
       events.emit('newBlock', latestBlock);
     }
   } catch (err) {
-    console.error('newBlock emitter', err);
+    logger.error('newBlock emitter error', err);
   }
 };
 
 export const onBlock = async (
   ws: Server.Ws,
+  clientId: string,
   latestBlock: Responses['block_content'],
   affectedAddressesInBlock: Responses['block_content_addresses'],
   activeSubscriptions: Server.Subscription[] | undefined,
@@ -110,7 +117,7 @@ export const onBlock = async (
     const txIdsSet = new Set<string>();
     for (const address of affectedAddresses) {
       for (const tx of address.transactions) {
-        txIdsSet.add(tx.tx_hash); // bug in ts types, tx_hash is required
+        txIdsSet.add(tx.tx_hash);
       }
     }
     // fetch txs that include client's address with their utxo data
@@ -125,7 +132,7 @@ export const onBlock = async (
         const enhancedTx = txs.find(t => t.txData.hash === tx.tx_hash);
         if (!enhancedTx) {
           // should not happen
-          console.error(`onBlock: Could not find tx data for ${tx.tx_hash}`);
+          logger.error(`onBlock: Could not find tx data for ${tx.tx_hash}`);
         } else {
           notifications.push({
             address: address.address,
@@ -137,13 +144,14 @@ export const onBlock = async (
       }
     }
 
+    logger.debug(`Sent tx notification to client ${clientId}`);
     const message = prepareMessage(activeAddressSub.id, notifications);
     ws.send(message);
   }
 };
 
 export const startEmitter = () => {
-  console.info('Started block emitter');
+  logger.info('Started block emitter');
   setInterval(
     emitBlock,
     process.env.BLOCKFROST_BLOCK_LISTEN_INTERVAL
