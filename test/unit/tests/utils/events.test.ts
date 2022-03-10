@@ -162,6 +162,7 @@ describe('events', () => {
 
       await onBlock(
         wsClientMock as unknown as Ws,
+        '1', // clientId
         fixture.mocks.block,
         fixture.mocks.addressesAffectedInBlock,
         subscription,

@@ -1,5 +1,6 @@
 import { prepareErrorMessage, prepareMessage } from '../utils/message';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { logger } from '../utils/logger';
 
 export default async (id: number, transaction: Uint8Array | string): Promise<string> => {
   try {
@@ -8,7 +9,7 @@ export default async (id: number, transaction: Uint8Array | string): Promise<str
 
     return message;
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     const message = prepareErrorMessage(id, err);
     return message;
   }

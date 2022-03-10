@@ -9,6 +9,7 @@ import { prepareErrorMessage, prepareMessage } from '../utils/message';
 import { txIdsToTransactions } from '../utils/transaction';
 import { FIAT_RATES_ENABLE_ON_TESTNET } from '../constants/config';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { logger } from '../utils/logger';
 
 interface BalanceHistoryBin {
   from: number;
@@ -189,12 +190,12 @@ export default async (
     const message = prepareMessage(id, data);
     return message;
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     const message = prepareErrorMessage(id, err);
     return message;
   } finally {
     const t2 = new Date().getTime();
     const diff = t2 - t1;
-    console.log(`getBalanceHistory for public key ${publicKey} took ${diff} ms`);
+    logger.debug(`getBalanceHistory for public key ${publicKey} took ${diff} ms`);
   }
 };

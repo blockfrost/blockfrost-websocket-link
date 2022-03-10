@@ -13,6 +13,7 @@ import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
 import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { logger } from '../utils/logger';
 
 export const getAccountInfo = async (
   publicKey: string,
@@ -154,7 +155,7 @@ export const getAccountInfo = async (
   const duration = (tEnd - tStart) / 1000;
 
   if (duration > 7) {
-    console.warn(
+    logger.warn(
       `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} ByronAddresses: ${_byronAddressesCount} Tokens: ${tokensBalances.length} `,
     );
   }
@@ -181,7 +182,7 @@ export default async (
     const message = prepareMessage(id, accountInfo);
     return message;
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     const message = prepareErrorMessage(id, err);
     return message;
   }

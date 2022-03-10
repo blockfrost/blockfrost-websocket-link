@@ -22,6 +22,7 @@ import submitTransaction from './methods/pushTransaction';
 import estimateFee from './methods/estimateFee';
 import getBalanceHistory from './methods/getBalanceHistory';
 import { getAffectedAddresses } from './utils/address';
+import { logger } from './utils/logger';
 
 const app = express();
 
@@ -98,13 +99,18 @@ const interval = setInterval(() => {
 startEmitter();
 // this event is triggered with every new block see events.ts
 events.on('newBlock', async (latestBlock: Responses['block_content']) => {
+  logger.info(
+    `Retrieving affectted addressed for newBlock ${latestBlock.hash} ${latestBlock.height}`,
+  );
   const affectedAddresses = await getAffectedAddresses(latestBlock.height);
+  logger.debug(`Running newBlock callback for ${clients.length} clients`);
   clients.forEach(client => client.newBlockCallback(latestBlock, affectedAddresses));
 });
 
 wss.on('connection', (ws: Server.Ws) => {
   // generate unique client ID and set callbacks
   const clientId = uuidv4();
+  logger.debug(`Client ${clientId} connected`);
   addressesSubscribed[clientId] = [];
   activeSubscriptions[clientId] = [];
   clients.push({
@@ -112,6 +118,7 @@ wss.on('connection', (ws: Server.Ws) => {
     newBlockCallback: (latestBlock, affectedAddresses) =>
       onBlock(
         ws,
+        clientId,
         latestBlock,
         affectedAddresses,
         activeSubscriptions[clientId],
@@ -144,6 +151,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
   ws.on('error', error => {
     const message = prepareErrorMessage(-1, error);
+    logger.warn(`Received error ${JSON.stringify(message)} for client ${clientId}`);
     ws.send(message);
   });
 
@@ -154,9 +162,15 @@ wss.on('connection', (ws: Server.Ws) => {
 
     if (!data) {
       const message = prepareErrorMessage(-1, 'Cannot parse the message');
+      logger.debug(`Received invalid message from client ${clientId}`);
       ws.send(message);
       return;
     }
+    logger.debug(
+      `RECV MSG ID ${data.id} "${
+        data?.command
+      }" from client ${clientId} with params: ${JSON.stringify(data.params)}`,
+    );
 
     switch (data.command) {
       case MESSAGES.GET_SERVER_INFO: {
@@ -316,6 +330,7 @@ wss.on('connection', (ws: Server.Ws) => {
   });
 
   ws.on('close', () => {
+    logger.info(`Client ${clientId} disconnected`);
     // clear intervals on close
     clearInterval(interval);
 
@@ -330,5 +345,5 @@ wss.on('connection', (ws: Server.Ws) => {
 });
 
 server.listen(port, () => {
-  console.log(`✨✨✨ Server started - http://localhost:${port} ✨✨✨`);
+  logger.info(`✨✨✨ Server started - http://localhost:${port} ✨✨✨`);
 });
