@@ -63,6 +63,6 @@ export const getLogger = (options: LoggerOptions): Logger => {
 };
 
 export const logger = getLogger({
-  level: process.env.BLOCKFROST_DEBUG ? 'debug' : 'info',
+  level: process.env.BLOCKFROST_WSLINK_DEBUG ? 'debug' : 'info',
   printTimestamp: process.env.NODE_ENV === 'development' ? true : false,
 });
