@@ -59,7 +59,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.5.0"],\
             ["memoizee", "npm:0.4.15"],\
             ["nock", "npm:13.2.4"],\
-            ["p-queue", "npm:7.2.0"],\
+            ["p-queue", "npm:6.6.2"],\
             ["prettier", "npm:2.5.1"],\
             ["rate-limiter-flexible", "npm:2.3.6"],\
             ["rimraf", "npm:3.0.2"],\
@@ -1396,7 +1396,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:e2afef9db12f6436d373bb4d7f32de8e7263c85b88818d5093440fe226f0aeee9beb2ad356fe6c9f4626b9938b1143baa8288a83628c9520936fe8adcf81a4ac#npm:27.5.0"],\
             ["memoizee", "npm:0.4.15"],\
             ["nock", "npm:13.2.4"],\
-            ["p-queue", "npm:7.2.0"],\
+            ["p-queue", "npm:6.6.2"],\
             ["prettier", "npm:2.5.1"],\
             ["rate-limiter-flexible", "npm:2.3.6"],\
             ["rimraf", "npm:3.0.2"],\
@@ -7164,6 +7164,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["p-finally", [\
+        ["npm:1.0.0", {\
+          "packageLocation": "./.yarn/cache/p-finally-npm-1.0.0-35fbaa57c6-93a654c53d.zip/node_modules/p-finally/",\
+          "packageDependencies": [\
+            ["p-finally", "npm:1.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["p-limit", [\
         ["npm:1.3.0", {\
           "packageLocation": "./.yarn/cache/p-limit-npm-1.3.0-fdb471d864-281c1c0b8c.zip/node_modules/p-limit/",\
@@ -7201,21 +7210,22 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["p-queue", [\
-        ["npm:7.2.0", {\
-          "packageLocation": "./.yarn/cache/p-queue-npm-7.2.0-412f033955-53630ee58a.zip/node_modules/p-queue/",\
+        ["npm:6.6.2", {\
+          "packageLocation": "./.yarn/cache/p-queue-npm-6.6.2-b173c5bfa8-832642fcc4.zip/node_modules/p-queue/",\
           "packageDependencies": [\
-            ["p-queue", "npm:7.2.0"],\
+            ["p-queue", "npm:6.6.2"],\
             ["eventemitter3", "npm:4.0.7"],\
-            ["p-timeout", "npm:5.0.2"]\
+            ["p-timeout", "npm:3.2.0"]\
           ],\
           "linkType": "HARD"\
         }]\
       ]],\
       ["p-timeout", [\
-        ["npm:5.0.2", {\
-          "packageLocation": "./.yarn/cache/p-timeout-npm-5.0.2-0d58a76109-69eda717e2.zip/node_modules/p-timeout/",\
+        ["npm:3.2.0", {\
+          "packageLocation": "./.yarn/cache/p-timeout-npm-3.2.0-7fdb33f733-3dd0eaa048.zip/node_modules/p-timeout/",\
           "packageDependencies": [\
-            ["p-timeout", "npm:5.0.2"]\
+            ["p-timeout", "npm:3.2.0"],\
+            ["p-finally", "npm:1.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
