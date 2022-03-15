@@ -1,5 +1,4 @@
-import pLimit from 'p-limit';
-import { ADDRESS_GAP_LIMIT, PROMISE_CONCURRENCY } from '../constants/config';
+import { ADDRESS_GAP_LIMIT } from '../constants/config';
 import * as Addresses from '../types/address';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import {
@@ -10,6 +9,7 @@ import {
 import memoizee from 'memoizee';
 import { getAssetData, transformAsset } from './asset';
 import { logger } from './logger';
+import { pLimiter } from './limiter';
 
 export const deriveAddress = (
   publicKey: string,
@@ -71,7 +71,7 @@ export const discoverAddresses = async (
         !!isByron,
       );
       addressCount++;
-      const promise = blockfrostAPI.addresses(address);
+      const promise = pLimiter.add(() => blockfrostAPI.addresses(address));
       promisesBundle.push({ address, promise, path });
     }
 
@@ -107,21 +107,18 @@ export const discoverAddresses = async (
 export const addressesToUtxos = async (
   addresses: { address: string; path: string; data: Responses['address_content'] | 'empty' }[],
 ): Promise<{ address: string; path: string; data: Addresses.TransformedUtxo[] | 'empty' }[]> => {
-  const pUtxolimit = pLimit(PROMISE_CONCURRENCY);
   const promises = addresses.map(item =>
     item.data === 'empty'
       ? []
-      : pUtxolimit(
-          address =>
-            // change batchSize to fetch only 1 page at a time (each page has 100 utxos)
-            blockfrostAPI.addressesUtxosAll(address, { batchSize: 1 }).catch(err => {
-              if (err instanceof BlockfrostServerError && err.status_code === 404) {
-                return [];
-              } else {
-                throw err;
-              }
-            }),
-          item.address,
+      : pLimiter.add(() =>
+          // change batchSize to fetch only 1 page at a time (each page has 100 utxos)
+          blockfrostAPI.addressesUtxosAll(item.address, { batchSize: 1 }).catch(err => {
+            if (err instanceof BlockfrostServerError && err.status_code === 404) {
+              return [];
+            } else {
+              throw err;
+            }
+          }),
         ),
   );
 
@@ -134,9 +131,8 @@ export const addressesToUtxos = async (
     ),
   );
 
-  const pMetadataLimit = pLimit(PROMISE_CONCURRENCY);
   const tokenMetadata = await Promise.all(
-    Array.from(assets).map(a => pMetadataLimit(asset => getAssetData(asset), a)),
+    Array.from(assets).map(a => pLimiter.add(() => getAssetData(a))),
   );
 
   return addresses.map((addr, index) => ({
@@ -157,22 +153,19 @@ export const addressesToUtxos = async (
 export const utxosWithBlocks = async (
   utxos: Addresses.UtxosWithBlocksParams,
 ): Promise<Addresses.UtxosWithBlockResponse[]> => {
-  const limit = pLimit(PROMISE_CONCURRENCY);
   const promisesBundle: Promise<Addresses.UtxosWithBlockResponse>[] = [];
 
   utxos.forEach(utxo => {
     if (utxo.data === 'empty') return;
 
     utxo.data.map(utxoData => {
-      const promise = limit(
-        blockHash =>
-          blockfrostAPI.blocks(blockHash).then(blockData => ({
-            address: utxo.address,
-            path: utxo.path,
-            utxoData: utxoData,
-            blockInfo: blockData,
-          })),
-        utxoData.block,
+      const promise = pLimiter.add(() =>
+        blockfrostAPI.blocks(utxoData.block).then(blockData => ({
+          address: utxo.address,
+          path: utxo.path,
+          utxoData: utxoData,
+          blockInfo: blockData,
+        })),
       );
       promisesBundle.push(promise);
     });
@@ -185,8 +178,6 @@ export const utxosWithBlocks = async (
 export const addressesToTxIds = async (
   addresses: Addresses.Address[],
 ): Promise<{ address: string; data: Responses['address_transactions_content'] }[]> => {
-  const limit = pLimit(PROMISE_CONCURRENCY);
-
   const promisesBundle: Promise<{
     address: string;
     data: Responses['address_transactions_content'];
@@ -195,27 +186,25 @@ export const addressesToTxIds = async (
   addresses.forEach(item => {
     if (item.data === 'empty') return;
 
-    const promise = limit(
-      address =>
-        // 1 page (100 txs) per address at a time should be more efficient default value
-        // compared to fetching 10 pages (1000 txs) per address
-        blockfrostAPI
-          .addressesTransactionsAll(address, { batchSize: 1 })
-          .then(data => ({
-            address: address,
-            data,
-          }))
-          .catch(error => {
-            if (error instanceof BlockfrostServerError && error.status_code === 404) {
-              return {
-                address: address,
-                data: [],
-              };
-            } else {
-              throw error;
-            }
-          }),
-      item.address,
+    const promise = pLimiter.add(() =>
+      // 1 page (100 txs) per address at a time should be more efficient default value
+      // compared to fetching 10 pages (1000 txs) per address
+      blockfrostAPI
+        .addressesTransactionsAll(item.address, { batchSize: 1 })
+        .then(data => ({
+          address: item.address,
+          data,
+        }))
+        .catch(error => {
+          if (error instanceof BlockfrostServerError && error.status_code === 404) {
+            return {
+              address: item.address,
+              data: [],
+            };
+          } else {
+            throw error;
+          }
+        }),
     );
     promisesBundle.push(promise);
   });
@@ -237,25 +226,22 @@ export const getAddressesData = async (
       sum: '0',
     }));
   }
-  const limit = pLimit(PROMISE_CONCURRENCY);
 
   const promises = addresses.map(addr =>
-    limit(
-      stringAddress =>
-        blockfrostAPI.addressesTotal(stringAddress).catch(error => {
-          if (error.status_code === 404) {
-            return {
-              address: stringAddress,
-              path: addr.path,
-              tx_count: 0,
-              received_sum: [{ unit: 'lovelace', quantity: '0' }],
-              sent_sum: [{ unit: 'lovelace', quantity: '0' }],
-            };
-          } else {
-            throw Error(error);
-          }
-        }),
-      addr.address,
+    pLimiter.add(() =>
+      blockfrostAPI.addressesTotal(addr.address).catch(error => {
+        if (error.status_code === 404) {
+          return {
+            address: addr.address,
+            path: addr.path,
+            tx_count: 0,
+            received_sum: [{ unit: 'lovelace', quantity: '0' }],
+            sent_sum: [{ unit: 'lovelace', quantity: '0' }],
+          };
+        } else {
+          throw Error(error);
+        }
+      }),
     ),
   );
   const responses = await Promise.all(promises);

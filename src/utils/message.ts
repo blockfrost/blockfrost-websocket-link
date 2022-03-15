@@ -16,6 +16,8 @@ export const getMessage = (message: string): Messages | null => {
 };
 
 export const prepareErrorMessage = (id: number, error: unknown): string => {
+  logger.debug(`Prepared error response for id ${id}`, (error as Error)?.message);
+
   if (
     error instanceof BlockfrostClientError ||
     error instanceof BlockfrostServerError ||
