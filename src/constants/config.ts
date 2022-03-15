@@ -19,4 +19,4 @@ export const FIAT_RATES_REQUESTS_TIMEOUT = 1000;
 export const FIAT_RATES_ENABLE_ON_TESTNET = false;
 
 // Global requests concurrency limit
-export const REQUEST_CONCURRENCY = 500;
+export const REQUEST_CONCURRENCY = 5000;
