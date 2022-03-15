@@ -1,4 +1,5 @@
 import { WebSocketServer } from 'ws';
+import { pLimiter } from './limiter';
 
 export const jsonToPrometheus = (metrics: Record<string, unknown>): string => {
   let output = '';
@@ -27,6 +28,8 @@ export class MetricsCollector {
       websocket_link_heap_used: process.memoryUsage().heapUsed,
       websocket_link_external: process.memoryUsage().external,
       websocket_link_array_buffers: process.memoryUsage().arrayBuffers,
+      websocket_link_request_queue_size: pLimiter.size,
+      websocket_link_request_queue_pending: pLimiter.pending,
     };
   };
 
