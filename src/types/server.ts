@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 
 export interface Ws extends WebSocket {
+  uid: string;
   isAlive: boolean;
 }
 

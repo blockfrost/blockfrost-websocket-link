@@ -88,10 +88,12 @@ const interval = setInterval(() => {
   wss.clients.forEach(w => {
     const ws = w as Server.Ws;
     if (ws.isAlive === false) {
+      logger.debug(`Terminating stale connection for client ${ws.uid}.`);
       return ws.terminate();
     }
 
     ws.isAlive = false;
+    logger.debug(`Sending ping for client ${ws.uid}`);
     ws.ping(noop);
   });
 }, 30000);
@@ -110,6 +112,7 @@ events.on('newBlock', async (latestBlock: Responses['block_content']) => {
 wss.on('connection', (ws: Server.Ws) => {
   // generate unique client ID and set callbacks
   const clientId = uuidv4();
+  ws.uid = clientId;
   logger.info(`Client ${clientId} connected`);
   addressesSubscribed[clientId] = [];
   activeSubscriptions[clientId] = [];
@@ -129,6 +132,7 @@ wss.on('connection', (ws: Server.Ws) => {
   ws.isAlive = true;
 
   ws.on('pong', () => {
+    logger.debug(`Received pong from client ${clientId}`);
     heartbeat(ws);
   });
 
@@ -151,7 +155,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
   ws.on('error', error => {
     const message = prepareErrorMessage(-1, error);
-    logger.warn(`Received error ${JSON.stringify(message)} for client ${clientId}`);
+    logger.warn(`Received error ${JSON.stringify(message)} for client ${clientId}.`);
     ws.send(message);
   });
 
@@ -329,8 +333,8 @@ wss.on('connection', (ws: Server.Ws) => {
     }
   });
 
-  ws.on('close', () => {
-    logger.info(`Client ${clientId} disconnected`);
+  ws.on('close', (code, reason) => {
+    logger.info(`Client ${clientId} disconnected. Code: ${code}, reason: ${reason}`);
     // clear intervals on close
     clearInterval(interval);
 
