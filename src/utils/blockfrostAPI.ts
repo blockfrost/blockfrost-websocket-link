@@ -6,6 +6,7 @@ const blockfrostAPI = new BlockFrostAPI({
   customBackend: process.env.BLOCKFROST_BACKEND_URL || '',
   isTestnet: process.env.BLOCKFROST_NETWORK === 'testnet',
   userAgent: `${packageJson.name}@${packageJson.version}`,
+  rateLimiter: false,
 });
 
 export { blockfrostAPI };
