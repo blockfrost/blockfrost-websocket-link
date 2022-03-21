@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - use one global newBlock listener instead of one per each connection
 - logic in `onBlock` callback called on `newBlock` event
+- ping-pong between a server and a client to keep connection alive
 
 ### Changed
 

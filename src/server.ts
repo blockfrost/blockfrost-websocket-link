@@ -84,7 +84,8 @@ const heartbeat = (ws: Server.Ws) => {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 function noop() {}
 
-const interval = setInterval(() => {
+// ping all clients every 30s to keep connection alive
+setInterval(() => {
   wss.clients.forEach(w => {
     const ws = w as Server.Ws;
     if (ws.isAlive === false) {
@@ -110,6 +111,7 @@ events.on('newBlock', async (latestBlock: Responses['block_content']) => {
 });
 
 wss.on('connection', (ws: Server.Ws) => {
+  ws.isAlive = true;
   // generate unique client ID and set callbacks
   const clientId = uuidv4();
   ws.uid = clientId;
@@ -129,13 +131,6 @@ wss.on('connection', (ws: Server.Ws) => {
       ),
   });
 
-  ws.isAlive = true;
-
-  ws.on('pong', () => {
-    logger.debug(`Received pong from client ${clientId}`);
-    heartbeat(ws);
-  });
-
   if (!process.env.BLOCKFROST_PROJECT_ID) {
     const message = prepareErrorMessage(
       -1,
@@ -152,12 +147,6 @@ wss.on('connection', (ws: Server.Ws) => {
     ws.send(message);
     return;
   }
-
-  ws.on('error', error => {
-    const message = prepareErrorMessage(-1, error);
-    logger.warn(`Received error ${JSON.stringify(message)} for client ${clientId}.`);
-    ws.send(message);
-  });
 
   // general messages
 
@@ -333,10 +322,19 @@ wss.on('connection', (ws: Server.Ws) => {
     }
   });
 
+  ws.on('pong', () => {
+    logger.debug(`Received pong from client ${clientId}`);
+    heartbeat(ws);
+  });
+
+  ws.on('error', error => {
+    const message = prepareErrorMessage(-1, error);
+    logger.warn(`Received error ${JSON.stringify(message)} for client ${clientId}.`);
+    ws.send(message);
+  });
+
   ws.on('close', (code, reason) => {
     logger.info(`Client ${clientId} disconnected. Code: ${code}, reason: ${reason}`);
-    // clear intervals on close
-    clearInterval(interval);
 
     // remove subscriptions on close
     clients.splice(

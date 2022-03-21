@@ -5,7 +5,7 @@
     "prebuild": "yarn clean",
     "build": "yarn clean && tsc",
     "clean": "rimraf dist",
-    "dev": "ts-node-dev ./src/server.ts",
+    "dev": "NODE_ENV=development ts-node-dev ./src/server.ts",
     "lint": "eslint ./src/**/*.ts",
     "start": "yarn build && yarn node ./dist/src/server.js",
     "start:profiler": "yarn build && NODE_ENV=production yarn node --prof ./dist/src/server.js",
