@@ -12,10 +12,10 @@ export const ratesLimiter = new PQueue({
 
 // @ts-expect-error error event not defined, but it exists
 pLimiter.on('error', error => {
-  logger.error(error);
+  logger.error(`pLimiter error`, error);
 });
 
 // @ts-expect-error error event not defined, but it exists
 ratesLimiter.on('error', error => {
-  logger.error(error);
+  logger.error(`ratesLimiter error`, error);
 });
