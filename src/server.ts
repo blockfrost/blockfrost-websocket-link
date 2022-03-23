@@ -23,6 +23,7 @@ import estimateFee from './methods/estimateFee';
 import getBalanceHistory from './methods/getBalanceHistory';
 import { getAffectedAddresses } from './utils/address';
 import { logger } from './utils/logger';
+import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config';
 
 const app = express();
 
@@ -69,7 +70,7 @@ app.get('/status', (_req, res) => {
   });
 });
 
-const metricsCollector = new MetricsCollector(wss, 20000);
+const metricsCollector = new MetricsCollector(wss, METRICS_COLLECTOR_INTERVAL_MS);
 
 // metrics route
 app.get('/metrics', (_req, res) => {
