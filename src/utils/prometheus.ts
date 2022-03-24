@@ -30,10 +30,10 @@ export class MetricsCollector {
       websocket_link_array_buffers: process.memoryUsage().arrayBuffers,
       websocket_link_request_queue_size: pLimiter.size,
       websocket_link_request_queue_pending: pLimiter.pending,
-      websocket_link_request_queue_paused: pLimiter.isPaused,
+      websocket_link_request_queue_paused: pLimiter.isPaused ? 1 : 0,
       websocket_link_rates_queue_size: ratesLimiter.size,
       websocket_link_rates_queue_pending: ratesLimiter.pending,
-      websocket_link_rates_queue_paused: ratesLimiter.isPaused,
+      websocket_link_rates_queue_paused: ratesLimiter.isPaused ? 1 : 0,
     };
   };
 
