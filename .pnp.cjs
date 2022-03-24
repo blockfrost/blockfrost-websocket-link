@@ -61,7 +61,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["nock", "npm:13.2.4"],\
             ["p-queue", "npm:6.6.2"],\
             ["prettier", "npm:2.6.0"],\
-            ["rate-limiter-flexible", "npm:2.3.6"],\
             ["rimraf", "npm:3.0.2"],\
             ["serialize-error", "npm:8.1.0"],\
             ["sinon", "npm:13.0.1"],\
@@ -1399,7 +1398,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["nock", "npm:13.2.4"],\
             ["p-queue", "npm:6.6.2"],\
             ["prettier", "npm:2.6.0"],\
-            ["rate-limiter-flexible", "npm:2.3.6"],\
             ["rimraf", "npm:3.0.2"],\
             ["serialize-error", "npm:8.1.0"],\
             ["sinon", "npm:13.0.1"],\
@@ -7614,15 +7612,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/range-parser-npm-1.2.1-1a470fa390-0a268d4fea.zip/node_modules/range-parser/",\
           "packageDependencies": [\
             ["range-parser", "npm:1.2.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["rate-limiter-flexible", [\
-        ["npm:2.3.6", {\
-          "packageLocation": "./.yarn/cache/rate-limiter-flexible-npm-2.3.6-07a4dd65e8-c008c7bcc1.zip/node_modules/rate-limiter-flexible/",\
-          "packageDependencies": [\
-            ["rate-limiter-flexible", "npm:2.3.6"]\
           ],\
           "linkType": "HARD"\
         }]\
