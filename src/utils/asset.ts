@@ -10,6 +10,7 @@ export const getAssetData = memoizee(
   async (hex: string) => {
     if (hex === 'lovelace') return undefined;
     try {
+      logger.debug(`Fetching asset metadata for ${hex}`);
       const res = await blockfrostAPI.assetsById(hex);
       return res;
     } catch (error) {
