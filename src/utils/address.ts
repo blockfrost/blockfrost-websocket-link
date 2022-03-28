@@ -183,8 +183,8 @@ export const addressesToTxIds = async (
     data: Responses['address_transactions_content'];
   }>[] = [];
 
-  addresses.forEach(item => {
-    if (item.data === 'empty') return;
+  for (const item of addresses) {
+    if (item.data === 'empty') continue;
 
     const promise = pLimiter.add(() =>
       // 1 page (100 txs) per address at a time should be more efficient default value
@@ -207,7 +207,7 @@ export const addressesToTxIds = async (
         }),
     );
     promisesBundle.push(promise);
-  });
+  }
 
   const result = await Promise.all(promisesBundle);
   return result;
