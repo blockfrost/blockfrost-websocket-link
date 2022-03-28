@@ -16,6 +16,27 @@ export const sortTransactionsCmp = <
   b: T,
 ): number => b.block_height - a.block_height || b.index - a.index;
 
+const fetchTxWithUtxo = async (txHash: string, address: string) => {
+  try {
+    const txData = await transformTransactionData(await blockfrostAPI.txs(txHash));
+    const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(txHash));
+    return {
+      txData,
+      txUtxos,
+      address: address,
+      txHash: txHash,
+    };
+  } catch (error) {
+    // WARNING: this will omit txs that returned 404, caller should be well aware of this fact
+    if (error instanceof BlockfrostServerError && error.status_code === 404) {
+      logger.error(`Fetching tx ${txHash} failed with status code ${error.status_code}`);
+      return;
+    } else {
+      throw error;
+    }
+  }
+};
+
 export const txIdsToTransactions = async (
   txidsPerAddress: {
     address: string;
@@ -24,36 +45,16 @@ export const txIdsToTransactions = async (
 ): Promise<Types.TxIdsToTransactionsResponse[]> => {
   if (txidsPerAddress.length === 0) return [];
 
-  const promisesBundle = txidsPerAddress
-    .map(item =>
-      item.data.map(hash =>
-        pLimiter.add(async () => {
-          try {
-            const txData = await transformTransactionData(await blockfrostAPI.txs(hash));
-            const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(hash));
-            return {
-              txData,
-              txUtxos,
-              address: item.address,
-              txHash: hash,
-            };
-          } catch (error) {
-            // WARNING: this will omit txs that returned 404, caller should be well aware of this fact
-            if (error instanceof BlockfrostServerError && error.status_code === 404) {
-              logger.error(`Fetching tx ${hash} failed with status code ${error.status_code}`);
-              return;
-            } else {
-              throw error;
-            }
-          }
-        }),
-      ),
-    )
-    .flat();
+  const promises: Promise<Types.TxIdsToTransactionsResponse | undefined>[] = [];
+  for (const item of txidsPerAddress) {
+    for (const tx of item.data) {
+      promises.push(pLimiter.add(() => fetchTxWithUtxo(tx, item.address)));
+    }
+  }
 
-  const result = (await Promise.all(
-    promisesBundle.filter(p => p !== undefined),
-  )) as Types.TxIdsToTransactionsResponse[];
+  const result = (await Promise.all(promises)).filter(
+    i => i !== undefined,
+  ) as Types.TxIdsToTransactionsResponse[];
 
   const sortedTxs = result.sort((a, b) => sortTransactionsCmp(a.txData, b.txData));
 
