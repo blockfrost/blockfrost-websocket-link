@@ -9,13 +9,15 @@ import { logger } from './logger';
 export const getAssetData = memoizee(
   async (hex: string) => {
     if (hex === 'lovelace') return undefined;
+    logger.debug(`Fetching asset metadata for ${hex}`);
     try {
-      logger.debug(`Fetching asset metadata for ${hex}`);
       const res = await blockfrostAPI.assetsById(hex);
       return res;
     } catch (error) {
       if (error instanceof BlockfrostServerError && error.status_code === 404) {
         logger.warn(`Fetching asset ${hex} failed. Asset not found.`);
+      } else {
+        logger.error(error);
       }
       throw error;
     }

@@ -14,7 +14,7 @@ import { paginate } from '../utils/common';
 import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { logger } from '../utils/logger';
-import { pLimiter } from '../utils/limiter';
+import { assetMetadataLimiter } from '../utils/limiter';
 
 export const getAccountInfo = async (
   publicKey: string,
@@ -69,7 +69,7 @@ export const getAccountInfo = async (
     .filter(b => b.quantity !== '0' && b.unit !== 'lovelace');
 
   const tokenMetadataPromises = tokensBalances.map(token =>
-    pLimiter.add(() => getAssetData(token.unit)),
+    assetMetadataLimiter.add(() => getAssetData(token.unit)),
   );
   const tokenMetadata = await Promise.all(tokenMetadataPromises);
 
