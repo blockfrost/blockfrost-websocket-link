@@ -9,7 +9,6 @@ export type Messages =
         details: Details;
         page?: number;
         pageSize?: number;
-        deriveByronAddresses?: boolean;
       };
     }
   | {
