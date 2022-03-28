@@ -1,10 +1,9 @@
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
-import { QUEUE_PRIORITY } from '../constants';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { getAssetData, transformAsset } from './asset';
-import { pLimiter } from './limiter';
+import { assetMetadataLimiter, pLimiter } from './limiter';
 import { logger } from './logger';
 
 export const sortTransactionsCmp = <
@@ -19,8 +18,10 @@ export const sortTransactionsCmp = <
 
 const fetchTxWithUtxo = async (txHash: string, address: string) => {
   try {
-    const txData = await transformTransactionData(await blockfrostAPI.txs(txHash));
-    const txUtxos = await transformTransactionUtxo(await blockfrostAPI.txsUtxos(txHash));
+    const tx = await blockfrostAPI.txs(txHash);
+    const txUtxo = await blockfrostAPI.txsUtxos(txHash);
+    const txData = await transformTransactionData(tx);
+    const txUtxos = await transformTransactionUtxo(txUtxo);
     return {
       txData,
       txUtxos,
@@ -86,9 +87,7 @@ export const transformTransactionData = async (
   tx: Responses['tx_content'],
 ): Promise<Types.TransformedTransaction> => {
   const assetsMetadata = await Promise.all(
-    tx.output_amount.map(asset =>
-      pLimiter.add(() => getAssetData(asset.unit), { priority: QUEUE_PRIORITY.NESTED_PROMISE }),
-    ),
+    tx.output_amount.map(asset => assetMetadataLimiter.add(() => getAssetData(asset.unit))),
   );
   return {
     ...tx,
@@ -106,9 +105,7 @@ export const transformTransactionUtxo = async (
   const assetsMetadata = await Promise.all(
     Array.from(assets)
       .filter(asset => asset !== 'lovelace')
-      .map(asset =>
-        pLimiter.add(() => getAssetData(asset), { priority: QUEUE_PRIORITY.NESTED_PROMISE }),
-      ),
+      .map(asset => assetMetadataLimiter.add(() => getAssetData(asset))),
   );
 
   return {

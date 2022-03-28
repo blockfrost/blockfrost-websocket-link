@@ -9,7 +9,7 @@ import {
 import memoizee from 'memoizee';
 import { getAssetData, transformAsset } from './asset';
 import { logger } from './logger';
-import { pLimiter } from './limiter';
+import { assetMetadataLimiter, pLimiter } from './limiter';
 
 export const deriveAddress = (
   publicKey: string,
@@ -132,7 +132,7 @@ export const addressesToUtxos = async (
   );
 
   const tokenMetadata = await Promise.all(
-    Array.from(assets).map(a => pLimiter.add(() => getAssetData(a))),
+    Array.from(assets).map(a => assetMetadataLimiter.add(() => getAssetData(a))),
   );
 
   return addresses.map((addr, index) => ({

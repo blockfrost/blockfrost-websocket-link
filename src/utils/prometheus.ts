@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws';
-import { pLimiter, ratesLimiter } from './limiter';
+import { assetMetadataLimiter, pLimiter, ratesLimiter } from './limiter';
 
 export const jsonToPrometheus = (metrics: Record<string, unknown>): string => {
   let output = '';
@@ -34,6 +34,8 @@ export class MetricsCollector {
       websocket_link_rates_queue_size: ratesLimiter.size,
       websocket_link_rates_queue_pending: ratesLimiter.pending,
       websocket_link_rates_queue_paused: ratesLimiter.isPaused ? 1 : 0,
+      websocket_link_asset_metadata_queue_size: assetMetadataLimiter.size,
+      websocket_link_asset_metadata_queue_pending: assetMetadataLimiter.pending,
     };
   };
 
