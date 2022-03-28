@@ -134,6 +134,7 @@ export const getAccountBalanceHistory = async (
   });
 
   // fetch all transactions and filter only those that are from within from-to interval
+  logger.debug('getAccountBalanceHistory', `Fetching ${txIds.length} txs`);
   const txs = (
     await txIdsToTransactions(
       txIds.map(tx => ({
@@ -149,6 +150,7 @@ export const getAccountBalanceHistory = async (
     // txs are sorted from newest to oldest, we need exact opposite
     .reverse();
 
+  logger.debug('getAccountBalanceHistory', `aggregating ${txs.length} txs`);
   const bins = await aggregateTransactions(txs, addresses, groupBy);
 
   if (blockfrostAPI.options.isTestnet && !FIAT_RATES_ENABLE_ON_TESTNET) {
@@ -157,6 +159,7 @@ export const getAccountBalanceHistory = async (
   }
 
   // fetch fiat rate for each bin
+  logger.debug('getAccountBalanceHistory', `fetching fiat rates for ${bins.length} time intervals`);
   const binRatesPromises = bins.map(bin => getRatesForDate(bin.time));
   const binRates = await Promise.allSettled(binRatesPromises);
 
