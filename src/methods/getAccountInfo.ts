@@ -23,7 +23,6 @@ export const getAccountInfo = async (
   pageSize = 25,
 ): Promise<Responses.AccountInfo> => {
   let _addressesCount = 0;
-  let _byronAddressesCount = 0;
   const tStart = new Date().getTime();
   const pageSizeNumber = Number(pageSize);
   const pageIndex = Number(page) - 1;
@@ -144,7 +143,7 @@ export const getAccountInfo = async (
 
   if (duration > 7) {
     logger.warn(
-      `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} ByronAddresses: ${_byronAddressesCount} Tokens: ${tokensBalances.length} `,
+      `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} Tokens: ${tokensBalances.length} `,
     );
   }
 
