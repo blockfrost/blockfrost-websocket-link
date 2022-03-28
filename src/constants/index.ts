@@ -38,3 +38,8 @@ export const MESSAGES_RESPONSE = {
 } as const;
 
 export const WELCOME_MESSAGE = `Hello there! see: <a href="${REPOSITORY_URL}">${REPOSITORY_URL}</a>`;
+
+export const QUEUE_PRIORITY = {
+  DEFAULT: 0,
+  NESTED_PROMISE: 1, // higher priority
+} as const;
