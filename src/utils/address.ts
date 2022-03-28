@@ -155,10 +155,10 @@ export const utxosWithBlocks = async (
 ): Promise<Addresses.UtxosWithBlockResponse[]> => {
   const promisesBundle: Promise<Addresses.UtxosWithBlockResponse>[] = [];
 
-  utxos.forEach(utxo => {
-    if (utxo.data === 'empty') return;
+  for (const utxo of utxos) {
+    if (utxo.data === 'empty') continue;
 
-    utxo.data.map(utxoData => {
+    for (const utxoData of utxo.data) {
       const promise = pLimiter.add(() =>
         blockfrostAPI.blocks(utxoData.block).then(blockData => ({
           address: utxo.address,
@@ -168,8 +168,8 @@ export const utxosWithBlocks = async (
         })),
       );
       promisesBundle.push(promise);
-    });
-  });
+    }
+  }
 
   const result = await Promise.all(promisesBundle);
   return result;

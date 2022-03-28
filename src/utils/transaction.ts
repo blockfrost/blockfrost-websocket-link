@@ -1,4 +1,5 @@
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
+import { QUEUE_PRIORITY } from '../constants';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
 import { blockfrostAPI } from '../utils/blockfrostAPI';
@@ -85,7 +86,9 @@ export const transformTransactionData = async (
   tx: Responses['tx_content'],
 ): Promise<Types.TransformedTransaction> => {
   const assetsMetadata = await Promise.all(
-    tx.output_amount.map(asset => pLimiter.add(() => getAssetData(asset.unit))),
+    tx.output_amount.map(asset =>
+      pLimiter.add(() => getAssetData(asset.unit), { priority: QUEUE_PRIORITY.NESTED_PROMISE }),
+    ),
   );
   return {
     ...tx,
@@ -103,7 +106,9 @@ export const transformTransactionUtxo = async (
   const assetsMetadata = await Promise.all(
     Array.from(assets)
       .filter(asset => asset !== 'lovelace')
-      .map(asset => pLimiter.add(() => getAssetData(asset))),
+      .map(asset =>
+        pLimiter.add(() => getAssetData(asset), { priority: QUEUE_PRIORITY.NESTED_PROMISE }),
+      ),
   );
 
   return {
