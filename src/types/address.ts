@@ -62,7 +62,7 @@ export interface UtxosWithBlocksBundle {
   promise: Promise<Responses['block_content']>;
 }
 
-export type UtxosWithBlocksParameters = {
+export type UtxosWithBlocksParams = {
   address: string;
   path: string;
   data: TransformedUtxo[] | 'empty';

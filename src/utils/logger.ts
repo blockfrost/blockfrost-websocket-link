@@ -9,7 +9,7 @@ const LevelMap = {
 };
 
 type Logger = {
-  [k in Level]: (...arguments_: unknown[]) => void;
+  [k in Level]: (...args: unknown[]) => void;
 };
 
 interface LoggerOptions {
@@ -32,10 +32,10 @@ const myFormat = ({
   return [`${timestamp ? `[${timestamp}] ` : ''}${label ? `[${label}] ` : ''}[${level}]`, ...args];
 };
 
-const onMessage = (options: LoggerOptions, ...arguments_: unknown[]) => {
+const onMessage = (options: LoggerOptions, ...args: unknown[]) => {
   const formattedMessage = myFormat({
     level: options.level.toUpperCase(),
-    args: arguments_,
+    args: args,
     timestamp: options.printTimestamp ? new Date().toISOString() : undefined,
     label: options.label ?? undefined,
   });
@@ -50,7 +50,7 @@ export const getLogger = (options: LoggerOptions): Logger => {
     return requestedLevel > LevelMap[methodLevel]
       ? // eslint-disable-next-line @typescript-eslint/no-empty-function
         () => {}
-      : (...arguments_: unknown[]) => onMessage({ ...options, level: methodLevel }, ...arguments_);
+      : (...args: unknown[]) => onMessage({ ...options, level: methodLevel }, ...args);
   };
 
   return {

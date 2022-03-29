@@ -8,11 +8,10 @@ import { logger } from './logger';
 
 export const getAssetData = memoizee(
   async (hex: string) => {
-    if (hex === 'lovelace') return;
+    if (hex === 'lovelace') return undefined;
     try {
-      const response = await blockfrostAPI.assetsById(hex);
-
-      return response;
+      const res = await blockfrostAPI.assetsById(hex);
+      return res;
     } catch (error) {
       if (error instanceof BlockfrostServerError && error.status_code === 404) {
         logger.warn(`Fetching asset ${hex} failed. Asset not found.`);
@@ -37,7 +36,6 @@ export const transformAsset = (
 
   let decimals = 0;
   const metadataDecimals = tokenRegistryMetadata?.metadata?.decimals;
-
   if (metadataDecimals && typeof metadataDecimals === 'number') {
     decimals = metadataDecimals;
   }
@@ -56,21 +54,18 @@ export const getAssetBalance = (
 ) => {
   const receivedAsset = received.find(r => r.unit === asset)?.quantity ?? '0';
   const sentAsset = sent.find(r => r.unit === asset)?.quantity ?? '0';
-
   return new BigNumber(receivedAsset).minus(sentAsset);
 };
 
 export const sumAssetBalances = (list: { amount: Pick<AssetBalance, 'quantity' | 'unit'>[] }[]) => {
   const balances: Pick<AssetBalance, 'quantity' | 'unit'>[] = [];
-
   for (const item of list) {
     for (const asset of item.amount) {
       const index = balances.findIndex(bAsset => bAsset.unit === asset.unit);
-
       if (index > -1) {
         balances[index].quantity = new BigNumber(balances[index].quantity)
           .plus(asset.quantity)
-          .toFixed(0);
+          .toFixed();
       } else {
         // new item
         balances.push(asset);

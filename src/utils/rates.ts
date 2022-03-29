@@ -11,21 +11,18 @@ export const formatCoingeckoTime = (date: number): string => {
 
 export const getFiatRatesProxies = (additional = process.env.BLOCKFROST_FIAT_RATES_PROXY) => {
   let proxies = FIAT_RATES_PROXY;
-
   if (additional) {
     const items = additional.split(',');
     const sanitized = items
-      .map(item => (item.endsWith('/') ? item.slice(0, Math.max(0, item.length - 1)) : item))
+      .map(item => (item.endsWith('/') ? item.substring(0, item.length - 1) : item))
       .filter(proxy => proxy.length > 0); // remove trailing slash
-
-    proxies = [...sanitized, ...proxies];
+    proxies = sanitized.concat(proxies);
   }
   return proxies;
 };
 
 export const getRatesForDateNoLimit = async (date: number): Promise<Record<string, number>> => {
   const coingeckoDateFormat = formatCoingeckoTime(date);
-
   try {
     let response: {
       market_data?: {
@@ -47,29 +44,28 @@ export const getRatesForDateNoLimit = async (date: number): Promise<Record<strin
         if (response?.market_data?.current_price) {
           break;
         }
-      } catch (error) {
+      } catch (err) {
         if (index === FIAT_RATES_PROXY.length - 1) {
           // last proxy thrown error, we don't have the data
-          throw error;
+          throw err;
         }
       }
     }
 
     if (!response?.market_data) {
-      throw new Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
+      throw Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
     }
 
     return response.market_data?.current_price;
-  } catch {
-    throw new Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
+  } catch (error) {
+    throw Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
   }
 };
 
 export const getRatesForDate = async (date: number): Promise<Record<string, number>> => {
-  const t1 = Date.now();
-  const t2 = Date.now();
+  const t1 = new Date().getTime();
+  const t2 = new Date().getTime();
   const diff = t2 - t1;
-
   if (diff > 1000) {
     logger.warn(`Fiat rates limiter slowed down request for ${diff} ms!`);
   }

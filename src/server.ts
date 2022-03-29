@@ -13,14 +13,14 @@ import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
 import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
 import { MetricsCollector } from './utils/prometheus';
 import { events, onBlock, startEmitter } from './events';
-import getServerInfo from './methods/get-server-info';
-import getAccountInfo from './methods/get-account-info';
-import getAccountUtxo from './methods/get-account-utxo';
-import getBlock from './methods/get-block';
-import getTransaction from './methods/get-transaction';
-import submitTransaction from './methods/push-transaction';
-import estimateFee from './methods/estimate-fee';
-import getBalanceHistory from './methods/get-balance-history';
+import getServerInfo from './methods/getServerInfo';
+import getAccountInfo from './methods/getAccountInfo';
+import getAccountUtxo from './methods/getAccountUtxo';
+import getBlock from './methods/getBlock';
+import getTransaction from './methods/getTransaction';
+import submitTransaction from './methods/pushTransaction';
+import estimateFee from './methods/estimateFee';
+import getBalanceHistory from './methods/getBalanceHistory';
 import { getAffectedAddresses } from './utils/address';
 import { logger } from './utils/logger';
 import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config';
@@ -43,7 +43,7 @@ const port = process.env.PORT || 3005;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-server.keepAliveTimeout = 65_000;
+server.keepAliveTimeout = 65000;
 
 const activeSubscriptions: Record<string, Server.Subscription[]> = {};
 const addressesSubscribed: Record<string, string[]> = {};
@@ -57,13 +57,13 @@ const clients: Array<{
 }> = [];
 
 // index route
-app.get('/', (_request, response) => {
-  response.send(WELCOME_MESSAGE);
+app.get('/', (_req, res) => {
+  res.send(WELCOME_MESSAGE);
 });
 
 // status route
-app.get('/status', (_request, response) => {
-  response.send({
+app.get('/status', (_req, res) => {
+  res.send({
     status: 'ok',
     commit: process.env.BUILD_COMMIT ?? 'BUILD_COMMIT not set',
     version: packageJson.version,
@@ -73,9 +73,9 @@ app.get('/status', (_request, response) => {
 const metricsCollector = new MetricsCollector(wss, METRICS_COLLECTOR_INTERVAL_MS);
 
 // metrics route
-app.get('/metrics', (_request, response) => {
-  response.setHeader('Content-Type', 'text/plain');
-  response.send(metricsCollector.toJson());
+app.get('/metrics', (_req, res) => {
+  res.setHeader('Content-Type', 'text/plain');
+  res.send(metricsCollector.toJson());
 });
 
 const heartbeat = (ws: Server.Ws) => {
@@ -87,20 +87,18 @@ function noop() {}
 
 // ping all clients every 30s to keep connection alive
 setInterval(() => {
-  for (const w of wss.clients) {
+  wss.clients.forEach(w => {
     const ws = w as Server.Ws;
-
     if (ws.isAlive === false) {
       logger.debug(`Terminating stale connection for client ${ws.uid}.`);
-      ws.terminate();
-      continue;
+      return ws.terminate();
     }
 
     ws.isAlive = false;
     logger.debug(`Sending ping for client ${ws.uid}`);
     ws.ping(noop);
-  }
-}, 30_000);
+  });
+}, 30000);
 
 startEmitter();
 // this event is triggered with every new block see events.ts
@@ -109,16 +107,14 @@ events.on('newBlock', async (latestBlock: Responses['block_content']) => {
     `Retrieving affected addressed for newBlock ${latestBlock.hash} ${latestBlock.height}`,
   );
   const affectedAddresses = await getAffectedAddresses(latestBlock.height);
-
   logger.debug(`Running newBlock callback for ${clients.length} clients`);
-  for (const client of clients) client.newBlockCallback(latestBlock, affectedAddresses);
+  clients.forEach(client => client.newBlockCallback(latestBlock, affectedAddresses));
 });
 
 wss.on('connection', (ws: Server.Ws) => {
   ws.isAlive = true;
   // generate unique client ID and set callbacks
   const clientId = uuidv4();
-
   ws.uid = clientId;
   logger.info(`Client ${clientId} connected`);
   addressesSubscribed[clientId] = [];
@@ -160,7 +156,6 @@ wss.on('connection', (ws: Server.Ws) => {
 
     if (!data) {
       const message = prepareErrorMessage(-1, 'Cannot parse the message');
-
       logger.debug(`Received invalid message from client ${clientId}`);
       ws.send(message);
       return;
@@ -174,35 +169,30 @@ wss.on('connection', (ws: Server.Ws) => {
     switch (data.command) {
       case MESSAGES.GET_SERVER_INFO: {
         const message = await getServerInfo(data.id);
-
         ws.send(message);
         break;
       }
 
       case MESSAGES.GET_TRANSACTION: {
         const message = await getTransaction(data.id, data.params.txId);
-
         ws.send(message);
         break;
       }
 
       case MESSAGES.GET_BLOCK: {
         const message = await getBlock(data.id, data.params.hashOrNumber);
-
         ws.send(message);
         break;
       }
 
       case MESSAGES.GET_ACCOUNT_UTXO: {
         const message = await getAccountUtxo(data.id, data.params.descriptor);
-
         ws.send(message);
         break;
       }
 
       case MESSAGES.ESTIMATE_FEE: {
         const message = await estimateFee(data.id);
-
         ws.send(message);
         break;
       }
@@ -235,7 +225,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.SUBSCRIBE_BLOCK: {
         const activeBlockSubIndex = activeSubscriptions[clientId].findIndex(
-          index => index.type === 'block',
+          i => i.type === 'block',
         );
 
         if (activeBlockSubIndex > -1) {
@@ -248,7 +238,6 @@ wss.on('connection', (ws: Server.Ws) => {
         });
 
         const message = prepareMessage(data.id, { subscribed: true });
-
         ws.send(message);
 
         break;
@@ -256,7 +245,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.UNSUBSCRIBE_BLOCK: {
         const activeBlockSubIndex = activeSubscriptions[clientId].findIndex(
-          index => index.type === 'block',
+          i => i.type === 'block',
         );
 
         if (activeBlockSubIndex > -1) {
@@ -274,14 +263,14 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.SUBSCRIBE_ADDRESS: {
         if (data.params.addresses && data.params.addresses.length > 0) {
-          for (const addressInput of data.params.addresses) {
+          data.params.addresses.forEach(addressInput => {
             if (!addressesSubscribed[clientId].includes(addressInput)) {
               addressesSubscribed[clientId].push(addressInput);
             }
-          }
+          });
 
           const activeAddressSubIndex = activeSubscriptions[clientId].findIndex(
-            index => index.type === 'addresses',
+            i => i.type === 'addresses',
           );
 
           if (activeAddressSubIndex > -1) {
@@ -303,7 +292,7 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.UNSUBSCRIBE_ADDRESS: {
         const activeAddressSubIndex = activeSubscriptions[clientId].findIndex(
-          index => index.type === 'addresses',
+          i => i.type === 'addresses',
         );
 
         if (activeAddressSubIndex > -1) {
@@ -322,14 +311,12 @@ wss.on('connection', (ws: Server.Ws) => {
 
       case MESSAGES.PUSH_TRANSACTION: {
         const submitTransactionMessage = await submitTransaction(data.id, data.params.txData);
-
         ws.send(submitTransactionMessage);
         break;
       }
 
       default: {
         const message = prepareErrorMessage(data.id, `Unknown message id: ${data.command}`);
-
         ws.send(message);
       }
     }
@@ -342,7 +329,6 @@ wss.on('connection', (ws: Server.Ws) => {
 
   ws.on('error', error => {
     const message = prepareErrorMessage(-1, error);
-
     logger.warn(`Received error ${JSON.stringify(message)} for client ${clientId}.`);
     ws.send(message);
   });

@@ -22,4 +22,4 @@ export const FIAT_RATES_ENABLE_ON_TESTNET = false;
 export const BLOCKFROST_REQUEST_CONCURRENCY = 500;
 
 // How often should metrics be updated
-export const METRICS_COLLECTOR_INTERVAL_MS = 10_000;
+export const METRICS_COLLECTOR_INTERVAL_MS = 10000;

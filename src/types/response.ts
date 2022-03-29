@@ -1,4 +1,4 @@
-import { Balance, AddressData } from './address';
+import { Balance, AddressData, Address } from './address';
 import {
   TransformedTransaction,
   TransformedTransactionUtxo,

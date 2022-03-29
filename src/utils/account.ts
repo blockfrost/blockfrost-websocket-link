@@ -6,19 +6,18 @@ export const getTxidsFromAccountAddresses = async (addresses: Address[], account
   const uniqueTxIds: ({
     address: string;
   } & Responses['address_transactions_content'][number])[] = [];
-
   if (accountEmpty) return [];
 
   const transactionsPerAddressList = await addressesToTxIds(addresses);
 
   // filter only unique txs to prevent counting a transaction that was sent from and to the same account twice
-  for (const txsPerAddress of transactionsPerAddressList) {
-    for (const addrItem of txsPerAddress.data) {
-      if (!uniqueTxIds.some(item => addrItem.tx_hash === item.tx_hash)) {
+  transactionsPerAddressList.forEach(txsPerAddress => {
+    txsPerAddress.data.forEach(addrItem => {
+      if (!uniqueTxIds.find(item => addrItem.tx_hash === item.tx_hash)) {
         uniqueTxIds.push({ address: txsPerAddress.address, ...addrItem });
       }
-    }
-  }
+    });
+  });
 
   const sortedTxIds = uniqueTxIds.sort(
     (first, second) => second.block_height - first.block_height || second.tx_index - first.tx_index,
@@ -48,9 +47,9 @@ export const getAccountAddressesData = async (
   return { change, used, unused };
 };
 
-export const getAccountTransactionHistory = async (parameters: { accountPublicKey: string }) => {
-  const externalAddresses = await discoverAddresses(parameters.accountPublicKey, 0);
-  const internalAddresses = await discoverAddresses(parameters.accountPublicKey, 1);
+export const getAccountTransactionHistory = async (params: { accountPublicKey: string }) => {
+  const externalAddresses = await discoverAddresses(params.accountPublicKey, 0);
+  const internalAddresses = await discoverAddresses(params.accountPublicKey, 1);
   const addresses = [...externalAddresses, ...internalAddresses];
 
   const txIds = await getTxidsFromAccountAddresses(addresses, false);

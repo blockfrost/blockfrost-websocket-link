@@ -9,10 +9,9 @@ export default async (id: number, txId: string): Promise<string> => {
     const message = prepareMessage(id, await transformTransactionData(tx));
 
     return message;
-  } catch (error) {
-    logger.error(error);
-    const message = prepareErrorMessage(id, error);
-
+  } catch (err) {
+    logger.error(err);
+    const message = prepareErrorMessage(id, err);
     return message;
   }
 };

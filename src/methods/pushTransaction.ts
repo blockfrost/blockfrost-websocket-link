@@ -8,10 +8,9 @@ export default async (id: number, transaction: Uint8Array | string): Promise<str
     const message = prepareMessage(id, submitTransactionResult);
 
     return message;
-  } catch (error) {
-    logger.error(error);
-    const message = prepareErrorMessage(id, error);
-
+  } catch (err) {
+    logger.error(err);
+    const message = prepareErrorMessage(id, err);
     return message;
   }
 };

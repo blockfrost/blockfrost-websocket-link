@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/filename-case */
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import packageJson from '../../package.json';
 
