@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import { blockfrostAPI } from '../../../../src/utils/blockfrostAPI';
+import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
 import { emitBlock, events, onBlock, _resetPreviousBlock } from '../../../../src/events';
 import { Subscription, Ws } from '../../../../src/types/server';
 import * as txUtils from '../../../../src/utils/transaction';
@@ -16,6 +16,7 @@ describe('events', () => {
       // @ts-ignore
       const mock1 = sinon.stub(blockfrostAPI, 'blocksLatest').resolves(fixture.blocks[0]);
       const callback = jest.fn();
+
       events.on('newBlock', callback);
       await emitBlock();
       mock1.restore();
