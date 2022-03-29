@@ -1,6 +1,6 @@
 import nock from 'nock';
-import { getAccountInfo } from '../../../../src/methods/getAccountInfo';
-import { loadRecord } from './__mocks__/getAccountInfo-txs.nock';
+import { getAccountInfo } from '../../../../src/methods/get-account-info';
+import { loadRecord } from './__mocks__/get-acount-info-txs.nock';
 
 describe('getAccountInfo', () => {
   // basic get account info
@@ -52,6 +52,7 @@ describe('getAccountInfo', () => {
           website: 'https://spacecoins.io',
           description: 'your did it!',
         },
+        // eslint-disable-next-line unicorn/no-null
         metadata: null,
       });
 

@@ -1,5 +1,5 @@
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
-import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { blockfrostAPI } from '../utils/blockfrost-api';
 
 export default async (id: number): Promise<string> => {
   try {
@@ -17,9 +17,11 @@ export default async (id: number): Promise<string> => {
     };
 
     const message = prepareMessage(id, serverInfo);
+
     return message;
   } catch (error) {
     const message = prepareErrorMessage(id, error);
+
     return message;
   }
 };

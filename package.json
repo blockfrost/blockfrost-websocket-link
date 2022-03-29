@@ -44,6 +44,7 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-unicorn": "^41.0.1",
     "jest": "^27.5.1",
     "nock": "^13.2.4",
     "prettier": "^2.6.0",

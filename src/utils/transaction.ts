@@ -1,7 +1,7 @@
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import * as Types from '../types/transactions';
 import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
-import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { blockfrostAPI } from '../utils/blockfrost-api';
 import { getAssetData, transformAsset } from './asset';
 import { assetMetadataLimiter, pLimiter } from './limiter';
 import { logger } from './logger';
@@ -22,6 +22,7 @@ const fetchTxWithUtxo = async (txHash: string, address: string) => {
     const txUtxo = await blockfrostAPI.txsUtxos(txHash);
     const txData = await transformTransactionData(tx);
     const txUtxos = await transformTransactionUtxo(txUtxo);
+
     return {
       txData,
       txUtxos,
@@ -48,14 +49,16 @@ export const txIdsToTransactions = async (
   if (txidsPerAddress.length === 0) return [];
 
   const promises: Promise<Types.TxIdsToTransactionsResponse | undefined>[] = [];
+
   for (const item of txidsPerAddress) {
     for (const tx of item.data) {
       promises.push(pLimiter.add(() => fetchTxWithUtxo(tx, item.address)));
     }
   }
 
+  // eslint-disable-next-line unicorn/no-await-expression-member
   const result = (await Promise.all(promises)).filter(
-    i => i !== undefined,
+    index => index !== undefined,
   ) as Types.TxIdsToTransactionsResponse[];
 
   const sortedTxs = result.sort((a, b) => sortTransactionsCmp(a.txData, b.txData));
@@ -89,6 +92,7 @@ export const transformTransactionData = async (
   const assetsMetadata = await Promise.all(
     tx.output_amount.map(asset => assetMetadataLimiter.add(() => getAssetData(asset.unit))),
   );
+
   return {
     ...tx,
     output_amount: tx.output_amount.map((a, index) => transformAsset(a, assetsMetadata[index])),
@@ -99,20 +103,21 @@ export const transformTransactionUtxo = async (
   utxo: Responses['tx_content_utxo'],
 ): Promise<Types.TransformedTransactionUtxo> => {
   const assets = new Set<string>();
-  utxo.inputs.forEach(input => input.amount.forEach(a => assets.add(a.unit)));
-  utxo.outputs.forEach(output => output.amount.forEach(a => assets.add(a.unit)));
+
+  for (const input of utxo.inputs) for (const a of input.amount) assets.add(a.unit);
+  for (const output of utxo.outputs) for (const a of output.amount) assets.add(a.unit);
 
   const assetsMetadata = await Promise.all(
-    Array.from(assets)
+    [...assets]
       .filter(asset => asset !== 'lovelace')
       .map(asset => assetMetadataLimiter.add(() => getAssetData(asset))),
   );
 
   return {
     ...utxo,
-    inputs: utxo.inputs.map(i => ({
-      ...i,
-      amount: i.amount.map(a =>
+    inputs: utxo.inputs.map(index => ({
+      ...index,
+      amount: index.amount.map(a =>
         transformAsset(
           a,
           assetsMetadata.find(m => m?.asset === a.unit),

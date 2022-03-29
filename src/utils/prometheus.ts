@@ -3,9 +3,10 @@ import { assetMetadataLimiter, pLimiter, ratesLimiter } from './limiter';
 
 export const jsonToPrometheus = (metrics: Record<string, unknown>): string => {
   let output = '';
-  Object.entries(metrics).forEach(([key, value]) => {
+
+  for (const [key, value] of Object.entries(metrics)) {
     output += `${key} ${value}\n`;
-  });
+  }
   return output;
 };
 

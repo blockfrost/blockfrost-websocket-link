@@ -1,6 +1,6 @@
 import { ADDRESS_GAP_LIMIT } from '../constants/config';
 import * as Addresses from '../types/address';
-import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { blockfrostAPI } from '../utils/blockfrost-api';
 import {
   BlockfrostServerError,
   deriveAddress as sdkDeriveAddress,
@@ -39,13 +39,15 @@ export const discoverAddresses = async (
   if (accountEmpty) {
     // just derive first ADDRESS_GAP_LIMIT and treat them as empty addresses
     const addresses: { address: string; path: string }[] = [];
-    for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
+
+    for (let index = 0; index < ADDRESS_GAP_LIMIT; index++) {
       const { address, path } = memoizedDeriveAddress(
         publicKey,
         type,
-        i,
+        index,
         !!blockfrostAPI.options.isTestnet,
       );
+
       addresses.push({ address, path });
     }
     return addresses.map(addr => ({ address: addr.address, data: 'empty', path: addr.path }));
@@ -59,15 +61,17 @@ export const discoverAddresses = async (
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
     const promisesBundle: Addresses.Bundle = [];
 
-    for (let i = 0; i < ADDRESS_GAP_LIMIT; i++) {
+    for (let index = 0; index < ADDRESS_GAP_LIMIT; index++) {
       const { address, path } = memoizedDeriveAddress(
         publicKey,
         type,
         addressCount,
         !!blockfrostAPI.options.isTestnet,
       );
+
       addressCount++;
       const promise = pLimiter.add(() => blockfrostAPI.addresses(address));
+
       promisesBundle.push({ address, promise, path });
     }
 
@@ -91,8 +95,8 @@ export const discoverAddresses = async (
   }
 
   const sortedResult = result.sort((item1, item2) => {
-    const path1 = parseInt(item1.path.split('/').slice(-1)[0], 10);
-    const path2 = parseInt(item2.path.split('/').slice(-1)[0], 10);
+    const path1 = Number.parseInt(item1.path.split('/').slice(-1)[0], 10);
+    const path2 = Number.parseInt(item2.path.split('/').slice(-1)[0], 10);
 
     return path1 - path2;
   });
@@ -108,11 +112,11 @@ export const addressesToUtxos = async (
       ? []
       : pLimiter.add(() =>
           // change batchSize to fetch only 1 page at a time (each page has 100 utxos)
-          blockfrostAPI.addressesUtxosAll(item.address, { batchSize: 1 }).catch(err => {
-            if (err instanceof BlockfrostServerError && err.status_code === 404) {
+          blockfrostAPI.addressesUtxosAll(item.address, { batchSize: 1 }).catch(error => {
+            if (error instanceof BlockfrostServerError && error.status_code === 404) {
               return [];
             } else {
-              throw err;
+              throw error;
             }
           }),
         ),
@@ -121,14 +125,13 @@ export const addressesToUtxos = async (
   const allUtxos = await Promise.all(promises);
 
   const assets = new Set<string>();
-  allUtxos.forEach(addressUtxos =>
-    addressUtxos.forEach(utxo =>
-      utxo.amount.forEach(a => (a.unit !== 'lovelace' ? assets.add(a.unit) : undefined)),
-    ),
-  );
+
+  for (const addressUtxos of allUtxos)
+    for (const utxo of addressUtxos)
+      for (const a of utxo.amount) a.unit !== 'lovelace' ? assets.add(a.unit) : undefined;
 
   const tokenMetadata = await Promise.all(
-    Array.from(assets).map(a => assetMetadataLimiter.add(() => getAssetData(a))),
+    [...assets].map(a => assetMetadataLimiter.add(() => getAssetData(a))),
   );
 
   return addresses.map((addr, index) => ({
@@ -147,7 +150,7 @@ export const addressesToUtxos = async (
 };
 
 export const utxosWithBlocks = async (
-  utxos: Addresses.UtxosWithBlocksParams,
+  utxos: Addresses.UtxosWithBlocksParameters,
 ): Promise<Addresses.UtxosWithBlockResponse[]> => {
   const promisesBundle: Promise<Addresses.UtxosWithBlockResponse>[] = [];
 
@@ -163,11 +166,13 @@ export const utxosWithBlocks = async (
           blockInfo: blockData,
         })),
       );
+
       promisesBundle.push(promise);
     }
   }
 
   const result = await Promise.all(promisesBundle);
+
   return result;
 };
 
@@ -202,10 +207,12 @@ export const addressesToTxIds = async (
           }
         }),
     );
+
     promisesBundle.push(promise);
   }
 
   const result = await Promise.all(promisesBundle);
+
   return result;
 };
 
@@ -235,15 +242,17 @@ export const getAddressesData = async (
             sent_sum: [{ unit: 'lovelace', quantity: '0' }],
           };
         } else {
-          throw Error(error);
+          throw new Error(error);
         }
       }),
     ),
   );
   const responses = await Promise.all(promises);
+
   return addresses.map(addr => {
     const response = responses.find(r => r.address === addr.address);
-    if (!response) throw Error('Failed getAddressData');
+
+    if (!response) throw new Error('Failed getAddressData');
 
     return {
       address: addr.address,
@@ -258,20 +267,20 @@ export const getAddressesData = async (
 export const getStakingData = async (stakeAddress: string): Promise<Addresses.StakingData> => {
   try {
     const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
+
     return {
       rewards: stakeAddressData.withdrawable_amount,
       isActive: stakeAddressData.active,
       poolId: stakeAddressData.pool_id,
     };
   } catch (error) {
-    if (error instanceof BlockfrostServerError) {
-      if (error.status_code === 404) {
-        return {
-          rewards: '0',
-          isActive: false,
-          poolId: null,
-        };
-      }
+    if (error instanceof BlockfrostServerError && error.status_code === 404) {
+      return {
+        rewards: '0',
+        isActive: false,
+        // eslint-disable-next-line unicorn/no-null
+        poolId: null,
+      };
     }
     throw error;
   }
@@ -282,17 +291,16 @@ export const getStakingAccountTotal = async (
 ): Promise<Responses['account_addresses_total']> => {
   try {
     const total = await blockfrostAPI.accountsAddressesTotal(stakeAddress);
+
     return total;
   } catch (error) {
-    if (error instanceof BlockfrostServerError) {
-      if (error.status_code === 404) {
-        return {
-          stake_address: stakeAddress,
-          received_sum: [],
-          sent_sum: [],
-          tx_count: 0,
-        };
-      }
+    if (error instanceof BlockfrostServerError && error.status_code === 404) {
+      return {
+        stake_address: stakeAddress,
+        received_sum: [],
+        sent_sum: [],
+        tx_count: 0,
+      };
     }
     throw error;
   }
@@ -306,6 +314,7 @@ export const getAffectedAddresses = async (
   }
   try {
     const addresses = await blockfrostAPI.blocksAddressesAll(blockHeight, { batchSize: 2 });
+
     return addresses;
   } catch (error) {
     if (error instanceof BlockfrostServerError && error.status_code === 404) {

@@ -1,5 +1,5 @@
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
-import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { blockfrostAPI } from '../utils/blockfrost-api';
 import { logger } from '../utils/logger';
 
 export default async (id: number): Promise<string> => {
@@ -12,10 +12,12 @@ export default async (id: number): Promise<string> => {
     };
 
     const message = prepareMessage(id, result);
+
     return message;
-  } catch (err) {
-    logger.error(err);
-    const message = prepareErrorMessage(id, err);
+  } catch (error) {
+    logger.error(error);
+    const message = prepareErrorMessage(id, error);
+
     return message;
   }
 };

@@ -18,10 +18,12 @@ export default async (id: number, publicKey: string): Promise<string> => {
     const utxosBlocks = await utxosWithBlocks(utxosResult);
 
     const message = prepareMessage(id, utxosBlocks);
+
     return message;
-  } catch (err) {
-    logger.error(err);
-    const message = prepareErrorMessage(id, err);
+  } catch (error) {
+    logger.error(error);
+    const message = prepareErrorMessage(id, error);
+
     return message;
   }
 };
