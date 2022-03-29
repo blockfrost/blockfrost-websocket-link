@@ -115,6 +115,7 @@ export const aggregateTransactions = async (
       sentToSelf: sentToSelf.toFixed(),
     };
   });
+
   return result;
 };
 
@@ -123,15 +124,8 @@ export const getAccountBalanceHistory = async (
   groupBy: number,
   from?: number,
   to?: number,
-  deriveByronAddresses?: boolean,
 ): Promise<BalanceHistoryData[]> => {
-  const { txIds, addresses } = await getAccountTransactionHistory({
-    accountPublicKey: publicKey,
-    // Some txs may have byron inputs/outputs, in order to properly calculate amounts during
-    // tx aggregation we need to know if given byron i/o belongs to the account or not.
-    // And we cannot do that if we don't derive account's byron addresses first.
-    deriveByronAddresses,
-  });
+  const { txIds, addresses } = await getAccountTransactionHistory({ accountPublicKey: publicKey });
 
   // fetch all transactions and filter only those that are from within from-to interval
   logger.debug('getAccountBalanceHistory', `Fetching ${txIds.length} txs`);
@@ -180,7 +174,6 @@ export default async (
   groupBy: number,
   from?: number,
   to?: number,
-  deriveByronAddresses?: boolean,
 ): Promise<string> => {
   if (!publicKey) {
     const message = prepareMessage(id, 'Missing parameter descriptor');
@@ -189,7 +182,7 @@ export default async (
 
   const t1 = new Date().getTime();
   try {
-    const data = await getAccountBalanceHistory(publicKey, groupBy, from, to, deriveByronAddresses);
+    const data = await getAccountBalanceHistory(publicKey, groupBy, from, to);
     const message = prepareMessage(id, data);
     return message;
   } catch (err) {

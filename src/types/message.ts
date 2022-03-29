@@ -9,7 +9,6 @@ export type Messages =
         details: Details;
         page?: number;
         pageSize?: number;
-        deriveByronAddresses?: boolean;
       };
     }
   | {
@@ -20,7 +19,6 @@ export type Messages =
         groupBy: number;
         from: number;
         to: number;
-        deriveByronAddresses?: boolean;
       };
     }
   | {
