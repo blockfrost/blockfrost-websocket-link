@@ -10,7 +10,6 @@ describe('address utils', () => {
           fixture.type,
           fixture.addressIndex,
           fixture.isTestnet,
-          false,
         ),
       ).toMatchObject(fixture.result);
     });
