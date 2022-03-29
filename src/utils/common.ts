@@ -2,10 +2,12 @@ import { blockfrostAPI } from '../utils/blockfrostAPI';
 import { NetworkInfo } from '@emurgo/cardano-serialization-lib-nodejs';
 
 export const paginate = <T>(items: T[], pageSize: number): T[][] => {
-  return items.reduce((ac, val, i) => {
-    const id = Math.floor(i / pageSize);
+  // eslint-disable-next-line unicorn/no-array-reduce
+  return items.reduce((ac, value, index) => {
+    const id = Math.floor(index / pageSize);
     const page = ac[id] || (ac[id] = []);
-    page.push(val);
+
+    page.push(value);
     return ac;
   }, [] as T[][]);
 };
@@ -23,7 +25,7 @@ export const promiseTimeout = <T>(promise: T, ms: number) => {
   const timeout = new Promise((_resolve, reject) => {
     const id = setTimeout(() => {
       clearTimeout(id);
-      reject(Error('PROMISE_TIMEOUT'));
+      reject(new Error('PROMISE_TIMEOUT'));
     }, ms);
   });
 

@@ -6,39 +6,36 @@ import { UtxosWithBlockResponse } from '../types/address';
 import { AccountInfo, BalanceHistoryData, ServerInfo } from '../types/response';
 import { logger } from './logger';
 
-export const getMessage = (message: string): Messages | null => {
+export const getMessage = (message: string): Messages | undefined => {
   try {
     const parsedMessage: Messages = JSON.parse(message);
+
     return parsedMessage;
-  } catch (err) {
-    return null;
+  } catch {
+    return undefined;
   }
 };
 
 export const prepareErrorMessage = (id: number, error: unknown): string => {
   logger.debug(`Prepared error response for id ${id}`, (error as Error)?.message);
 
-  if (
-    error instanceof BlockfrostClientError ||
+  return error instanceof BlockfrostClientError ||
     error instanceof BlockfrostServerError ||
     error instanceof Error
-  ) {
-    return JSON.stringify({
-      id,
-      type: 'error',
-      data: {
-        error: { ...serializeError(error), stack: undefined },
-      },
-    });
-  } else {
-    return JSON.stringify({
-      id,
-      type: 'error',
-      data: {
-        error: error,
-      },
-    });
-  }
+    ? JSON.stringify({
+        id,
+        type: 'error',
+        data: {
+          error: { ...serializeError(error), stack: undefined },
+        },
+      })
+    : JSON.stringify({
+        id,
+        type: 'error',
+        data: {
+          error: error,
+        },
+      });
 };
 
 export const prepareMessage = (
@@ -55,7 +52,8 @@ export const prepareMessage = (
     | { subscribed: boolean }
     | { lovelacePerByte: number },
 ): string => {
-  const msg = JSON.stringify({ id, type: 'message', data });
-  logger.debug(`Prepared response for id ${id} with length ${msg.length}`);
-  return msg;
+  const message = JSON.stringify({ id, type: 'message', data });
+
+  logger.debug(`Prepared response for id ${id} with length ${message.length}`);
+  return message;
 };

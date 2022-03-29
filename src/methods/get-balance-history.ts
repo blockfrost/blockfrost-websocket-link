@@ -38,6 +38,7 @@ export const aggregateTransactions = async (
     to: firstTxTimestamp + groupBy,
     txs: [],
   };
+
   bins.push(currentBin);
 
   for (const tx of txs) {
@@ -52,6 +53,7 @@ export const aggregateTransactions = async (
       const newFrom =
         firstTxTimestamp +
         Math.floor((tx.txData.block_time - firstTxTimestamp) / groupBy) * groupBy;
+
       currentBin = {
         from: newFrom,
         to: newFrom + groupBy,
@@ -67,11 +69,12 @@ export const aggregateTransactions = async (
     let received = new BigNumber(0);
     let sentToSelf = new BigNumber(0);
 
-    const addressesList = addresses.all.map(a => a.address);
+    const addressesList = new Set(addresses.all.map(a => a.address));
+
     for (const tx of bin.txs) {
       const { inputs, outputs } = tx.txUtxos;
-      const myInputs = inputs.filter(input => addressesList.includes(input.address));
-      const myOutputs = outputs.filter(output => addressesList.includes(output.address));
+      const myInputs = inputs.filter(input => addressesList.has(input.address));
+      const myOutputs = outputs.filter(output => addressesList.has(output.address));
 
       const myInputsAmount = sumAssetBalances(myInputs);
       const myInputsAmountLovelace =
@@ -110,9 +113,9 @@ export const aggregateTransactions = async (
       time: bin.from,
       txs: bin.txs.length, // TODO: should be renamed to txCount, but that will break compatibility with trezor/blockchain-link
       txids: bin.txs.map(tx => tx.txHash),
-      sent: sent.toFixed(), // sent including sentToSelf
-      received: received.toFixed(), // received including sentToSelf
-      sentToSelf: sentToSelf.toFixed(),
+      sent: sent.toFixed(0), // sent including sentToSelf
+      received: received.toFixed(0), // received including sentToSelf
+      sentToSelf: sentToSelf.toFixed(0),
     };
   });
 
@@ -136,6 +139,7 @@ export const getAccountBalanceHistory = async (
       })),
     )
   )
+    // eslint-disable-next-line unicorn/no-await-expression-member
     .filter(tx => {
       if (typeof from !== 'number' || typeof to !== 'number') return true;
       return tx.txData.block_time >= from && tx.txData.block_time <= to;
@@ -156,6 +160,7 @@ export const getAccountBalanceHistory = async (
 
   const binsWithRates = bins.map((bin, index) => {
     const rateForBin = binRates[index];
+
     return {
       ...bin,
       rates: rateForBin.status === 'fulfilled' ? rateForBin.value : {},
@@ -174,21 +179,26 @@ export default async (
 ): Promise<string> => {
   if (!publicKey) {
     const message = prepareMessage(id, 'Missing parameter descriptor');
+
     return message;
   }
 
-  const t1 = new Date().getTime();
+  const t1 = Date.now();
+
   try {
     const data = await getAccountBalanceHistory(publicKey, groupBy, from, to);
     const message = prepareMessage(id, data);
+
     return message;
-  } catch (err) {
-    logger.error(err);
-    const message = prepareErrorMessage(id, err);
+  } catch (error) {
+    logger.error(error);
+    const message = prepareErrorMessage(id, error);
+
     return message;
   } finally {
-    const t2 = new Date().getTime();
+    const t2 = Date.now();
     const diff = t2 - t1;
+
     logger.debug(`getBalanceHistory for public key ${publicKey} took ${diff} ms`);
   }
 };

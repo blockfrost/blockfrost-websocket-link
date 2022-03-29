@@ -9,8 +9,8 @@
     "lint": "eslint ./src/**/*.ts",
     "start": "yarn build && yarn node ./dist/src/server.js",
     "start:profiler": "yarn build && NODE_ENV=production yarn node --prof ./dist/src/server.js",
-    "test-performance": "yarn ts-node-dev ./scripts/performance/index.ts",
     "test": "PROJECT_ID='none' jest",
+    "test-performance": "yarn ts-node-dev ./scripts/performance/index.ts",
     "type-check": "tsc --project tsconfig.json"
   },
   "dependencies": {
@@ -44,6 +44,7 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-unicorn": "^41.0.0",
     "jest": "^27.5.1",
     "nock": "^13.2.4",
     "prettier": "^2.6.0",
