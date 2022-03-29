@@ -40,7 +40,6 @@ export const getAccountInfo = async (
     2,
     0,
     !!blockfrostAPI.options.isTestnet,
-    false,
   );
   const [stakeAddressTotal, stakingData] = await Promise.all([
     getStakingAccountTotal(stakeAddress),
