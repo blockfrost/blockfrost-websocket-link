@@ -30,10 +30,6 @@ export interface AccountInfo {
     used: AddressData[];
     unused: AddressData[];
   };
-  byronAddresses?: {
-    change: Pick<Address, 'address' | 'path'>[];
-    external: Pick<Address, 'address' | 'path'>[];
-  };
   empty: boolean;
   availableBalance: string;
   descriptor: string;

@@ -47,39 +47,18 @@ export const getAccountAddressesData = async (
   return { change, used, unused };
 };
 
-export const getAccountTransactionHistory = async (params: {
-  accountPublicKey: string;
-  deriveByronAddresses?: boolean;
-}) => {
+export const getAccountTransactionHistory = async (params: { accountPublicKey: string }) => {
   const externalAddresses = await discoverAddresses(params.accountPublicKey, 0);
   const internalAddresses = await discoverAddresses(params.accountPublicKey, 1);
-  let byronExternalAddresses: Address[] = [];
-  let byronInternalAddresses: Address[] = [];
-
-  const isEmpty =
-    externalAddresses.every(a => a.data === 'empty') &&
-    internalAddresses.every(a => a.data === 'empty');
-
   const addresses = [...externalAddresses, ...internalAddresses];
-
-  if (params.deriveByronAddresses) {
-    // discover byron addresses only if account is non empty, we don't really care about txs history on byron
-    // we just need byron addresses to properly assign byron inputs that could be used in a transaction
-    byronExternalAddresses = !isEmpty
-      ? await discoverAddresses(params.accountPublicKey, 0, false, true)
-      : [];
-    byronInternalAddresses = !isEmpty
-      ? await discoverAddresses(params.accountPublicKey, 1, false, true)
-      : [];
-  }
 
   const txIds = await getTxidsFromAccountAddresses(addresses, false);
 
   return {
     addresses: {
-      external: [...externalAddresses, ...byronExternalAddresses],
-      internal: [...internalAddresses, ...byronInternalAddresses],
-      all: [...addresses, ...byronExternalAddresses, ...byronInternalAddresses],
+      external: [...externalAddresses],
+      internal: [...internalAddresses],
+      all: [...addresses],
     },
     txIds,
   };

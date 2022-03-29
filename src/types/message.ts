@@ -19,7 +19,6 @@ export type Messages =
         groupBy: number;
         from: number;
         to: number;
-        deriveByronAddresses?: boolean;
       };
     }
   | {

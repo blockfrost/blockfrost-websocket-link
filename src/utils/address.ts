@@ -16,10 +16,9 @@ export const deriveAddress = (
   type: number,
   addressIndex: number,
   isTestnet: boolean,
-  isByron: boolean,
 ): { address: string; path: string } => {
-  const { address } = sdkDeriveAddress(publicKey, type, addressIndex, isTestnet, isByron);
-  const purpose = isByron ? 44 : 1852;
+  const { address } = sdkDeriveAddress(publicKey, type, addressIndex, isTestnet);
+  const purpose = 1852;
 
   return {
     address: address,
@@ -36,7 +35,6 @@ export const discoverAddresses = async (
   publicKey: string,
   type: Addresses.Type,
   accountEmpty?: boolean,
-  isByron?: boolean,
 ): Promise<Addresses.Address[]> => {
   if (accountEmpty) {
     // just derive first ADDRESS_GAP_LIMIT and treat them as empty addresses
@@ -47,7 +45,6 @@ export const discoverAddresses = async (
         type,
         i,
         !!blockfrostAPI.options.isTestnet,
-        !!isByron,
       );
       addresses.push({ address, path });
     }
@@ -68,7 +65,6 @@ export const discoverAddresses = async (
         type,
         addressCount,
         !!blockfrostAPI.options.isTestnet,
-        !!isByron,
       );
       addressCount++;
       const promise = pLimiter.add(() => blockfrostAPI.addresses(address));
