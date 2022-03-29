@@ -1,5 +1,5 @@
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
-import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { blockfrostAPI } from '../utils/blockfrost-api';
 import { transformTransactionData } from '../utils/transaction';
 import { logger } from '../utils/logger';
 
@@ -9,9 +9,10 @@ export default async (id: number, txId: string): Promise<string> => {
     const message = prepareMessage(id, await transformTransactionData(tx));
 
     return message;
-  } catch (err) {
-    logger.error(err);
-    const message = prepareErrorMessage(id, err);
+  } catch (error) {
+    logger.error(error);
+    const message = prepareErrorMessage(id, error);
+
     return message;
   }
 };

@@ -12,7 +12,7 @@ import { txIdsToTransactions } from '../utils/transaction';
 import { prepareMessage, prepareErrorMessage } from '../utils/message';
 import { paginate } from '../utils/common';
 import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset';
-import { blockfrostAPI } from '../utils/blockfrostAPI';
+import { blockfrostAPI } from '../utils/blockfrost-api';
 import { logger } from '../utils/logger';
 import { assetMetadataLimiter } from '../utils/limiter';
 
@@ -23,16 +23,16 @@ export const getAccountInfo = async (
   pageSize = 25,
 ): Promise<Responses.AccountInfo> => {
   let _addressesCount = 0;
-  const tStart = new Date().getTime();
+  const tStart = Date.now();
   const pageSizeNumber = Number(pageSize);
   const pageIndex = Number(page) - 1;
 
   if (page < 1) {
-    throw Error('Invalid page number - first page is 1');
+    throw new Error('Invalid page number - first page is 1');
   }
 
   if (!publicKey) {
-    throw Error('Missing parameter descriptor');
+    throw new Error('Missing parameter descriptor');
   }
 
   const { address: stakeAddress } = memoizedDeriveAddress(
@@ -58,9 +58,10 @@ export const getAccountInfo = async (
     .map(r => {
       const received = r.quantity;
       const sent = stakeAddressTotal.sent_sum.find(s => s.unit === r.unit)?.quantity ?? '0';
+
       return {
         unit: r.unit,
-        quantity: new BigNumber(received).minus(sent).toFixed(),
+        quantity: new BigNumber(received).minus(sent).toFixed(0),
       };
     })
     .filter(b => b.quantity !== '0' && b.unit !== 'lovelace');
@@ -76,8 +77,8 @@ export const getAccountInfo = async (
   const accountInfo: Responses.AccountInfo = {
     descriptor: publicKey,
     empty: accountEmpty,
-    balance: balanceWithRewards.toFixed(),
-    availableBalance: lovelaceBalance.toFixed(),
+    balance: balanceWithRewards.toFixed(0),
+    availableBalance: lovelaceBalance.toFixed(0),
     tokens: tokensBalances.map((t, index) => transformAsset(t, tokenMetadata[index])),
     history: {
       total: txCount,
@@ -120,6 +121,7 @@ export const getAccountInfo = async (
       const txs = await txIdsToTransactions(
         requestedPageTxIds.map(item => ({ address: item.address, data: [item.tx_hash] })),
       );
+
       accountInfo.history.transactions = txs;
 
       // fetch data for each address and set account.addresses
@@ -137,7 +139,7 @@ export const getAccountInfo = async (
     }
   }
 
-  const tEnd = new Date().getTime();
+  const tEnd = Date.now();
   const duration = (tEnd - tStart) / 1000;
 
   if (duration > 7) {
@@ -159,10 +161,12 @@ export default async (
   try {
     const accountInfo = await getAccountInfo(publicKey, details, page, pageSize);
     const message = prepareMessage(id, accountInfo);
+
     return message;
-  } catch (err) {
-    logger.error(err);
-    const message = prepareErrorMessage(id, err);
+  } catch (error) {
+    logger.error(error);
+    const message = prepareErrorMessage(id, error);
+
     return message;
   }
 };

@@ -1,8 +1,8 @@
 import * as fixtures from '../../fixtures/getBalanceHistory';
-import { aggregateTransactions } from '../../../../src/methods/getBalanceHistory';
+import { aggregateTransactions } from '../../../../src/methods/get-balance-history';
 
 describe('getBalanceHistory', () => {
-  fixtures.aggregateTransactions.forEach(fixture => {
+  for (const fixture of fixtures.aggregateTransactions) {
     test(fixture.description, async () => {
       const result = await aggregateTransactions(
         fixture.transactions,
@@ -13,5 +13,5 @@ describe('getBalanceHistory', () => {
 
       expect(result).toMatchObject(fixture.result);
     });
-  });
+  }
 });

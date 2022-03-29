@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import got from 'got';
 import { FIAT_RATES_PROXY, FIAT_RATES_REQUESTS_TIMEOUT } from '../constants/config';
-import { blockfrostAPI } from './blockfrostAPI';
+import { blockfrostAPI } from './blockfrost-api';
 import { ratesLimiter } from './limiter';
 import { logger } from './logger';
 
@@ -11,18 +11,21 @@ export const formatCoingeckoTime = (date: number): string => {
 
 export const getFiatRatesProxies = (additional = process.env.BLOCKFROST_FIAT_RATES_PROXY) => {
   let proxies = FIAT_RATES_PROXY;
+
   if (additional) {
     const items = additional.split(',');
     const sanitized = items
-      .map(item => (item.endsWith('/') ? item.substring(0, item.length - 1) : item))
+      .map(item => (item.endsWith('/') ? item.slice(0, Math.max(0, item.length - 1)) : item))
       .filter(proxy => proxy.length > 0); // remove trailing slash
-    proxies = sanitized.concat(proxies);
+
+    proxies = [...sanitized, ...proxies];
   }
   return proxies;
 };
 
 export const getRatesForDateNoLimit = async (date: number): Promise<Record<string, number>> => {
   const coingeckoDateFormat = formatCoingeckoTime(date);
+
   try {
     let response: {
       market_data?: {
@@ -44,28 +47,29 @@ export const getRatesForDateNoLimit = async (date: number): Promise<Record<strin
         if (response?.market_data?.current_price) {
           break;
         }
-      } catch (err) {
+      } catch (error) {
         if (index === FIAT_RATES_PROXY.length - 1) {
           // last proxy thrown error, we don't have the data
-          throw err;
+          throw error;
         }
       }
     }
 
     if (!response?.market_data) {
-      throw Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
+      throw new Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
     }
 
     return response.market_data?.current_price;
-  } catch (error) {
-    throw Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
+  } catch {
+    throw new Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
   }
 };
 
 export const getRatesForDate = async (date: number): Promise<Record<string, number>> => {
-  const t1 = new Date().getTime();
-  const t2 = new Date().getTime();
+  const t1 = Date.now();
+  const t2 = Date.now();
   const diff = t2 - t1;
+
   if (diff > 1000) {
     logger.warn(`Fiat rates limiter slowed down request for ${diff} ms!`);
   }
