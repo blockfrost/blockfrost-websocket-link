@@ -6,6 +6,7 @@ dotenv.config();
 import { Responses } from '@blockfrost/blockfrost-js';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
+import { CaptureConsole } from '@sentry/integrations';
 import { v4 as uuidv4 } from 'uuid';
 import packageJson from '../package.json';
 import * as Server from './types/server';
@@ -34,6 +35,9 @@ if (process.env.BLOCKFROST_SENTRY_DSN) {
     integrations: [
       new Sentry.Integrations.Http({ tracing: true }),
       new Tracing.Integrations.Express({ app }),
+      new CaptureConsole({
+        levels: ['error'],
+      }),
     ],
     tracesSampleRate: 0.5,
   });
