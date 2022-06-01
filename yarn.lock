@@ -933,16 +933,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:4.1.0-beta.2":
-  version: 4.1.0-beta.2
-  resolution: "@blockfrost/blockfrost-js@npm:4.1.0-beta.2"
+"@blockfrost/blockfrost-js@npm:4.2.0-beta.3":
+  version: 4.2.0-beta.3
+  resolution: "@blockfrost/blockfrost-js@npm:4.2.0-beta.3"
   dependencies:
-    "@emurgo/cardano-serialization-lib-nodejs": ^10.0.4
+    "@emurgo/cardano-serialization-lib-nodejs": ^10.1.0
     "@emurgo/cip14-js": 3.0.1
     bottleneck: ^2.19.5
     form-data: ^4.0.0
     got: ^11.8.3
-  checksum: 3a8159e1225edf2a950b8df19c3b22e5f81b1246ee3c1f1f1f1fe1f6ad98442cc2b87e11cc86385e0f3f3325e07f459024e83020eb3473394fe582e0e3bcefd9
+  checksum: eb4a00590aa2b6a55a65a00dedc9c78f4c528ed80285877e05b3971bbb660d8838341a8637b0fb4155cfcadc32348fee330d16523af05ddcaf7b92378f68503c
   languageName: node
   linkType: hard
 
@@ -950,8 +950,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blockfrost/blockfrost-websocket-link@workspace:."
   dependencies:
-    "@blockfrost/blockfrost-js": 4.1.0-beta.2
-    "@emurgo/cardano-serialization-lib-nodejs": ^10.0.4
+    "@blockfrost/blockfrost-js": 4.2.0-beta.3
+    "@emurgo/cardano-serialization-lib-nodejs": ^10.1.0
     "@sentry/integrations": ^6.19.7
     "@sentry/node": ^6.19.7
     "@sentry/tracing": ^6.19.7
@@ -991,10 +991,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@emurgo/cardano-serialization-lib-nodejs@npm:^10.0.4":
-  version: 10.0.4
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:10.0.4"
-  checksum: e660212a1a325cc01f97d3baed86815c9f86fa32ad023b5b391eaa5c437f3ca336a533a57d8827ceb0ddc74145de5ba038216e0b4e44a5cfa1dd7b7154c99511
+"@emurgo/cardano-serialization-lib-nodejs@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:10.1.0"
+  checksum: 3bc4704cd4a4f991d8166124cfba3c3087661d21c62101e82d1c24b091ad71af57f1ad24779ec063d827b49ff8ce92b407fef4f60a6c6c4159eb4636be49a5c0
   languageName: node
   linkType: hard
 
