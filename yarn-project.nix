@@ -119,6 +119,7 @@ let
   });
 
 cacheEntries = {
+"@emurgo/cardano-serialization-lib-nodejs@npm:10.1.0" = { filename = "@emurgo-cardano-serialization-lib-nodejs-npm-10.1.0-bc87aa2935-3bc4704cd4.zip"; sha512 = "3bc4704cd4a4f991d8166124cfba3c3087661d21c62101e82d1c24b091ad71af57f1ad24779ec063d827b49ff8ce92b407fef4f60a6c6c4159eb4636be49a5c0"; };
 "@types/memoizee@npm:0.4.7" = { filename = "@types-memoizee-npm-0.4.7-7714e0096b-aa90865ef0.zip"; sha512 = "aa90865ef05ddc9436fea029fc4131a5f175952201766ebf92c404482969daef6dd36a307feab2f1e85902534244dcda822e884f43b9f7cc874adf1f180e1c90"; };
 "@types/node@npm:16.11.22" = { filename = "@types-node-npm-16.11.22-e445de895f-9d879b9b04.zip"; sha512 = "9d879b9b0427e21a11e3162917553d5bc3c7d68d1ef4aa631512144801fe59bc3b4da5965e7ea7c2db99394487b543d4f2499b318e12392574802ac4f975b7c4"; };
 "@types/uuid@npm:8.3.4" = { filename = "@types-uuid-npm-8.3.4-7547f4402c-6f11f3ff70.zip"; sha512 = "6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f"; };
@@ -913,8 +914,7 @@ cacheEntries = {
 "prelude-ls@npm:1.1.2" = { filename = "prelude-ls-npm-1.1.2-a0daac0886-c4867c8748.zip"; sha512 = "c4867c87488e4a0c233e158e4d0d5565b609b105d75e4c05dc760840475f06b731332eb93cc8c9cecb840aa8ec323ca3c9a56ad7820ad2e63f0261dadcb154e4"; };
 "type-check@npm:0.3.2" = { filename = "type-check-npm-0.3.2-a4a38bb0b6-dd3b149564.zip"; sha512 = "dd3b1495642731bc0e1fc40abe5e977e0263005551ac83342ecb6f4f89551d106b368ec32ad3fb2da19b3bd7b2d1f64330da2ea9176d8ddbfe389fb286eb5124"; };
 "levn@npm:0.3.0" = { filename = "levn-npm-0.3.0-48d774b1c2-0d084a5242.zip"; sha512 = "0d084a524231a8246bb10fec48cdbb35282099f6954838604f3c7fc66f2e16fa66fd9cc2f3f20a541a113c4dafdf181e822c887c8a319c9195444e6c64ac395e"; };
-"@emurgo/cardano-serialization-lib-nodejs@npm:10.1.0" = { filename = "@emurgo-cardano-serialization-lib-nodejs-npm-10.1.0-bc87aa2935-3bc4704cd4.zip"; sha512 = "3bc4704cd4a4f991d8166124cfba3c3087661d21c62101e82d1c24b091ad71af57f1ad24779ec063d827b49ff8ce92b407fef4f60a6c6c4159eb4636be49a5c0"; };
-"@blockfrost/blockfrost-js@npm:4.2.0-beta.3" = { filename = "@blockfrost-blockfrost-js-npm-4.2.0-beta.3-70d448d3b0-eb4a00590a.zip"; sha512 = "eb4a00590aa2b6a55a65a00dedc9c78f4c528ed80285877e05b3971bbb660d8838341a8637b0fb4155cfcadc32348fee330d16523af05ddcaf7b92378f68503c"; };
+"@blockfrost/blockfrost-js@npm:4.2.0-beta.4" = { filename = "@blockfrost-blockfrost-js-npm-4.2.0-beta.4-c1685d8003-1995c68775.zip"; sha512 = "1995c687750a91e32a6eba0e084d26f1104cb9c12e38ad3ffcaa324e81c9e2884743870f00dfab8a34fa737b6d403547226ca5a88d1142ea5808f036352735bb"; };
 "bottleneck@npm:2.19.5" = { filename = "bottleneck-npm-2.19.5-2c6092aa17-c5eef1bbea.zip"; sha512 = "c5eef1bbea12cef1f1405e7306e7d24860568b0f7ac5eeab706a86762b3fc65ef6d1c641c8a166e4db90f412fc5c948fc5ce8008a8cd3d28c7212ef9c3482bda"; };
 "@emurgo/cip14-js@npm:3.0.1" = { filename = "@emurgo-cip14-js-npm-3.0.1-6011030ea2-9eaf312410.zip"; sha512 = "9eaf3124108e8c252a745de9ef1f334ab26a32271077b00fe0ea2a06e40838dd435165dac523ebd4d851ae7a94d8c56766dabc372aabffedd36551c798c607c5"; };
 "form-data@npm:4.0.0" = { filename = "form-data-npm-4.0.0-916facec2d-01135bf867.zip"; sha512 = "01135bf8675f9d5c61ff18e2e2932f719ca4de964e3be90ef4c36aacfc7b9cb2fceb5eca0b7e0190e3383fe51c5b37f4cb80b62ca06a99aaabfcfd6ac7c9328c"; };
