@@ -33,7 +33,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
-            ["@blockfrost/blockfrost-js", "npm:4.2.0-beta.3"],\
+            ["@blockfrost/blockfrost-js", "npm:4.2.0-beta.4"],\
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:10.1.0"],\
             ["@sentry/integrations", "npm:6.19.7"],\
             ["@sentry/node", "npm:6.19.7"],\
@@ -1354,10 +1354,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@blockfrost/blockfrost-js", [\
-        ["npm:4.2.0-beta.3", {\
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-4.2.0-beta.3-70d448d3b0-eb4a00590a.zip/node_modules/@blockfrost/blockfrost-js/",\
+        ["npm:4.2.0-beta.4", {\
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-4.2.0-beta.4-c1685d8003-1995c68775.zip/node_modules/@blockfrost/blockfrost-js/",\
           "packageDependencies": [\
-            ["@blockfrost/blockfrost-js", "npm:4.2.0-beta.3"],\
+            ["@blockfrost/blockfrost-js", "npm:4.2.0-beta.4"],\
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:10.1.0"],\
             ["@emurgo/cip14-js", "npm:3.0.1"],\
             ["bottleneck", "npm:2.19.5"],\
@@ -1372,7 +1372,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["@blockfrost/blockfrost-websocket-link", "workspace:."],\
-            ["@blockfrost/blockfrost-js", "npm:4.2.0-beta.3"],\
+            ["@blockfrost/blockfrost-js", "npm:4.2.0-beta.4"],\
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:10.1.0"],\
             ["@sentry/integrations", "npm:6.19.7"],\
             ["@sentry/node", "npm:6.19.7"],\
