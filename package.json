@@ -10,7 +10,7 @@
     "start": "yarn build && yarn node ./dist/src/server.js",
     "start:profiler": "yarn build && NODE_ENV=production yarn node --prof ./dist/src/server.js",
     "test-performance": "yarn ts-node-dev ./scripts/performance/index.ts",
-    "test": "PROJECT_ID='none' jest",
+    "test": "BLOCKFROST_PROJECT_ID='none' jest",
     "type-check": "tsc --project tsconfig.json"
   },
   "dependencies": {
