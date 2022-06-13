@@ -1,6 +1,6 @@
-import { allSeed } from './constants';
+import { ALL_SEED } from './constants';
 import { deriveAddressesForXpub, generateRandomAccounts, randomIntFromInterval } from './utils';
-import { TestClient } from './websocket';
+import { WebsocketClient } from '../../src/utils/websocket-client';
 
 interface TestSuiteMetrics {
   accounts: number;
@@ -22,7 +22,8 @@ class TestSuite {
   addUser = async (xpubs: string[]) => {
     console.log(`Connecting user with ${xpubs.length} accounts... `);
     //  each user has its own websocket client
-    const c = new TestClient(this.wsServer, false);
+    const c = new WebsocketClient(this.wsServer, false);
+
     await c.waitForConnection();
 
     // retrieve basic info and subscribe to block notifications
@@ -30,6 +31,7 @@ class TestSuite {
     c.send('SUBSCRIBE_BLOCK', {});
 
     const addresses: string[] = []; // for all user's accounts (xpubs)
+
     for (const xpub of xpubs) {
       addresses.push(...deriveAddressesForXpub(xpub));
 
@@ -54,13 +56,13 @@ class TestSuite {
           descriptor: xpub,
           details: 'basic',
         });
-      }, 20000);
+      }, 20_000);
 
       // refetch balance history (could happen after receiving/sending tx)
       setInterval(() => {
         c.send('GET_BALANCE_HISTORY', {
           descriptor: xpub,
-          groupBy: 86400, // 1 day
+          groupBy: 86_400, // 1 day
         });
       }, randomIntFromInterval(600, 1200) * 1000); // every 10-20 mins
       this.metrics.accounts += 1;
@@ -69,7 +71,7 @@ class TestSuite {
       // fetch history for all xpubs of the user
       c.send('GET_BALANCE_HISTORY', {
         descriptor: xpub,
-        groupBy: 86400, // 1 day
+        groupBy: 86_400, // 1 day
       });
     }
 
@@ -84,8 +86,9 @@ class TestSuite {
       console.log('Adding new user');
       // 50% change it will be "all seed" user otherwise there will be only empty accounts
       const r = randomIntFromInterval(0, 10);
+
       if (r > 5) {
-        this.addUser(allSeed);
+        this.addUser(ALL_SEED);
       } else {
         this.addUser(generateRandomAccounts(randomIntFromInterval(2, 4)));
       }
@@ -94,5 +97,6 @@ class TestSuite {
 }
 
 const suite = new TestSuite(process.env.TEST_WEBSOCKET_BACKEND ?? 'ws://localhost:3005');
-suite.addUser(allSeed);
-suite.addRandomUserInInterval(30000);
+
+suite.addUser(ALL_SEED);
+suite.addRandomUserInInterval(30_000);

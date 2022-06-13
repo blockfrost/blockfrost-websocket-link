@@ -1,11 +1,11 @@
 import WebSocket from 'ws';
-import { Deferred } from './utils';
-import { MESSAGES } from '../../src/constants';
+import { Deferred } from '../../scripts/performance/utils';
+import { MESSAGES } from '../constants';
 
-export class TestClient {
+export class WebsocketClient {
   client: WebSocket;
   pingTimeout: NodeJS.Timeout | undefined;
-  responseWaitList: { id: number; dfd: Deferred }[] = [];
+  responseWaitList: { id: number; dfd: Deferred<any> }[] = [];
   debug = false;
   private msgId = 0;
   private _connected = false;
@@ -47,7 +47,7 @@ export class TestClient {
     }
     this.pingTimeout = setTimeout(() => {
       this.client?.terminate();
-    }, 30000 + 1000);
+    }, 30_000 + 1000);
   }
 
   public get connected() {
@@ -55,25 +55,28 @@ export class TestClient {
   }
 
   onMessage = (data: any) => {
-    const msg = JSON.parse(data);
+    const message = JSON.parse(data);
+
     if (this.debug) {
-      console.log('received:', msg);
+      console.log('received:', message);
     }
 
-    const index = this.responseWaitList.findIndex(a => a.id === msg?.id);
+    const index = this.responseWaitList.findIndex(a => a.id === message?.id);
+
     if (index > -1) {
-      this.responseWaitList[index].dfd.resolve(true);
+      this.responseWaitList[index].dfd.resolve(message.data);
       this.responseWaitList.splice(index, 1);
     }
   };
 
-  send = (command: keyof typeof MESSAGES, params?: Record<string, any>) => {
+  send = (command: keyof typeof MESSAGES, parameters?: Record<string, any>) => {
     const id = this.msgId;
     const stringifiedMessage = JSON.stringify({
       id: id,
       command: command,
-      params: params ?? {},
+      params: parameters ?? {},
     });
+
     if (this.debug) {
       console.log('send:', id, command, stringifiedMessage);
     }
@@ -81,13 +84,18 @@ export class TestClient {
     this.msgId += 1;
   };
 
-  sendAndWait = async (command: keyof typeof MESSAGES, params?: Record<string, any>) => {
+  sendAndWait = async (
+    command: keyof typeof MESSAGES,
+    parameters?: Record<string, any>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> => {
     const id = this.msgId;
     const dfd = new Deferred();
 
     this.responseWaitList.push({ id: id, dfd: dfd });
 
-    this.send(command, params);
+    this.send(command, parameters);
     await dfd.promise;
+    return dfd.promise;
   };
 }

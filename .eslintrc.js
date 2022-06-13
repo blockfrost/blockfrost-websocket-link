@@ -14,6 +14,7 @@ module.exports = {
   rules: {
     'no-console': 'off',
     'unicorn/no-null': 'off',
+    'unicorn/prefer-type-error': 'off',
     'no-extra-boolean-cast': 'off',
     'newline-after-var': ['error', 'always'],
     'arrow-parens': [2, 'as-needed'],

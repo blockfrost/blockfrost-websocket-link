@@ -25,8 +25,10 @@ import getBalanceHistory from './methods/get-balance-history';
 import { getAffectedAddresses } from './utils/address';
 import { logger } from './utils/logger';
 import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config';
+import { healthCheck } from './utils/health';
 
 const app = express();
+let healthy = true;
 
 if (process.env.BLOCKFROST_SENTRY_DSN) {
   Sentry.init({
@@ -60,6 +62,22 @@ const clients: Array<{
   ) => Promise<void>;
 }> = [];
 
+const runHealthCheck = () => {
+  setTimeout(async () => {
+    logger.info('[HealthCheck] Running health check');
+    try {
+      await healthCheck(`ws://localhost:${port}`);
+      logger.info('[HealthCheck] Health check done');
+    } catch (error) {
+      logger.error(error);
+      healthy = false;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    runHealthCheck();
+  }, 10_000);
+};
+
 // index route
 app.get('/', (_request, response) => {
   response.send(WELCOME_MESSAGE);
@@ -69,6 +87,7 @@ app.get('/', (_request, response) => {
 app.get('/status', (_request, response) => {
   response.send({
     status: 'ok',
+    is_healthy: healthy,
     commit: process.env.BUILD_COMMIT ?? 'BUILD_COMMIT not set',
     version: packageJson.version,
   });
