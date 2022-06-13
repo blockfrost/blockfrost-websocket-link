@@ -1,10 +1,10 @@
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { deriveAddress } from '@blockfrost/blockfrost-js';
 
-export class Deferred {
-  promise: Promise<unknown>;
+export class Deferred<T> {
+  promise: Promise<T>;
   reject!: (reason?: any) => void;
-  resolve!: (value: unknown) => void;
+  resolve!: (value: T) => void;
   constructor() {
     this.promise = new Promise((resolve, reject) => {
       this.reject = reject;

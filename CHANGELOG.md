@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - report node.js memory usage on `/metrics`
 - `GET_BALANCE_HISTORY` - aggregated sent/received/sentToSelf lovelace amounts for given range and groupBy param
 - `hostname` field to getServerInfo response
+- report health check status in `/status` (`is_healthy`)
 
 ### Fixed
 
