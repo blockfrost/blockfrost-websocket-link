@@ -87,7 +87,7 @@ app.get('/', (_request, response) => {
 app.get('/status', (_request, response) => {
   response.send({
     status: 'ok',
-    is_healthy: healthy,
+    is_healthy: healthy ? 1 : 0,
     commit: process.env.BUILD_COMMIT ?? 'BUILD_COMMIT not set',
     version: packageJson.version,
   });
