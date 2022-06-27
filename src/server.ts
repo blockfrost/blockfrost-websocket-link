@@ -25,10 +25,9 @@ import getBalanceHistory from './methods/get-balance-history';
 import { getAffectedAddresses } from './utils/address';
 import { logger } from './utils/logger';
 import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config';
-import { healthCheck } from './utils/health';
+import { getPort } from './utils/server';
 
 const app = express();
-let healthy = true;
 
 if (process.env.BLOCKFROST_SENTRY_DSN) {
   Sentry.init({
@@ -45,7 +44,7 @@ if (process.env.BLOCKFROST_SENTRY_DSN) {
   });
 }
 
-const port = process.env.PORT || 3005;
+const port = getPort();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
@@ -62,22 +61,6 @@ const clients: Array<{
   ) => Promise<void>;
 }> = [];
 
-const runHealthCheck = () => {
-  setTimeout(async () => {
-    logger.info('[HealthCheck] Running health check');
-    try {
-      await healthCheck(`ws://localhost:${port}`);
-      logger.info('[HealthCheck] Health check done');
-    } catch (error) {
-      logger.error(error);
-      healthy = false;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    runHealthCheck();
-  }, 10_000);
-};
-
 // index route
 app.get('/', (_request, response) => {
   response.send(WELCOME_MESSAGE);
@@ -87,7 +70,6 @@ app.get('/', (_request, response) => {
 app.get('/status', (_request, response) => {
   response.send({
     status: 'ok',
-    is_healthy: healthy ? 1 : 0,
     commit: process.env.BUILD_COMMIT ?? 'BUILD_COMMIT not set',
     version: packageJson.version,
   });
