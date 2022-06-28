@@ -98,4 +98,8 @@ export class WebsocketClient {
     await dfd.promise;
     return dfd.promise;
   };
+
+  close = () => {
+    this.client.close();
+  };
 }
