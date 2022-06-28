@@ -1,3 +1,4 @@
+import * as os from 'os';
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
@@ -41,6 +42,9 @@ if (process.env.BLOCKFROST_SENTRY_DSN) {
       }),
     ],
     tracesSampleRate: 0.5,
+    initialScope: {
+      tags: { hostname: os.hostname() },
+    },
   });
 }
 
