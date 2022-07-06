@@ -34,6 +34,7 @@ if (process.env.BLOCKFROST_SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.BLOCKFROST_SENTRY_DSN,
     release: `websocket-link@${packageJson.version}`,
+    environment: process.env.NODE_ENV,
     integrations: [
       new Sentry.Integrations.Http({ tracing: true }),
       new Tracing.Integrations.Express({ app }),
@@ -43,7 +44,7 @@ if (process.env.BLOCKFROST_SENTRY_DSN) {
     ],
     tracesSampleRate: 0.5,
     initialScope: {
-      tags: { hostname: os.hostname() },
+      tags: { hostname: os.hostname(), network: process.env.BLOCKFROST_NETWORK },
     },
   });
 }
