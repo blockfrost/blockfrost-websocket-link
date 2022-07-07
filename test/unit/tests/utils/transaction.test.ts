@@ -7,9 +7,9 @@ describe('transaction utils', () => {
     nock.cleanAll();
   });
 
-  fixtures.transformTransactionData.forEach(fixture => {
+  for (const fixture of fixtures.transformTransactionData) {
     test(fixture.description, async () => {
-      nock(/.*.blockfrost.io/)
+      nock(/.+blockfrost.io/)
         .persist()
         .get(/api\/v0\/assets\/.*/)
         .reply(200, {
@@ -28,13 +28,14 @@ describe('transaction utils', () => {
           },
         });
       const res = await transactionUtils.transformTransactionData(fixture.tx);
+
       expect(res).toStrictEqual(fixture.result);
     });
-  });
+  }
 
-  fixtures.transformTransactionUtxo.forEach(fixture => {
+  for (const fixture of fixtures.transformTransactionUtxo) {
     test(fixture.description, async () => {
-      nock(/.*.blockfrost.io/)
+      nock(/.+blockfrost.io/)
         .persist()
         .get(/api\/v0\/assets\/.*/)
         .reply(200, {
@@ -53,18 +54,18 @@ describe('transaction utils', () => {
           },
         });
       // nock.recorder.rec();
-      const res = await transactionUtils.transformTransactionUtxo(fixture.utxo);
+      const result = await transactionUtils.transformTransactionUtxo(fixture.utxo);
       // nock.restore();
 
-      expect(res).toStrictEqual(fixture.result);
+      expect(result).toStrictEqual(fixture.result);
     });
-  });
+  }
 
-  fixtures.sortTransactionsCmp.forEach(fixture => {
+  for (const fixture of fixtures.sortTransactionsCmp) {
     test(fixture.description, () => {
       expect(transactionUtils.sortTransactionsCmp(fixture.tx1, fixture.tx2)).toStrictEqual(
         fixture.result,
       );
     });
-  });
+  }
 });
