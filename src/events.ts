@@ -14,6 +14,7 @@ interface EmitBlockOptions {
   maxMissedBlocks?: number;
 }
 
+// eslint-disable-next-line unicorn/prefer-event-target
 const events = new EventEmitter();
 
 let previousBlock: undefined | Responses['block_content'];

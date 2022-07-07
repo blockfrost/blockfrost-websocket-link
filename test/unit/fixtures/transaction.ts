@@ -4,9 +4,9 @@ export const transformTransactionData = [
     tx: {
       hash: '115293f3a35ca4f4fc01fb0e083f85dde7e77435d53dc15f0a38fa591858bb99',
       block: '31df233d137e13dfc1b5d3722e44f366109830aa2e0b06c36c037ae4d8ab2d54',
-      block_height: 3006224,
-      block_time: 1634717057,
-      slot: 40347841,
+      block_height: 3_006_224,
+      block_time: 1_634_717_057,
+      slot: 40_347_841,
       index: 0,
       output_amount: [
         {
@@ -37,9 +37,9 @@ export const transformTransactionData = [
     result: {
       hash: '115293f3a35ca4f4fc01fb0e083f85dde7e77435d53dc15f0a38fa591858bb99',
       block: '31df233d137e13dfc1b5d3722e44f366109830aa2e0b06c36c037ae4d8ab2d54',
-      block_height: 3006224,
-      block_time: 1634717057,
-      slot: 40347841,
+      block_height: 3_006_224,
+      block_time: 1_634_717_057,
+      slot: 40_347_841,
       index: 0,
       output_amount: [
         {
@@ -95,6 +95,8 @@ export const transformTransactionUtxo = [
           output_index: 0,
           collateral: false,
           data_hash: 'e7b345c671e56c590c96894948725bb6f510790cf21547ee98b365f7c4e6c044',
+          inline_datum: null,
+          reference_script_hash: null,
         },
         {
           address:
@@ -113,6 +115,8 @@ export const transformTransactionUtxo = [
           output_index: 3,
           collateral: false,
           data_hash: null,
+          inline_datum: null,
+          reference_script_hash: null,
         },
       ],
       outputs: [
@@ -138,6 +142,8 @@ export const transformTransactionUtxo = [
           ],
           output_index: 0,
           data_hash: 'dc3ef2a0954c0245b77dd3c448f441d4d91d304383d859851be070444cfa7b99',
+          inline_datum: null,
+          reference_script_hash: null,
         },
       ],
     },
@@ -163,6 +169,8 @@ export const transformTransactionUtxo = [
           output_index: 0,
           collateral: false,
           data_hash: 'e7b345c671e56c590c96894948725bb6f510790cf21547ee98b365f7c4e6c044',
+          inline_datum: null,
+          reference_script_hash: null,
         },
         {
           address:
@@ -185,6 +193,8 @@ export const transformTransactionUtxo = [
           output_index: 3,
           collateral: false,
           data_hash: null,
+          inline_datum: null,
+          reference_script_hash: null,
         },
       ],
       outputs: [
@@ -217,6 +227,8 @@ export const transformTransactionUtxo = [
           ],
           output_index: 0,
           data_hash: 'dc3ef2a0954c0245b77dd3c448f441d4d91d304383d859851be070444cfa7b99',
+          inline_datum: null,
+          reference_script_hash: null,
         },
       ],
     },
