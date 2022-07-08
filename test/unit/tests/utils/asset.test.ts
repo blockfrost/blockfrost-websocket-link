@@ -1,14 +1,15 @@
+import { describe, test, expect } from 'vitest';
 import * as assetUtils from '../../../../src/utils/asset';
 import * as fixtures from '../../fixtures/asset';
 
 describe('asset utils', () => {
-  fixtures.transformAsset.forEach(fixture => {
+  for (const fixture of fixtures.transformAsset) {
     test(fixture.description, () => {
       expect(assetUtils.transformAsset(fixture.input, undefined)).toMatchObject(fixture.result);
     });
-  });
+  }
 
-  fixtures.getAssetBalance.forEach(fixture => {
+  for (const fixture of fixtures.getAssetBalance) {
     test(fixture.description, () => {
       expect(
         assetUtils
@@ -16,11 +17,11 @@ describe('asset utils', () => {
           .toString(),
       ).toBe(fixture.result);
     });
-  });
+  }
 
-  fixtures.sumAssetBalances.forEach(fixture => {
+  for (const fixture of fixtures.sumAssetBalances) {
     test(fixture.description, () => {
       expect(assetUtils.sumAssetBalances(fixture.list)).toStrictEqual(fixture.result);
     });
-  });
+  }
 });

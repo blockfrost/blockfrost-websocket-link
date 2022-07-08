@@ -1,4 +1,5 @@
 import sinon from 'sinon';
+import { describe, test, expect } from 'vitest';
 import fixtures from '../../fixtures/getTransaction';
 import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
 import getTransaction from '../../../../src/methods/get-transaction';

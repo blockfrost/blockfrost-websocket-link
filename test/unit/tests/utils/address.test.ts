@@ -1,8 +1,9 @@
 import * as addressUtils from '../../../../src/utils/address';
 import * as fixtures from '../../fixtures/address';
+import { describe, test, expect } from 'vitest';
 
 describe('address utils', () => {
-  fixtures.deriveAddress.forEach(fixture => {
+  for (const fixture of fixtures.deriveAddress) {
     test(fixture.description, () => {
       expect(
         addressUtils.deriveAddress(
@@ -13,5 +14,5 @@ describe('address utils', () => {
         ),
       ).toMatchObject(fixture.result);
     });
-  });
+  }
 });
