@@ -1,4 +1,5 @@
 import nock from 'nock';
+import { describe, test, expect } from 'vitest';
 import { getAccountInfo } from '../../../../src/methods/get-account-info';
 import { loadRecord } from './__mocks__/get-acount-info-txs.nock';
 

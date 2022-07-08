@@ -1,4 +1,5 @@
 import * as fixtures from '../../fixtures/getBalanceHistory';
+import { describe, test, expect } from 'vitest';
 import { aggregateTransactions } from '../../../../src/methods/get-balance-history';
 
 describe('getBalanceHistory', () => {

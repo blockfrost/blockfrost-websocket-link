@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import sinon from 'sinon';
 import fixtures from '../../fixtures/estimteFee';
 import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
