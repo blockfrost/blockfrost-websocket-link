@@ -348,7 +348,7 @@ export const onBlock = [
           hash: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
           slot: 45122720,
           epoch: 174,
-          epoch_slot: 324320,
+          epoch_slot: 324_320,
           slot_leader: 'pool1weu4vlg9t8knma7t2j5y3w2k3vzdr9mtnynd2jhfalwn76nwh48',
           size: 15416,
           tx_count: 2,
