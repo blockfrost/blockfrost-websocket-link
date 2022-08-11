@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import * as utils from '../../../src/utils/message';
 
 describe('messages utils', () => {

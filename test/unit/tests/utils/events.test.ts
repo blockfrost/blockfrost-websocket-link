@@ -3,6 +3,7 @@ import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
 import { emitBlock, events, onBlock, _resetPreviousBlock } from '../../../../src/events';
 import { Subscription, Ws } from '../../../../src/types/server';
 import * as txUtils from '../../../../src/utils/transaction';
+import { describe, test, expect, vi } from 'vitest';
 
 import * as fixtures from '../../fixtures/events';
 import {
@@ -15,7 +16,7 @@ describe('events', () => {
     test(fixture.description, async () => {
       // @ts-ignore
       const mock1 = sinon.stub(blockfrostAPI, 'blocksLatest').resolves(fixture.blocks[0]);
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       events.on('newBlock', callback);
       await emitBlock();
@@ -27,9 +28,10 @@ describe('events', () => {
     });
   });
 
-  fixtures.emitMissedBlock.forEach(fixture => {
+  for (const fixture of fixtures.emitMissedBlock) {
     test(fixture.description, async () => {
       const mock1 = sinon.stub(blockfrostAPI, 'blocks');
+
       mock1
         .onCall(0)
         // @ts-ignore
@@ -39,6 +41,7 @@ describe('events', () => {
         // @ts-ignore
         .resolves(fixture.missedBlocks[1]);
       const mock2 = sinon.stub(blockfrostAPI, 'blocksLatest');
+
       mock2
         .onCall(0)
         // @ts-ignore
@@ -47,7 +50,8 @@ describe('events', () => {
         .onCall(1)
         // @ts-ignore
         .resolves(fixture.latestBlocks[1]);
-      const callback = jest.fn();
+      const callback = vi.fn();
+
       events.on('newBlock', callback);
 
       await emitBlock();
@@ -75,7 +79,7 @@ describe('events', () => {
         .onCall(1)
         // @ts-ignore
         .resolves(fixture.latestBlocks[1]);
-      const callback = jest.fn();
+      const callback = vi.fn();
       events.on('newBlock', callback);
 
       const blockMock = sinon.stub(blockfrostAPI, 'blocks');
@@ -119,11 +123,11 @@ describe('events', () => {
       events.removeAllListeners();
       _resetPreviousBlock();
     });
-  });
+  }
 
   fixtures.onBlock.forEach(fixture => {
     test(`onBlock: ${fixture.description}`, async () => {
-      const mockedSend = jest.fn((payload: string) => {
+      const mockedSend = vi.fn((payload: string) => {
         // console.log('payload', JSON.parse(payload));
         return payload;
       });
@@ -132,7 +136,7 @@ describe('events', () => {
         send: (msg: string) => mockedSend(msg),
       };
 
-      jest.spyOn(txUtils, 'getTransactionsWithUtxo').mockImplementation((txids: string[]) => {
+      vi.spyOn(txUtils, 'getTransactionsWithUtxo').mockImplementation((txids: string[]) => {
         return new Promise(resolve => {
           // sanity check that the test really wanted to fetch transactions that we expected
           for (const mockedTx of fixture.mocks.txsWithUtxo) {
@@ -176,8 +180,8 @@ describe('events', () => {
         expect(mockedSend).toHaveBeenNthCalledWith(index + 1, JSON.stringify(notificationFixture));
       }
 
-      jest.resetAllMocks();
-      jest.restoreAllMocks();
+      vi.resetAllMocks();
+      vi.restoreAllMocks();
     });
   });
 });
