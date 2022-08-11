@@ -1,9 +1,13 @@
-with import <nixpkgs> {};
+with import <nixpkgs> { };
 
 stdenv.mkDerivation {
   name = "blockfrost-websocket-link";
   buildInputs = [
-    nodejs-16_x
-    (yarn.override { nodejs = nodejs-16_x; })
+    nodejs-18_x
+    (yarn.override { nodejs = nodejs-18_x; })
   ];
+
+  shellHook = ''
+    yarn
+  '';
 }
