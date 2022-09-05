@@ -13,6 +13,8 @@ export const getBlockfrostClient = (options?: Partial<Options>) => {
   });
 };
 
-const blockfrostAPI = getBlockfrostClient();
+export const blockfrostAPI = getBlockfrostClient();
 
-export { blockfrostAPI };
+// Special client for tx submit due timeout that's necessary for handling "mempool full" error.
+// Cardano Tx Submit API will just wait indefinitely, so we need to close the connection and return proper error message
+export const txClient = getBlockfrostClient({ requestTimeout: 5000 });

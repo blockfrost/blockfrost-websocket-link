@@ -1,11 +1,7 @@
-import { prepareErrorMessage, prepareMessage } from '../utils/message';
-import { getBlockfrostClient } from '../utils/blockfrost-api';
-import { logger } from '../utils/logger';
 import { BlockfrostClientError } from '@blockfrost/blockfrost-js';
-
-// Special client for tx submit due timeout that's necessary for handling "mempool full" error.
-// Cardano Tx Submit API will just wait indefinitely, so we need to close the connection and return proper error message
-const txClient = getBlockfrostClient({ requestTimeout: 5000 });
+import { prepareErrorMessage, prepareMessage } from '../utils/message';
+import { txClient } from '../utils/blockfrost-api';
+import { logger } from '../utils/logger';
 
 export default async (id: number, transaction: Uint8Array | string): Promise<string> => {
   try {
