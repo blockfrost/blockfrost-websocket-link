@@ -151,7 +151,7 @@ export const getAccountBalanceHistory = async (
   logger.debug('getAccountBalanceHistory', `aggregating ${txs.length} txs`);
   const bins = await aggregateTransactions(txs, addresses, groupBy);
 
-  if (blockfrostAPI.options.isTestnet && !FIAT_RATES_ENABLE_ON_TESTNET) {
+  if (blockfrostAPI.options.network !== 'mainnet' && !FIAT_RATES_ENABLE_ON_TESTNET) {
     // fiat rates for testnet are disabled
     return bins;
   }

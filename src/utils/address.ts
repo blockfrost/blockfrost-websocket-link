@@ -45,7 +45,7 @@ export const discoverAddresses = async (
         publicKey,
         type,
         index,
-        !!blockfrostAPI.options.isTestnet,
+        blockfrostAPI.options.network !== 'mainnet',
       );
 
       addresses.push({ address, path });
@@ -66,7 +66,7 @@ export const discoverAddresses = async (
         publicKey,
         type,
         addressCount,
-        !!blockfrostAPI.options.isTestnet,
+        blockfrostAPI.options.network !== 'mainnet',
       );
 
       addressCount++;
