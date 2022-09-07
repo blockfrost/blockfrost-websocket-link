@@ -30,6 +30,14 @@ import { getPort } from './utils/server';
 
 const app = express();
 
+if (!process.env.BLOCKFROST_PROJECT_ID) {
+  throw new Error(`Missing BLOCKFROST_PROJECT_ID env variable. See ${REPOSITORY_URL}`);
+}
+
+if (!process.env.BLOCKFROST_NETWORK) {
+  throw new Error(`Missing BLOCKFROST_NETWORK env variable. See ${REPOSITORY_URL}`);
+}
+
 if (process.env.BLOCKFROST_SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.BLOCKFROST_SENTRY_DSN,
@@ -146,32 +154,14 @@ wss.on('connection', (ws: Server.Ws) => {
       ),
   });
 
-  if (!process.env.BLOCKFROST_PROJECT_ID) {
-    const message = prepareErrorMessage(
-      -1,
-      `Missing PROJECT_ID env variable see: ${REPOSITORY_URL}`,
-    );
-
-    ws.send(message);
-    return;
-  }
-
-  if (!process.env.BLOCKFROST_NETWORK) {
-    const message = prepareErrorMessage(-1, `Missing NETWORK env variable see: ${REPOSITORY_URL}`);
-
-    ws.send(message);
-    return;
-  }
-
   // general messages
-
   ws.on('message', async (message: string) => {
     const data = getMessage(message);
 
     if (!data) {
       const message = prepareErrorMessage(-1, 'Cannot parse the message');
 
-      logger.debug(`Received invalid message from client ${clientId}`);
+      logger.debug(`Received invalid message from client ${clientId}:`, message);
       ws.send(message);
       return;
     }
