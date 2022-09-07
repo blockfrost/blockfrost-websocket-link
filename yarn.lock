@@ -39,16 +39,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@blockfrost/blockfrost-js@npm:4.2.0"
+"@blockfrost/blockfrost-js@npm:5.1.0-beta.1":
+  version: 5.1.0-beta.1
+  resolution: "@blockfrost/blockfrost-js@npm:5.1.0-beta.1"
   dependencies:
     "@emurgo/cardano-serialization-lib-nodejs": ^10.2.0
     "@emurgo/cip14-js": 3.0.1
     bottleneck: ^2.19.5
     form-data: ^4.0.0
-    got: ^11.8.3
-  checksum: 0eb7618617584058e42ae76d4a9a5e8a2116c9e3c646c7ff31f6fbe44f0a5db304dda835cf1bb7746816d1ae70d99721c630bd50889cdbf28ea2d3947d4e6618
+    got: ^11.8.5
+  checksum: 384c7fddba9d660acb5d98f6f66b8ba558112e3ae9556a34636d12efd7cfb99cdfc0055dbdc85e34f292f3303586ad2a0dcc418b89918f8ab98bff17a8e64848
   languageName: node
   linkType: hard
 
@@ -56,7 +56,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blockfrost/blockfrost-websocket-link@workspace:."
   dependencies:
-    "@blockfrost/blockfrost-js": 4.2.0
+    "@blockfrost/blockfrost-js": 5.1.0-beta.1
     "@emurgo/cardano-serialization-lib-nodejs": ^10.2.0
     "@sentry/integrations": ^7.5.1
     "@sentry/node": ^7.5.1
@@ -2672,7 +2672,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^11.8.3":
+"got@npm:^11.8.3, got@npm:^11.8.5":
   version: 11.8.5
   resolution: "got@npm:11.8.5"
   dependencies:
