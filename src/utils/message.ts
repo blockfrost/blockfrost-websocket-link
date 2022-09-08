@@ -17,32 +17,40 @@ export const getMessage = (message: string): Messages | undefined => {
 };
 
 export const prepareErrorMessage = (id: number, error: unknown): string => {
-  logger.debug(`Prepared error response for id ${id}`, (error as Error)?.message);
+  logger.debug(`Prepared error response for id ${id}.`, error);
 
-  return error instanceof BlockfrostClientError ||
+  if (
+    error instanceof BlockfrostClientError ||
     error instanceof BlockfrostServerError ||
     error instanceof Error
-    ? JSON.stringify({
-        id,
-        type: 'error',
-        data: {
-          error: {
-            ...serializeError({
-              ...error,
-              // 400 Bad Request could be directly from the Cardano Submit API due to invalid tx, forward a body which includes the error as a message
-              message: (error as BlockfrostServerError).body ?? error.message,
-            }),
-            stack: undefined,
-          },
+  ) {
+    const serializedError = serializeError({
+      ...error,
+      // 400 Bad Request could be directly from the Cardano Submit API due to invalid tx, forward a body which includes the error as a message
+      message: (error as BlockfrostServerError).body ?? error.message,
+      body: undefined,
+    });
+
+    return JSON.stringify({
+      id,
+      type: 'error',
+      data: {
+        error: {
+          ...serializedError,
+          stack: undefined,
         },
-      })
-    : JSON.stringify({
-        id,
-        type: 'error',
-        data: {
-          error: error,
-        },
-      });
+      },
+    });
+  } else {
+    // string and other non-Error messages
+    return JSON.stringify({
+      id,
+      type: 'error',
+      data: {
+        error: { message: error },
+      },
+    });
+  }
 };
 
 export const prepareMessage = (

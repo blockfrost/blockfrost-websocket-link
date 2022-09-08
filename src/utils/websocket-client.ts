@@ -1,11 +1,12 @@
 import WebSocket from 'ws';
+
 import { Deferred } from '../../scripts/performance/utils';
 import { MESSAGES } from '../constants';
 
 export class WebsocketClient {
   client: WebSocket;
   pingTimeout: NodeJS.Timeout | undefined;
-  responseWaitList: { id: number; dfd: Deferred<any> }[] = [];
+  responseWaitList: { id: number; dfd: Deferred<unknown> }[] = [];
   debug = false;
   private msgId = 0;
   private _connected = false;
@@ -23,7 +24,7 @@ export class WebsocketClient {
       }
     });
 
-    this.client.on('message', (data: any) => {
+    this.client.on('message', (data: string) => {
       this.onMessage(data);
     });
     this.client.on('ping', this.heartbeat);
@@ -54,7 +55,7 @@ export class WebsocketClient {
     return this._connected;
   }
 
-  onMessage = (data: any) => {
+  onMessage = (data: string) => {
     const message = JSON.parse(data);
 
     if (this.debug) {
@@ -69,7 +70,7 @@ export class WebsocketClient {
     }
   };
 
-  send = (command: keyof typeof MESSAGES, parameters?: Record<string, any>) => {
+  send = (command: keyof typeof MESSAGES, parameters?: Record<string, unknown>) => {
     const id = this.msgId;
     const stringifiedMessage = JSON.stringify({
       id: id,
@@ -86,7 +87,7 @@ export class WebsocketClient {
 
   sendAndWait = async (
     command: keyof typeof MESSAGES,
-    parameters?: Record<string, any>,
+    parameters?: Record<string, unknown>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     const id = this.msgId;
