@@ -22,14 +22,10 @@ export const prepareErrorMessage = (id: number, error: unknown): string => {
   if (
     error instanceof BlockfrostClientError ||
     error instanceof BlockfrostServerError ||
-    error instanceof Error
+    error instanceof Error ||
+    (typeof error === 'object' && error !== null && 'message' in error)
   ) {
-    const serializedError = serializeError({
-      ...error,
-      // 400 Bad Request could be directly from the Cardano Submit API due to invalid tx, forward a body which includes the error as a message
-      message: (error as BlockfrostServerError).body ?? error.message,
-      body: undefined,
-    });
+    const serializedError = serializeError(error);
 
     return JSON.stringify({
       id,
