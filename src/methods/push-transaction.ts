@@ -10,23 +10,35 @@ export default async (id: number, transaction: Uint8Array | string): Promise<str
 
     return message;
   } catch (error) {
-    logger.error(error);
     if (error instanceof BlockfrostClientError && error.code === 'ETIMEDOUT') {
       // Request timed out. Most likely mempool is full since that's the only reason why submit api should get stuck
       const errorMessage = 'Mempool is full, please try resubmitting again later.';
       const message = prepareErrorMessage(id, errorMessage);
 
+      logger.error(error);
       return message;
     } else if (error instanceof BlockfrostServerError && error.status_code === 400) {
       // 400 Bad Request could be directly from the Cardano Submit API due to invalid tx, forward a body which includes the error as a message
-      const message = prepareErrorMessage(id, {
+      const formattedError = {
         ...error,
         message: error.body ?? error.message,
         body: undefined,
-      });
+      };
+      const message = prepareErrorMessage(id, formattedError);
+
+      logger.error(
+        new BlockfrostServerError({
+          ...formattedError,
+          // error.body containing error msg from cardano submit api will be passed as a message in error object
+          // resulting in easier to use reports
+          message:
+            typeof formattedError.message === 'string' ? formattedError.message : error.message,
+        }),
+      );
 
       return message;
     } else {
+      logger.error(error);
       const message = prepareErrorMessage(id, error);
 
       return message;
