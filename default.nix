@@ -33,7 +33,7 @@ rec {
         ${nodePackages.pm2}/bin/pm2 delete all; \
           ${nodePackages.pm2}/bin/pm2 start \
           $out/libexec/source/dist/src/server.js \
-          --interpreter=${nodejs-16_x}/bin/node --node-args="--max-http-header-size=32768" \
+          --interpreter=${nodejs-16_x}/bin/node --node-args="--require $out/libexec/source/.pnp.cjs --max-http-header-size=32768" \
           --max-memory-restart 1500M \
           -i max --time --no-daemon
         EOF
