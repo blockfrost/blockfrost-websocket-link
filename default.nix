@@ -5,6 +5,7 @@
     })
     { }
 }:
+with pkgs;
 rec {
   blockfrost-websocket-link =
     let
@@ -28,7 +29,13 @@ rec {
         mkdir -p $out/bin
         cat <<EOF > $out/bin/${name}
         #!${pkgs.runtimeShell}
-        ${pkgs.nodejs-16_x}/bin/node --require "$out/libexec/source/.pnp.cjs" $out/libexec/source/dist/src/server.js
+        echo "Starting ${name} ...";
+        ${nodePackages.pm2}/bin/pm2 delete all; \
+          ${nodePackages.pm2}/bin/pm2 start \
+          $out/libexec/source/dist/src/server.js \
+          --interpreter=${nodejs-16_x}/bin/node --node-args="--max-http-header-size=32768" \
+          --max-memory-restart 1500M \
+          -i max --time --no-daemon
         EOF
         chmod +x $out/bin/${name}
       '';
