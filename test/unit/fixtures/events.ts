@@ -62,6 +62,8 @@ export const onBlock = [
         previous_block: '426440d04d9591508760e4c4602701d960c91536c61e1b769d4c38dd4e4c07db',
         next_block: 'ad8514bee933f0e08cb6f8444fe83b0149217ff95a80b08e1f23574c31f69f9f',
         confirmations: 14,
+        op_cert: null,
+        op_cert_counter: null,
       },
       addressesAffectedInBlock: [
         {
@@ -358,6 +360,8 @@ export const onBlock = [
           previous_block: '426440d04d9591508760e4c4602701d960c91536c61e1b769d4c38dd4e4c07db',
           next_block: 'ad8514bee933f0e08cb6f8444fe83b0149217ff95a80b08e1f23574c31f69f9f',
           confirmations: 14,
+          op_cert: null,
+          op_cert_counter: null,
         },
       },
       {
@@ -617,6 +621,8 @@ export const onBlock = [
         previous_block: '426440d04d9591508760e4c4602701d960c91536c61e1b769d4c38dd4e4c07db',
         next_block: 'ad8514bee933f0e08cb6f8444fe83b0149217ff95a80b08e1f23574c31f69f9f',
         confirmations: 14,
+        op_cert: null,
+        op_cert_counter: null,
       },
       addressesAffectedInBlock: [
         {
@@ -719,6 +725,8 @@ export const onBlock = [
           previous_block: '426440d04d9591508760e4c4602701d960c91536c61e1b769d4c38dd4e4c07db',
           next_block: 'ad8514bee933f0e08cb6f8444fe83b0149217ff95a80b08e1f23574c31f69f9f',
           confirmations: 14,
+          op_cert: null,
+          op_cert_counter: null,
         },
       },
       {
@@ -799,6 +807,8 @@ export const onBlock = [
         previous_block: '426440d04d9591508760e4c4602701d960c91536c61e1b769d4c38dd4e4c07db',
         next_block: 'ad8514bee933f0e08cb6f8444fe83b0149217ff95a80b08e1f23574c31f69f9f',
         confirmations: 14,
+        op_cert: null,
+        op_cert_counter: null,
       },
       addressesAffectedInBlock: [
         {
@@ -838,6 +848,8 @@ export const onBlock = [
           previous_block: '426440d04d9591508760e4c4602701d960c91536c61e1b769d4c38dd4e4c07db',
           next_block: 'ad8514bee933f0e08cb6f8444fe83b0149217ff95a80b08e1f23574c31f69f9f',
           confirmations: 14,
+          op_cert: null,
+          op_cert_counter: null,
         },
       },
     ],

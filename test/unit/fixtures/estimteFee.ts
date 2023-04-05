@@ -34,6 +34,9 @@ export default [
       max_collateral_inputs: 3,
       coins_per_utxo_word: '4310',
       coins_per_utxo_size: '4310',
+      cost_models: {
+        
+      }
     },
     epochLatest: {
       epoch: 298,

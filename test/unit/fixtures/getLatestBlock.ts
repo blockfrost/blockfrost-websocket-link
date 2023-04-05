@@ -18,6 +18,8 @@ export default [
       previous_block: 'dabe0ec6cf11034b2024a4e5bb24c4037274027c91c37978e8ffd6848de7939d',
       next_block: null,
       confirmations: 0,
+      op_cert: null,
+      op_cert_counter: null,
     },
     result: {
       id: 1,
@@ -38,6 +40,8 @@ export default [
         previous_block: 'dabe0ec6cf11034b2024a4e5bb24c4037274027c91c37978e8ffd6848de7939d',
         next_block: null,
         confirmations: 0,
+        op_cert: null,
+        op_cert_counter: null,
       },
     },
   },
