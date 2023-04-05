@@ -18,6 +18,8 @@ export default [
       previous_block: null,
       next_block: '89d9b5a5b8ddc8d7e5a6795e9774d97faf1efea59b2caf7eaf9f8c5b32059df4',
       confirmations: 6420635,
+      op_cert: null,
+      op_cert_counter: null,
     },
     result: {
       id: 1,
@@ -38,6 +40,8 @@ export default [
         previous_block: null,
         next_block: '89d9b5a5b8ddc8d7e5a6795e9774d97faf1efea59b2caf7eaf9f8c5b32059df4',
         confirmations: 6420635,
+        op_cert: null,
+        op_cert_counter: null,
       },
     },
   },
