@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - throw error if any of the partial calls of GetAccountInfo fails
 - memoized address derivation in getAccountInfo method
 - transaction (as part of `getAccountInfo` or emitted as a notification for an address subscription) no longer includes `blockInfo` field. (`block_hash`, `block_height`, `block_time` are available directly in transaction object)
+- updated dependencies
 
 ## [1.0.1] - 2021-10-26
 
