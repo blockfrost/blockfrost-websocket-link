@@ -1,6 +1,6 @@
 {
   "name": "@blockfrost/blockfrost-websocket-link",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "scripts": {
     "prebuild": "yarn clean",
     "build": "yarn clean && tsc",
