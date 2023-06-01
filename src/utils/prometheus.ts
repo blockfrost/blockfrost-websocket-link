@@ -3,6 +3,7 @@ import { healthCheck } from './health';
 import { assetMetadataLimiter, pLimiter, ratesLimiter } from './limiter';
 import { logger } from './logger';
 import { getPort } from './server';
+import { HEALTHCHECK_FAIL_THRESHOLD_MS } from '../constants/config';
 
 const port = getPort();
 
@@ -20,6 +21,7 @@ export class MetricsCollector {
   intervalId: NodeJS.Timer | undefined;
   wss: WebSocketServer;
   healthy = true;
+  healthCheckFailingSince: number | null = null;
 
   constructor(wss: WebSocketServer, interval: number) {
     this.wss = wss;
@@ -31,9 +33,23 @@ export class MetricsCollector {
     try {
       await healthCheck(`ws://localhost:${port}`);
       this.healthy = true;
+      this.healthCheckFailingSince = null;
     } catch (error) {
       logger.error(error);
       this.healthy = false;
+      if (this.healthCheckFailingSince) {
+        const failDurationMs = Date.now() - this.healthCheckFailingSince;
+
+        if (failDurationMs > HEALTHCHECK_FAIL_THRESHOLD_MS) {
+          logger.error(
+            `Healthcheck failing for longer than ${HEALTHCHECK_FAIL_THRESHOLD_MS} ms. Exiting process.`,
+          );
+          // eslint-disable-next-line unicorn/no-process-exit
+          process.exit(1);
+        }
+      } else {
+        this.healthCheckFailingSince = Date.now();
+      }
     }
     logger.info('[HealthCheck] Health check done');
     return {
