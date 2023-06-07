@@ -28,7 +28,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
-            ["@blockfrost/blockfrost-js", "npm:5.3.0-beta.0"],\
+            ["@blockfrost/blockfrost-js", "npm:5.3.2-beta.0"],\
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:10.2.0"],\
             ["@sentry/integrations", "npm:7.46.0"],\
             ["@sentry/node", "npm:7.46.0"],\
@@ -271,12 +271,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@blockfrost/blockfrost-js", [\
-        ["npm:5.3.0-beta.0", {\
-          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-5.3.0-beta.0-1f8c071f98-201284addd.zip/node_modules/@blockfrost/blockfrost-js/",\
+        ["npm:5.3.2-beta.0", {\
+          "packageLocation": "./.yarn/cache/@blockfrost-blockfrost-js-npm-5.3.2-beta.0-3f27d58748-bdbb23961d.zip/node_modules/@blockfrost/blockfrost-js/",\
           "packageDependencies": [\
-            ["@blockfrost/blockfrost-js", "npm:5.3.0-beta.0"],\
+            ["@blockfrost/blockfrost-js", "npm:5.3.2-beta.0"],\
             ["@blockfrost/openapi", "npm:0.1.57"],\
-            ["@emurgo/cardano-serialization-lib-nodejs", "npm:10.2.0"],\
+            ["@emurgo/cardano-serialization-lib-nodejs", "npm:11.4.0"],\
             ["@emurgo/cip14-js", "npm:3.0.1"],\
             ["bottleneck", "npm:2.19.5"],\
             ["form-data", "npm:4.0.0"],\
@@ -291,7 +291,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["@blockfrost/blockfrost-websocket-link", "workspace:."],\
-            ["@blockfrost/blockfrost-js", "npm:5.3.0-beta.0"],\
+            ["@blockfrost/blockfrost-js", "npm:5.3.2-beta.0"],\
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:10.2.0"],\
             ["@sentry/integrations", "npm:7.46.0"],\
             ["@sentry/node", "npm:7.46.0"],\
@@ -397,6 +397,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-10.2.0-220a08c8b9-4337c4b57d.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",\
           "packageDependencies": [\
             ["@emurgo/cardano-serialization-lib-nodejs", "npm:10.2.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:11.4.0", {\
+          "packageLocation": "./.yarn/cache/@emurgo-cardano-serialization-lib-nodejs-npm-11.4.0-98e9c716e3-2033f63352.zip/node_modules/@emurgo/cardano-serialization-lib-nodejs/",\
+          "packageDependencies": [\
+            ["@emurgo/cardano-serialization-lib-nodejs", "npm:11.4.0"]\
           ],\
           "linkType": "HARD"\
         }]\
