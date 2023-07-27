@@ -1,13 +1,13 @@
 import EventEmitter from 'events';
-import * as Server from './types/server';
-import { prepareMessage } from './utils/message';
-import { blockfrostAPI } from './utils/blockfrost-api';
+import * as Server from './types/server.js';
+import { prepareMessage } from './utils/message.js';
+import { blockfrostAPI } from './utils/blockfrost-api.js';
 import { Responses } from '@blockfrost/blockfrost-js';
-import { promiseTimeout } from './utils/common';
-import { getTransactionsWithUtxo } from './utils/transaction';
-import { TxNotification } from './types/response';
-import { EMIT_MAX_MISSED_BLOCKS } from './constants/config';
-import { logger } from './utils/logger';
+import { promiseTimeout } from './utils/common.js';
+import { getTransactionsWithUtxo } from './utils/transaction.js';
+import { TxNotification } from './types/response.js';
+import { EMIT_MAX_MISSED_BLOCKS } from './constants/config.js';
+import { logger } from './utils/logger.js';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;

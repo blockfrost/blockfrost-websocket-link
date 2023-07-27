@@ -1,9 +1,9 @@
 import { WebSocketServer } from 'ws';
-import { healthCheck } from './health';
-import { assetMetadataLimiter, pLimiter, ratesLimiter } from './limiter';
-import { logger } from './logger';
-import { getPort } from './server';
-import { HEALTHCHECK_FAIL_THRESHOLD_MS } from '../constants/config';
+import { healthCheck } from './health.js';
+import { assetMetadataLimiter, pLimiter, ratesLimiter } from './limiter.js';
+import { logger } from './logger.js';
+import { getPort } from './server.js';
+import { HEALTHCHECK_FAIL_THRESHOLD_MS } from '../constants/config.js';
 
 const port = getPort();
 

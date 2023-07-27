@@ -1,4 +1,4 @@
-import { AssetBalance } from './response';
+import { AssetBalance } from './response.js';
 export interface TxIdsToTransactionsResponse {
   txUtxos: TransformedTransactionUtxo;
   txData: TransformedTransaction;

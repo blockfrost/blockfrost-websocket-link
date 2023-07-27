@@ -8,6 +8,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:import/recommended',
     'prettier',
     'plugin:unicorn/recommended',
   ],
@@ -21,7 +22,9 @@ module.exports = {
     'arrow-parens': [2, 'as-needed'],
     'prettier/prettier': 2,
     eqeqeq: ['error', 'always'],
-    'unicorn/prefer-module': 0,
+    'unicorn/prevent-abbreviations': 'off',
     'unicorn/prefer-node-protocol': 0,
+    'import/extensions': ['error', 'always'],
+    'import/no-unresolved': 'off',
   },
 };

@@ -1,15 +1,15 @@
-import { ADDRESS_GAP_LIMIT } from '../constants/config';
-import * as Addresses from '../types/address';
-import { blockfrostAPI } from '../utils/blockfrost-api';
+import { ADDRESS_GAP_LIMIT } from '../constants/config.js';
+import * as Addresses from '../types/address.js';
+import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import {
   BlockfrostServerError,
   deriveAddress as sdkDeriveAddress,
   Responses,
 } from '@blockfrost/blockfrost-js';
 import memoizee from 'memoizee';
-import { getAssetData, transformAsset } from './asset';
-import { logger } from './logger';
-import { assetMetadataLimiter, pLimiter } from './limiter';
+import { getAssetData, transformAsset } from './asset.js';
+import { logger } from './logger.js';
+import { assetMetadataLimiter, pLimiter } from './limiter.js';
 
 export const deriveAddress = (
   publicKey: string,
@@ -70,7 +70,9 @@ export const discoverAddresses = async (
       );
 
       addressCount++;
-      const promise = pLimiter.add(() => blockfrostAPI.addresses(address));
+      const promise = pLimiter.add(() => blockfrostAPI.addresses(address), {
+        throwOnTimeout: true,
+      });
 
       promisesBundle.push({ address, promise, path });
     }
@@ -112,15 +114,17 @@ export const addressesToUtxos = async (
   const promises = addresses.map(item =>
     item.data === 'empty'
       ? []
-      : pLimiter.add(() =>
-          // change batchSize to fetch only 1 page at a time (each page has 100 utxos)
-          blockfrostAPI.addressesUtxosAll(item.address, { batchSize: 1 }).catch(error => {
-            if (error instanceof BlockfrostServerError && error.status_code === 404) {
-              return [];
-            } else {
-              throw error;
-            }
-          }),
+      : pLimiter.add(
+          () =>
+            // change batchSize to fetch only 1 page at a time (each page has 100 utxos)
+            blockfrostAPI.addressesUtxosAll(item.address, { batchSize: 1 }).catch(error => {
+              if (error instanceof BlockfrostServerError && error.status_code === 404) {
+                return [];
+              } else {
+                throw error;
+              }
+            }),
+          { throwOnTimeout: true },
         ),
   );
 
@@ -133,7 +137,7 @@ export const addressesToUtxos = async (
       for (const a of utxo.amount) a.unit !== 'lovelace' ? assets.add(a.unit) : undefined;
 
   const tokenMetadata = await Promise.all(
-    [...assets].map(a => assetMetadataLimiter.add(() => getAssetData(a))),
+    [...assets].map(a => assetMetadataLimiter.add(() => getAssetData(a), { throwOnTimeout: true })),
   );
 
   return addresses.map((addr, index) => ({
@@ -160,13 +164,15 @@ export const utxosWithBlocks = async (
     if (utxo.data === 'empty') continue;
 
     for (const utxoData of utxo.data) {
-      const promise = pLimiter.add(() =>
-        blockfrostAPI.blocks(utxoData.block).then(blockData => ({
-          address: utxo.address,
-          path: utxo.path,
-          utxoData: utxoData,
-          blockInfo: blockData,
-        })),
+      const promise = pLimiter.add(
+        () =>
+          blockfrostAPI.blocks(utxoData.block).then(blockData => ({
+            address: utxo.address,
+            path: utxo.path,
+            utxoData: utxoData,
+            blockInfo: blockData,
+          })),
+        { throwOnTimeout: true },
       );
 
       promisesBundle.push(promise);
@@ -189,25 +195,27 @@ export const addressesToTxIds = async (
   for (const item of addresses) {
     if (item.data === 'empty') continue;
 
-    const promise = pLimiter.add(() =>
-      // 1 page (100 txs) per address at a time should be more efficient default value
-      // compared to fetching 10 pages (1000 txs) per address
-      blockfrostAPI
-        .addressesTransactionsAll(item.address, { batchSize: 1 })
-        .then(data => ({
-          address: item.address,
-          data,
-        }))
-        .catch(error => {
-          if (error instanceof BlockfrostServerError && error.status_code === 404) {
-            return {
-              address: item.address,
-              data: [],
-            };
-          } else {
-            throw error;
-          }
-        }),
+    const promise = pLimiter.add(
+      () =>
+        // 1 page (100 txs) per address at a time should be more efficient default value
+        // compared to fetching 10 pages (1000 txs) per address
+        blockfrostAPI
+          .addressesTransactionsAll(item.address, { batchSize: 1 })
+          .then(data => ({
+            address: item.address,
+            data,
+          }))
+          .catch(error => {
+            if (error instanceof BlockfrostServerError && error.status_code === 404) {
+              return {
+                address: item.address,
+                data: [],
+              };
+            } else {
+              throw error;
+            }
+          }),
+      { throwOnTimeout: true },
     );
 
     promisesBundle.push(promise);
@@ -233,20 +241,22 @@ export const getAddressesData = async (
   }
 
   const promises = addresses.map(addr =>
-    pLimiter.add(() =>
-      blockfrostAPI.addressesTotal(addr.address).catch(error => {
-        if (error.status_code === 404) {
-          return {
-            address: addr.address,
-            path: addr.path,
-            tx_count: 0,
-            received_sum: [{ unit: 'lovelace', quantity: '0' }],
-            sent_sum: [{ unit: 'lovelace', quantity: '0' }],
-          };
-        } else {
-          throw new Error(error);
-        }
-      }),
+    pLimiter.add(
+      () =>
+        blockfrostAPI.addressesTotal(addr.address).catch(error => {
+          if (error.status_code === 404) {
+            return {
+              address: addr.address,
+              path: addr.path,
+              tx_count: 0,
+              received_sum: [{ unit: 'lovelace', quantity: '0' }],
+              sent_sum: [{ unit: 'lovelace', quantity: '0' }],
+            };
+          } else {
+            throw new Error(error);
+          }
+        }),
+      { throwOnTimeout: true },
     ),
   );
   const responses = await Promise.all(promises);

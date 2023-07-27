@@ -1,8 +1,8 @@
 import sinon from 'sinon';
 import { describe, test, expect } from 'vitest';
-import fixtures from '../../fixtures/getBlock';
-import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
-import getBlock from '../../../../src/methods/get-block';
+import fixtures from '../../fixtures/getBlock.js';
+import { blockfrostAPI } from '../../../../src/utils/blockfrost-api.js';
+import getBlock from '../../../../src/methods/get-block.js';
 
 describe('getBlock', () => {
   for (const fixture of fixtures) {

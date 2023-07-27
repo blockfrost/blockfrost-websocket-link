@@ -1,6 +1,6 @@
-import { ALL_SEED } from './constants';
-import { deriveAddressesForXpub, generateRandomAccounts, randomIntFromInterval } from './utils';
-import { WebsocketClient } from '../../src/utils/websocket-client';
+import { ALL_SEED } from './constants.js';
+import { deriveAddressesForXpub, generateRandomAccounts, randomIntFromInterval } from './utils.js';
+import { WebsocketClient } from '../../src/utils/websocket-client.js';
 
 interface TestSuiteMetrics {
   accounts: number;
@@ -59,12 +59,15 @@ class TestSuite {
       }, 20_000);
 
       // refetch balance history (could happen after receiving/sending tx)
-      setInterval(() => {
-        c.send('GET_BALANCE_HISTORY', {
-          descriptor: xpub,
-          groupBy: 86_400, // 1 day
-        });
-      }, randomIntFromInterval(600, 1200) * 1000); // every 10-20 mins
+      setInterval(
+        () => {
+          c.send('GET_BALANCE_HISTORY', {
+            descriptor: xpub,
+            groupBy: 86_400, // 1 day
+          });
+        },
+        randomIntFromInterval(600, 1200) * 1000,
+      ); // every 10-20 mins
       this.metrics.accounts += 1;
     }
     for (const xpub of xpubs) {

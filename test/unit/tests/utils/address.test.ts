@@ -1,5 +1,5 @@
-import * as addressUtils from '../../../../src/utils/address';
-import * as fixtures from '../../fixtures/address';
+import * as addressUtils from '../../../../src/utils/address.js';
+import * as fixtures from '../../fixtures/address.js';
 import { describe, test, expect } from 'vitest';
 
 describe('address utils', () => {

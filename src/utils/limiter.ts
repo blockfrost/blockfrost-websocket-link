@@ -1,6 +1,9 @@
 import PQueue from 'p-queue';
-import { FIAT_RATES_REQUESTS_PER_SEC, BLOCKFROST_REQUEST_CONCURRENCY } from '../constants/config';
-import { logger } from './logger';
+import {
+  FIAT_RATES_REQUESTS_PER_SEC,
+  BLOCKFROST_REQUEST_CONCURRENCY,
+} from '../constants/config.js';
+import { logger } from './logger.js';
 
 export const pLimiter = new PQueue({ concurrency: BLOCKFROST_REQUEST_CONCURRENCY });
 
@@ -13,12 +16,10 @@ export const ratesLimiter = new PQueue({
   carryoverConcurrencyCount: true,
 });
 
-// @ts-expect-error error event not defined, but it exists
 pLimiter.on('error', error => {
   logger.error(`pLimiter error`, error);
 });
 
-// @ts-expect-error error event not defined, but it exists
 ratesLimiter.on('error', error => {
   logger.error(`ratesLimiter error`, error);
 });

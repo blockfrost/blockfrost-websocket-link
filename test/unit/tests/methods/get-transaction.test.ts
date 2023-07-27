@@ -1,8 +1,8 @@
 import sinon from 'sinon';
 import { describe, test, expect } from 'vitest';
-import fixtures from '../../fixtures/getTransaction';
-import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
-import getTransaction from '../../../../src/methods/get-transaction';
+import fixtures from '../../fixtures/getTransaction.js';
+import { blockfrostAPI } from '../../../../src/utils/blockfrost-api.js';
+import getTransaction from '../../../../src/methods/get-transaction.js';
 
 describe('getTransaction', () => {
   for (const fixture of fixtures) {

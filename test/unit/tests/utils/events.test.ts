@@ -1,18 +1,18 @@
 import sinon from 'sinon';
-import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
-import { emitBlock, events, onBlock, _resetPreviousBlock } from '../../../../src/events';
-import { Subscription, Ws } from '../../../../src/types/server';
-import * as txUtils from '../../../../src/utils/transaction';
+import { blockfrostAPI } from '../../../../src/utils/blockfrost-api.js';
+import { emitBlock, events, onBlock, _resetPreviousBlock } from '../../../../src/events.js';
+import { Subscription, Ws } from '../../../../src/types/server.js';
+import * as txUtils from '../../../../src/utils/transaction.js';
 import { describe, test, expect, vi } from 'vitest';
 
-import * as fixtures from '../../fixtures/events';
+import * as fixtures from '../../fixtures/events.js';
 import {
   TransformedTransaction,
   TransformedTransactionUtxo,
-} from '../../../../src/types/transactions';
+} from '../../../../src/types/transactions.js';
 
 describe('events', () => {
-  fixtures.emitBlock.forEach(fixture => {
+  for (const fixture of fixtures.emitBlock) {
     test(fixture.description, async () => {
       // @ts-ignore
       const mock1 = sinon.stub(blockfrostAPI, 'blocksLatest').resolves(fixture.blocks[0]);
@@ -26,7 +26,7 @@ describe('events', () => {
       expect(callback).toBeCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(fixture.blocks[0]);
     });
-  });
+  }
 
   for (const fixture of fixtures.emitMissedBlock) {
     test(fixture.description, async () => {
@@ -71,6 +71,7 @@ describe('events', () => {
 
     test(`${fixture.description} - timeout test`, async () => {
       const blockLatestMock = sinon.stub(blockfrostAPI, 'blocksLatest');
+
       blockLatestMock
         .onCall(0)
         // @ts-ignore
@@ -80,9 +81,11 @@ describe('events', () => {
         // @ts-ignore
         .resolves(fixture.latestBlocks[1]);
       const callback = vi.fn();
+
       events.on('newBlock', callback);
 
       const blockMock = sinon.stub(blockfrostAPI, 'blocks');
+
       blockMock
         .onCall(0)
         // @ts-ignore
@@ -125,7 +128,7 @@ describe('events', () => {
     });
   }
 
-  fixtures.onBlock.forEach(fixture => {
+  for (const fixture of fixtures.onBlock) {
     test(`onBlock: ${fixture.description}`, async () => {
       const mockedSend = vi.fn((payload: string) => {
         // console.log('payload', JSON.parse(payload));
@@ -133,7 +136,7 @@ describe('events', () => {
       });
 
       const wsClientMock = {
-        send: (msg: string) => mockedSend(msg),
+        send: (message: string) => mockedSend(message),
       };
 
       vi.spyOn(txUtils, 'getTransactionsWithUtxo').mockImplementation((txids: string[]) => {
@@ -141,7 +144,7 @@ describe('events', () => {
           // sanity check that the test really wanted to fetch transactions that we expected
           for (const mockedTx of fixture.mocks.txsWithUtxo) {
             if (!txids.find(txid => mockedTx.txData.hash === txid)) {
-              throw Error('Unexpected list of affected addresses');
+              throw new Error('Unexpected list of affected addresses');
             }
           }
           resolve(
@@ -183,5 +186,5 @@ describe('events', () => {
       vi.resetAllMocks();
       vi.restoreAllMocks();
     });
-  });
+  }
 });

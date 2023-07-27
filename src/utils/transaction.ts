@@ -1,10 +1,10 @@
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
-import * as Types from '../types/transactions';
-import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions';
-import { blockfrostAPI } from '../utils/blockfrost-api';
-import { getAssetData, transformAsset } from './asset';
-import { assetMetadataLimiter, pLimiter } from './limiter';
-import { logger } from './logger';
+import * as Types from '../types/transactions.js';
+import { TransformedTransaction, TransformedTransactionUtxo } from '../types/transactions.js';
+import { blockfrostAPI } from '../utils/blockfrost-api.js';
+import { getAssetData, transformAsset } from './asset.js';
+import { assetMetadataLimiter, pLimiter } from './limiter.js';
+import { logger } from './logger.js';
 
 export const sortTransactionsCmp = <
   T extends {
@@ -52,7 +52,9 @@ export const txIdsToTransactions = async (
 
   for (const item of txidsPerAddress) {
     for (const tx of item.data) {
-      promises.push(pLimiter.add(() => fetchTxWithUtxo(tx, item.address)));
+      promises.push(
+        pLimiter.add(() => fetchTxWithUtxo(tx, item.address), { throwOnTimeout: true }),
+      );
     }
   }
 
@@ -71,12 +73,17 @@ export const getTransactionsWithUtxo = async (
 ): Promise<{ txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[]> => {
   const txsData = await Promise.all(
     txids.map(txid =>
-      pLimiter.add(() => blockfrostAPI.txs(txid).then(data => transformTransactionData(data))),
+      pLimiter.add(() => blockfrostAPI.txs(txid).then(data => transformTransactionData(data)), {
+        throwOnTimeout: true,
+      }),
     ),
   );
   const txsUtxo = await Promise.all(
     txids.map(txid =>
-      pLimiter.add(() => blockfrostAPI.txsUtxos(txid).then(data => transformTransactionUtxo(data))),
+      pLimiter.add(
+        () => blockfrostAPI.txsUtxos(txid).then(data => transformTransactionUtxo(data)),
+        { throwOnTimeout: true },
+      ),
     ),
   );
 
@@ -90,7 +97,9 @@ export const transformTransactionData = async (
   tx: Responses['tx_content'],
 ): Promise<Types.TransformedTransaction> => {
   const assetsMetadata = await Promise.all(
-    tx.output_amount.map(asset => assetMetadataLimiter.add(() => getAssetData(asset.unit))),
+    tx.output_amount.map(asset =>
+      assetMetadataLimiter.add(() => getAssetData(asset.unit), { throwOnTimeout: true }),
+    ),
   );
 
   return {
@@ -110,7 +119,7 @@ export const transformTransactionUtxo = async (
   const assetsMetadata = await Promise.all(
     [...assets]
       .filter(asset => asset !== 'lovelace')
-      .map(asset => assetMetadataLimiter.add(() => getAssetData(asset))),
+      .map(asset => assetMetadataLimiter.add(() => getAssetData(asset), { throwOnTimeout: true })),
   );
 
   return {

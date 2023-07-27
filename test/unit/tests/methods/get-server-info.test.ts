@@ -1,9 +1,9 @@
 import sinon from 'sinon';
 // import * as os from 'os';
 import { describe, test, expect } from 'vitest';
-import fixtures from '../../fixtures/getServerInfo';
-import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
-import { getServerInfo } from '../../../../src/methods/get-server-info';
+import fixtures from '../../fixtures/getServerInfo.js';
+import { blockfrostAPI } from '../../../../src/utils/blockfrost-api.js';
+import { getServerInfo } from '../../../../src/methods/get-server-info.js';
 
 describe('getServerInfo', () => {
   //  TODO: hostname mock

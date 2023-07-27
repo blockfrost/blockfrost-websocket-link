@@ -1,10 +1,10 @@
 import { BlockfrostServerError, parseAsset, Responses } from '@blockfrost/blockfrost-js';
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import memoizee from 'memoizee';
-import { blockfrostAPI } from '../utils/blockfrost-api';
-import { Balance } from '../types/address';
-import { AssetBalance } from '../types/response';
-import { logger } from './logger';
+import { blockfrostAPI } from '../utils/blockfrost-api.js';
+import { Balance } from '../types/address.js';
+import { AssetBalance } from '../types/response.js';
+import { logger } from './logger.js';
 
 export const getAssetData = memoizee(
   async (hex: string) => {

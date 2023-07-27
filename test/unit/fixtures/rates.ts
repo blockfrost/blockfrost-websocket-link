@@ -1,4 +1,4 @@
-import { FIAT_RATES_PROXY } from '../../../src/constants/config';
+import { FIAT_RATES_PROXY } from '../../../src/constants/config.js';
 
 export const getFiatRatesProxies = [
   {
@@ -31,12 +31,12 @@ export const getFiatRatesProxies = [
 export const formatCoingeckoTime = [
   {
     description: 'formatCoingeckoTime: basic',
-    time: 1641561868,
+    time: 1_641_561_868,
     result: '07-01-2022',
   },
   {
     description: 'formatCoingeckoTime: basic 2',
-    time: 1643545468,
+    time: 1_643_545_468,
     result: '30-01-2022',
   },
 ];
