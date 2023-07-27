@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - upgrade codebase to ESM
 - bump Blockfrost SDK (memory leak in deriveAddress) and other dependencies
 
+### Removed
+- `ts-node-dev` (`yarn dev` no longer auto reloads on code change)
 ## [2.0.0] - 2023-04-05
 
 ### Added

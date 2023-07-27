@@ -29,7 +29,7 @@ import { getPort } from './utils/server.js';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const packageJson = require('./package.json');
+const packageJson = require('../package.json');
 
 const app = express();
 
