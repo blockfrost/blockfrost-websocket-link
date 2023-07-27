@@ -95,7 +95,9 @@ export const discoverAddresses = async (
   }
 
   const sortedResult = result.sort((item1, item2) => {
+    // eslint-disable-next-line unicorn/prefer-at
     const path1 = Number.parseInt(item1.path.split('/').slice(-1)[0], 10);
+    // eslint-disable-next-line unicorn/prefer-at
     const path2 = Number.parseInt(item2.path.split('/').slice(-1)[0], 10);
 
     return path1 - path2;

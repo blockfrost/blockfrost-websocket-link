@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - process exits after health check fails for more than `HEALTHCHECK_FAIL_THRESHOLD_MS` (default 60s)
-- bump Blockfrost SDK (memory leak in deriveAddress)
+- bump Blockfrost SDK (memory leak in deriveAddress) and other dependencies
 
 ## [2.0.0] - 2023-04-05
 

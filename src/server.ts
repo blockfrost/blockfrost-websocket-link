@@ -166,9 +166,9 @@ wss.on('connection', (ws: Server.Ws) => {
       return;
     }
     logger.debug(
-      `RECV MSG ID ${data.id} "${
-        data?.command
-      }" from client ${clientId} with params: ${JSON.stringify(data.params)}`,
+      `RECV MSG ID ${
+        data.id
+      } "${data?.command}" from client ${clientId} with params: ${JSON.stringify(data.params)}`,
     );
 
     switch (data.command) {
