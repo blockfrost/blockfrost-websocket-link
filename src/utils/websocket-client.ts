@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { Deferred } from '../../scripts/performance/utils.js';
+import { Deferred } from '../scripts/performance/utils.js';
 import { MESSAGES } from '../constants/index.js';
 
 export class WebsocketClient {

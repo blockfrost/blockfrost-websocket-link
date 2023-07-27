@@ -3,13 +3,13 @@
   "version": "2.0.0",
   "scripts": {
     "prebuild": "yarn clean",
-    "build": "yarn clean && tsc && cp package.json dist/",
+    "build": "yarn clean && tsc",
     "clean": "rimraf dist",
-    "dev": "NODE_ENV=development yarn build && yarn node ./dist/src/server.js",
+    "dev": "NODE_ENV=development yarn build && yarn node ./dist/server.js",
     "lint": "eslint ./src/**/*.ts",
-    "start": "yarn build && yarn node ./dist/src/server.js",
-    "start:profiler": "yarn build && NODE_ENV=production yarn node --prof ./dist/src/server.js",
-    "test-performance": "yarn ts-node-dev ./scripts/performance/index.ts",
+    "start": "yarn build && yarn node ./dist/server.js",
+    "start:profiler": "yarn build && NODE_ENV=production yarn node --prof ./dist/server.js",
+    "test-performance": "yarn build && yarn node ./dist/scripts/performance/index.ts",
     "test": "BLOCKFROST_PROJECT_ID='none' vitest",
     "coverage": "vitest run --coverage",
     "type-check": "tsc --project tsconfig.json"
@@ -59,6 +59,6 @@
     "node": ">=16"
   },
   "type": "module",
-  "main": "dist/src/server.js",
+  "main": "dist/server.js",
   "packageManager": "yarn@3.6.1"
 }

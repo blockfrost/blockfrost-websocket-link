@@ -1,6 +1,6 @@
 import { ALL_SEED } from './constants.js';
 import { deriveAddressesForXpub, generateRandomAccounts, randomIntFromInterval } from './utils.js';
-import { WebsocketClient } from '../../src/utils/websocket-client.js';
+import { WebsocketClient } from '../../utils/websocket-client.js';
 
 interface TestSuiteMetrics {
   accounts: number;

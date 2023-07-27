@@ -1,4 +1,4 @@
-import { ALL_SEED } from '../../scripts/performance/constants.js';
+import { ALL_SEED } from '../scripts/performance/constants.js';
 import { WebsocketClient } from './websocket-client.js';
 
 export const healthCheck = async (url: string) => {

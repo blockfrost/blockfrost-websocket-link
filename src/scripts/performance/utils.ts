@@ -3,7 +3,7 @@ import { deriveAddress } from '@blockfrost/blockfrost-js';
 
 export class Deferred<T> {
   promise: Promise<T>;
-  reject!: (reason?: any) => void;
+  reject!: (reason?: unknown) => void;
   resolve!: (value: T) => void;
   constructor() {
     this.promise = new Promise((resolve, reject) => {

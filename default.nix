@@ -28,7 +28,7 @@ rec {
         mkdir -p $out/bin
         cat <<EOF > $out/bin/${name}
         #!${pkgs.runtimeShell}
-        ${pkgs.nodejs-18_x}/bin/node --require "$out/libexec/source/.pnp.cjs" $out/libexec/source/dist/src/server.js
+        ${pkgs.nodejs-18_x}/bin/node --require "$out/libexec/source/.pnp.cjs" $out/libexec/source/dist/server.js
         EOF
         chmod +x $out/bin/${name}
       '';
