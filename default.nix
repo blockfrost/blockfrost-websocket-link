@@ -1,7 +1,7 @@
 { pkgs ? import
     (builtins.fetchTarball {
-      url = "https://github.com/NixOS/nixpkgs/archive/45c9736ed69800a6ff2164fb4538c9e40dad25d6.tar.gz";
-      sha256 = "0q84mvh4liacqv8fdxpkm28233mfm5x1s36wwxhwdq01jivk58xn";
+      url = "https://github.com/NixOS/nixpkgs/archive/9790f3242da2152d5aa1976e3e4b8b414f4dd206.tar.gz";
+      sha256 = "1y6zipys4803ckvnamfljb8raglgkbz1fz1fg03cxp4jqiiva5s1";
     })
     { }
 }:
@@ -10,7 +10,7 @@ rec {
     let
       project = pkgs.callPackage ./yarn-project.nix
         {
-          nodejs = pkgs.nodejs-16_x;
+          nodejs = pkgs.nodejs-18_x;
         }
         {
           src = pkgs.lib.cleanSource ./.;
@@ -28,7 +28,7 @@ rec {
         mkdir -p $out/bin
         cat <<EOF > $out/bin/${name}
         #!${pkgs.runtimeShell}
-        ${pkgs.nodejs-16_x}/bin/node --require "$out/libexec/source/.pnp.cjs" $out/libexec/source/dist/src/server.js
+        ${pkgs.nodejs-18_x}/bin/node --require "$out/libexec/source/.pnp.cjs" $out/libexec/source/dist/src/server.js
         EOF
         chmod +x $out/bin/${name}
       '';
