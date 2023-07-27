@@ -1,7 +1,7 @@
 import * as os from 'os';
 import express from 'express';
 import http from 'http';
-import WebSocket from 'ws';
+import { WebSocketServer } from 'ws';
 import dotenv from 'dotenv';
 dotenv.config();
 import { Responses } from '@blockfrost/blockfrost-js';
@@ -62,7 +62,7 @@ if (process.env.BLOCKFROST_SENTRY_DSN) {
 
 const port = getPort();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocketServer({ server });
 
 server.keepAliveTimeout = 65_000;
 
