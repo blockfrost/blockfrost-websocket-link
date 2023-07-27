@@ -2,7 +2,7 @@ import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { Options } from '@blockfrost/blockfrost-js/lib/types/index.js';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const packageJson = require('../../../package.json');
+const packageJson = require('../../package.json');
 
 export const getBlockfrostClient = (options?: Partial<Options>) => {
   return new BlockFrostAPI({

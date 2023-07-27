@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "scripts": {
     "prebuild": "yarn clean",
-    "build": "yarn clean && tsc",
+    "build": "yarn clean && tsc && cp package.json dist/",
     "clean": "rimraf dist",
     "dev": "NODE_ENV=development yarn build && yarn node ./dist/src/server.js",
     "lint": "eslint ./src/**/*.ts",
