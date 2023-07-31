@@ -1,5 +1,5 @@
 import { Responses } from '@blockfrost/blockfrost-js';
-import { AssetBalance } from './response';
+import { AssetBalance } from './response.js';
 
 export type Address = {
   address: string;

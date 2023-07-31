@@ -1,6 +1,6 @@
-import { prepareMessage, prepareErrorMessage } from '../utils/message';
-import { discoverAddresses, addressesToUtxos, utxosWithBlocks } from '../utils/address';
-import { logger } from '../utils/logger';
+import { prepareMessage, prepareErrorMessage } from '../utils/message.js';
+import { discoverAddresses, addressesToUtxos, utxosWithBlocks } from '../utils/address.js';
+import { logger } from '../utils/logger.js';
 
 export default async (id: number, publicKey: string): Promise<string> => {
   if (!publicKey) {

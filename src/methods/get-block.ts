@@ -1,6 +1,6 @@
-import { prepareMessage, prepareErrorMessage } from '../utils/message';
-import { blockfrostAPI } from '../utils/blockfrost-api';
-import { logger } from '../utils/logger';
+import { prepareMessage, prepareErrorMessage } from '../utils/message.js';
+import { blockfrostAPI } from '../utils/blockfrost-api.js';
+import { logger } from '../utils/logger.js';
 
 export default async (id: number, hashOrNumber: string | number): Promise<string> => {
   try {

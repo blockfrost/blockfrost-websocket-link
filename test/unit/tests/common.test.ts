@@ -1,4 +1,4 @@
-import * as utils from '../../../src/utils/common';
+import * as utils from '../../../src/utils/common.js';
 import { describe, test, expect } from 'vitest';
 
 describe('common utils', () => {

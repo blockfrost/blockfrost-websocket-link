@@ -1,10 +1,10 @@
 import { BlockfrostClientError, BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import { serializeError } from 'serialize-error';
-import { Messages } from '../types/message';
-import * as TxTypes from '../types/transactions';
-import { UtxosWithBlockResponse } from '../types/address';
-import { AccountInfo, BalanceHistoryData, ServerInfo } from '../types/response';
-import { logger } from './logger';
+import { Messages } from '../types/message.js';
+import * as TxTypes from '../types/transactions.js';
+import { UtxosWithBlockResponse } from '../types/address.js';
+import { AccountInfo, BalanceHistoryData, ServerInfo } from '../types/response.js';
+import { logger } from './logger.js';
 
 export const getMessage = (message: string): Messages | undefined => {
   try {

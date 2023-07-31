@@ -1,20 +1,20 @@
-import * as Responses from '../types/response';
-import BigNumber from 'bignumber.js';
-import * as Messages from '../types/message';
+import * as Responses from '../types/response.js';
+import { BigNumber } from 'bignumber.js';
+import * as Messages from '../types/message.js';
 import {
   discoverAddresses,
   getStakingData,
   getStakingAccountTotal,
   memoizedDeriveAddress,
-} from '../utils/address';
-import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/account';
-import { txIdsToTransactions } from '../utils/transaction';
-import { prepareMessage, prepareErrorMessage } from '../utils/message';
-import { paginate } from '../utils/common';
-import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset';
-import { blockfrostAPI } from '../utils/blockfrost-api';
-import { logger } from '../utils/logger';
-import { assetMetadataLimiter } from '../utils/limiter';
+} from '../utils/address.js';
+import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/account.js';
+import { txIdsToTransactions } from '../utils/transaction.js';
+import { prepareMessage, prepareErrorMessage } from '../utils/message.js';
+import { paginate } from '../utils/common.js';
+import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset.js';
+import { blockfrostAPI } from '../utils/blockfrost-api.js';
+import { logger } from '../utils/logger.js';
+import { assetMetadataLimiter } from '../utils/limiter.js';
 
 export const getAccountInfo = async (
   publicKey: string,
@@ -67,7 +67,7 @@ export const getAccountInfo = async (
     .filter(b => b.quantity !== '0' && b.unit !== 'lovelace');
 
   const tokenMetadataPromises = tokensBalances.map(token =>
-    assetMetadataLimiter.add(() => getAssetData(token.unit)),
+    assetMetadataLimiter.add(() => getAssetData(token.unit), { throwOnTimeout: true }),
   );
   const tokenMetadata = await Promise.all(tokenMetadataPromises);
 

@@ -1,9 +1,9 @@
 import { format } from 'date-fns';
 import got from 'got';
-import { FIAT_RATES_PROXY, FIAT_RATES_REQUESTS_TIMEOUT } from '../constants/config';
-import { blockfrostAPI } from './blockfrost-api';
-import { ratesLimiter } from './limiter';
-import { logger } from './logger';
+import { FIAT_RATES_PROXY, FIAT_RATES_REQUESTS_TIMEOUT } from '../constants/config.js';
+import { blockfrostAPI } from './blockfrost-api.js';
+import { ratesLimiter } from './limiter.js';
+import { logger } from './logger.js';
 
 export const formatCoingeckoTime = (date: number): string => {
   return format(date * 1000, 'dd-MM-yyyy');
@@ -74,5 +74,5 @@ export const getRatesForDate = async (date: number): Promise<Record<string, numb
     logger.warn(`Fiat rates limiter slowed down request for ${diff} ms!`);
   }
 
-  return ratesLimiter.add(() => getRatesForDateNoLimit(date));
+  return ratesLimiter.add(() => getRatesForDateNoLimit(date), { throwOnTimeout: true });
 };

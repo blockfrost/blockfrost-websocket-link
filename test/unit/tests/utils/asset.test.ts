@@ -1,11 +1,12 @@
 import { describe, test, expect } from 'vitest';
-import * as assetUtils from '../../../../src/utils/asset';
-import * as fixtures from '../../fixtures/asset';
+import * as assetUtils from '../../../../src/utils/asset.js';
+import * as fixtures from '../../fixtures/asset.js';
 
 describe('asset utils', () => {
   for (const fixture of fixtures.transformAsset) {
     test(fixture.description, () => {
-      expect(assetUtils.transformAsset(fixture.input, undefined)).toMatchObject(fixture.result);
+      // @ts-expect-error partial mock
+      expect(assetUtils.transformAsset(fixture.input)).toMatchObject(fixture.result);
     });
   }
 

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import * as utils from '../../../src/utils/message';
+import * as utils from '../../../src/utils/message.js';
 
 describe('messages utils', () => {
   test('get params', () => {

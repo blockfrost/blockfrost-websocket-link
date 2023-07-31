@@ -1,9 +1,9 @@
-import { Balance, AddressData } from './address';
+import { Balance, AddressData } from './address.js';
 import {
   TransformedTransaction,
   TransformedTransactionUtxo,
   TxIdsToTransactionsResponse,
-} from './transactions';
+} from './transactions.js';
 
 export interface ServerInfo {
   name: string;

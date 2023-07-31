@@ -1,7 +1,7 @@
 import * as os from 'os';
 import express from 'express';
 import http from 'http';
-import WebSocket from 'ws';
+import { WebSocketServer } from 'ws';
 import dotenv from 'dotenv';
 dotenv.config();
 import { Responses } from '@blockfrost/blockfrost-js';
@@ -9,24 +9,27 @@ import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import { CaptureConsole } from '@sentry/integrations';
 import { v4 as uuidv4 } from 'uuid';
-import packageJson from '../package.json';
-import * as Server from './types/server';
-import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants';
-import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message';
-import { MetricsCollector } from './utils/prometheus';
-import { events, onBlock, startEmitter } from './events';
-import getServerInfo from './methods/get-server-info';
-import getAccountInfo from './methods/get-account-info';
-import getAccountUtxo from './methods/get-account-utxo';
-import getBlock from './methods/get-block';
-import getTransaction from './methods/get-transaction';
-import submitTransaction from './methods/push-transaction';
-import estimateFee from './methods/estimate-fee';
-import getBalanceHistory from './methods/get-balance-history';
-import { getAffectedAddresses } from './utils/address';
-import { logger } from './utils/logger';
-import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config';
-import { getPort } from './utils/server';
+import * as Server from './types/server.js';
+import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants/index.js';
+import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message.js';
+import { MetricsCollector } from './utils/prometheus.js';
+import { events, onBlock, startEmitter } from './events.js';
+import getServerInfo from './methods/get-server-info.js';
+import getAccountInfo from './methods/get-account-info.js';
+import getAccountUtxo from './methods/get-account-utxo.js';
+import getBlock from './methods/get-block.js';
+import getTransaction from './methods/get-transaction.js';
+import submitTransaction from './methods/push-transaction.js';
+import estimateFee from './methods/estimate-fee.js';
+import getBalanceHistory from './methods/get-balance-history.js';
+import { getAffectedAddresses } from './utils/address.js';
+import { logger } from './utils/logger.js';
+import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config.js';
+import { getPort } from './utils/server.js';
+
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const packageJson = require('../package.json');
 
 const app = express();
 
@@ -59,7 +62,7 @@ if (process.env.BLOCKFROST_SENTRY_DSN) {
 
 const port = getPort();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocketServer({ server });
 
 server.keepAliveTimeout = 65_000;
 
@@ -166,9 +169,9 @@ wss.on('connection', (ws: Server.Ws) => {
       return;
     }
     logger.debug(
-      `RECV MSG ID ${data.id} "${
-        data?.command
-      }" from client ${clientId} with params: ${JSON.stringify(data.params)}`,
+      `RECV MSG ID ${
+        data.id
+      } "${data?.command}" from client ${clientId} with params: ${JSON.stringify(data.params)}`,
     );
 
     switch (data.command) {

@@ -1,15 +1,15 @@
-import BigNumber from 'bignumber.js';
-import { Address } from '../types/address';
-import { BalanceHistoryData } from '../types/response';
-import { TxIdsToTransactionsResponse } from '../types/transactions';
-import { getAccountTransactionHistory } from '../utils/account';
-import { sumAssetBalances } from '../utils/asset';
-import { getRatesForDate } from '../utils/rates';
-import { prepareErrorMessage, prepareMessage } from '../utils/message';
-import { txIdsToTransactions } from '../utils/transaction';
-import { FIAT_RATES_ENABLE_ON_TESTNET } from '../constants/config';
-import { blockfrostAPI } from '../utils/blockfrost-api';
-import { logger } from '../utils/logger';
+import { BigNumber } from 'bignumber.js';
+import { Address } from '../types/address.js';
+import { BalanceHistoryData } from '../types/response.js';
+import { TxIdsToTransactionsResponse } from '../types/transactions.js';
+import { getAccountTransactionHistory } from '../utils/account.js';
+import { sumAssetBalances } from '../utils/asset.js';
+import { getRatesForDate } from '../utils/rates.js';
+import { prepareErrorMessage, prepareMessage } from '../utils/message.js';
+import { txIdsToTransactions } from '../utils/transaction.js';
+import { FIAT_RATES_ENABLE_ON_TESTNET } from '../constants/config.js';
+import { blockfrostAPI } from '../utils/blockfrost-api.js';
+import { logger } from '../utils/logger.js';
 
 interface BalanceHistoryBin {
   from: number;

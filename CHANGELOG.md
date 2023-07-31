@@ -10,8 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - process exits after health check fails for more than `HEALTHCHECK_FAIL_THRESHOLD_MS` (default 60s)
-- bump Blockfrost SDK (memory leak in deriveAddress)
+- upgrade codebase to ESM
+- bump Blockfrost SDK (memory leak in deriveAddress) and other dependencies
+- refactored build step, entrypoint is now `dist/server.js` (previously `dist/src/server.js`)
 
+### Removed
+- `ts-node-dev` (`yarn dev` no longer auto reloads on code change)
 ## [2.0.0] - 2023-04-05
 
 ### Added

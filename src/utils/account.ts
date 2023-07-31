@@ -1,6 +1,6 @@
-import { Address } from '../types/address';
+import { Address } from '../types/address.js';
 import { Responses } from '@blockfrost/blockfrost-js';
-import { addressesToTxIds, discoverAddresses, getAddressesData } from './address';
+import { addressesToTxIds, discoverAddresses, getAddressesData } from './address.js';
 
 export const getTxidsFromAccountAddresses = async (addresses: Address[], accountEmpty: boolean) => {
   const uniqueTxIds: ({

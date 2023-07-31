@@ -1,6 +1,6 @@
 import * as os from 'os';
-import { prepareMessage, prepareErrorMessage } from '../utils/message';
-import { blockfrostAPI } from '../utils/blockfrost-api';
+import { prepareMessage, prepareErrorMessage } from '../utils/message.js';
+import { blockfrostAPI } from '../utils/blockfrost-api.js';
 
 export const getServerInfo = async () => {
   const isTestnet = blockfrostAPI.options.network !== 'mainnet';

@@ -2,11 +2,12 @@
   "compilerOptions": {
     "outDir": "dist",
     "target": "ES2021",
-    "module": "CommonJS",
+    "module": "node16",
+    "rootDir": "src",
+    "moduleResolution": "node16",
     "declaration": false,
     "isolatedModules": true,
     "strict": true,
-    "resolveJsonModule": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -21,5 +22,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["src/**/*"]
 }

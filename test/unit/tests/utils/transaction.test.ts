@@ -1,5 +1,5 @@
-import * as transactionUtils from '../../../../src/utils/transaction';
-import * as fixtures from '../../fixtures/transaction';
+import * as transactionUtils from '../../../../src/utils/transaction.js';
+import * as fixtures from '../../fixtures/transaction.js';
 import nock from 'nock';
 import { describe, test, expect, afterEach } from 'vitest';
 

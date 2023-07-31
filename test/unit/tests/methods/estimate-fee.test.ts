@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest';
 import sinon from 'sinon';
-import fixtures from '../../fixtures/estimteFee';
-import { blockfrostAPI } from '../../../../src/utils/blockfrost-api';
-import estimateFee from '../../../../src/methods/estimate-fee';
+import fixtures from '../../fixtures/estimteFee.js';
+import { blockfrostAPI } from '../../../../src/utils/blockfrost-api.js';
+import estimateFee from '../../../../src/methods/estimate-fee.js';
 
 describe('estimateFee', () => {
   for (const fixture of fixtures) {
