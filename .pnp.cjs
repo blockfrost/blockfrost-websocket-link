@@ -28,6 +28,8 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@blockfrost/blockfrost-js", "npm:5.4.0"],\
           ["@emurgo/cardano-serialization-lib-nodejs", "npm:11.4.0"],\
+          ["@esbuild/darwin-arm64", "npm:0.19.8"],\
+          ["@esbuild/linux-x64", "npm:0.19.8"],\
           ["@sentry/integrations", "npm:7.85.0"],\
           ["@sentry/node", "npm:7.85.0"],\
           ["@sentry/tracing", "npm:7.85.0"],\
@@ -156,6 +158,8 @@ const RAW_RUNTIME_STATE =
           ["@blockfrost/blockfrost-websocket-link", "workspace:."],\
           ["@blockfrost/blockfrost-js", "npm:5.4.0"],\
           ["@emurgo/cardano-serialization-lib-nodejs", "npm:11.4.0"],\
+          ["@esbuild/darwin-arm64", "npm:0.19.8"],\
+          ["@esbuild/linux-x64", "npm:0.19.8"],\
           ["@sentry/integrations", "npm:7.85.0"],\
           ["@sentry/node", "npm:7.85.0"],\
           ["@sentry/tracing", "npm:7.85.0"],\

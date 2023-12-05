@@ -83,6 +83,8 @@ __metadata:
   dependencies:
     "@blockfrost/blockfrost-js": "npm:5.4.0"
     "@emurgo/cardano-serialization-lib-nodejs": "npm:^11.4.0"
+    "@esbuild/darwin-arm64": "npm:0.19.8"
+    "@esbuild/linux-x64": "npm:0.19.8"
     "@sentry/integrations": "npm:^7.85.0"
     "@sentry/node": "npm:^7.85.0"
     "@sentry/tracing": "npm:^7.85.0"
@@ -201,6 +203,7 @@ __metadata:
 "@esbuild/darwin-arm64@npm:0.19.8":
   version: 0.19.8
   resolution: "@esbuild/darwin-arm64@npm:0.19.8"
+  checksum: 869c5ded228fe18c5d1790672336ff7cabd20aff5af98b6ce5461048d063a28bd2c89ff495b349ce044628f829836fde6cbbdb00a39d663099f5675f78be2a2d
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
@@ -369,6 +372,7 @@ __metadata:
 "@esbuild/linux-x64@npm:0.19.8":
   version: 0.19.8
   resolution: "@esbuild/linux-x64@npm:0.19.8"
+  checksum: 5f08ec37084f49213bf82fdb2f7f8ab005bf038a2b0b0f971502481fe93ac8f30f865d5212f5a423f4504a8c21ca7e309302b56b9c8750b6d34a6ab20c7ebfdb
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
