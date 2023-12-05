@@ -18,7 +18,7 @@ export const jsonToPrometheus = (metrics: Record<string, unknown>): string => {
 
 export class MetricsCollector {
   metrics = {};
-  intervalId: NodeJS.Timer | undefined;
+  intervalId: NodeJS.Timeout | undefined;
   wss: WebSocketServer;
   healthy = true;
   healthCheckFailingSince: number | null = null;
