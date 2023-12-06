@@ -28,6 +28,7 @@ import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config.js';
 import { getPort } from './utils/server.js';
 
 import { createRequire } from 'module';
+import { connectionLimiter } from './utils/connection-limiter.js';
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
@@ -141,6 +142,15 @@ wss.on('connection', async (ws: Server.Ws) => {
   const clientId = uuidv4();
 
   ws.uid = clientId;
+
+  if (!connectionLimiter.allowNewConnection(clientId)) {
+    const delay = connectionLimiter.getDelayTime();
+
+    logger.info(`[${clientId}] Delayed connection for ${delay} ms.`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    connectionLimiter.resolveQueuedConnection(clientId);
+  }
+
   addressesSubscribed[clientId] = [];
   activeSubscriptions[clientId] = [];
   clients.push({
@@ -370,6 +380,7 @@ wss.on('connection', async (ws: Server.Ws) => {
     );
     delete activeSubscriptions[clientId];
     delete addressesSubscribed[clientId];
+    connectionLimiter.resolveQueuedConnection(clientId);
   });
 });
 
