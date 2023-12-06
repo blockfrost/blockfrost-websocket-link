@@ -16,8 +16,8 @@ export const getMessage = (message: string): Messages | undefined => {
   }
 };
 
-export const prepareErrorMessage = (id: number, error: unknown): string => {
-  logger.debug(`Prepared error response for id ${id}.`, error);
+export const prepareErrorMessage = (id: number, clientId: string, error: unknown): string => {
+  logger.debug(`[${clientId}] Prepared error response for id ${id}.`, error);
 
   if (
     error instanceof BlockfrostClientError ||
@@ -51,6 +51,7 @@ export const prepareErrorMessage = (id: number, error: unknown): string => {
 
 export const prepareMessage = (
   id: string | number,
+  clientId: string,
   data:
     | ServerInfo
     | AccountInfo
@@ -65,6 +66,6 @@ export const prepareMessage = (
 ): string => {
   const message = JSON.stringify({ id, type: 'message', data });
 
-  logger.debug(`Prepared response for id ${id} with length ${message.length}`);
+  logger.debug(`[${clientId}] Prepared response for msg id ${id} with length ${message.length}`);
   return message;
 };
