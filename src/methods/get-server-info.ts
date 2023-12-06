@@ -20,14 +20,14 @@ export const getServerInfo = async () => {
   return serverInfo;
 };
 
-export default async (id: number): Promise<string> => {
+export default async (id: number, clientId: string): Promise<string> => {
   try {
     const serverInfo = await getServerInfo();
-    const message = prepareMessage(id, serverInfo);
+    const message = prepareMessage(id, clientId, serverInfo);
 
     return message;
   } catch (error) {
-    const message = prepareErrorMessage(id, error);
+    const message = prepareErrorMessage(id, clientId, error);
 
     return message;
   }

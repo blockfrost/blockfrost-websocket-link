@@ -103,7 +103,7 @@ export const onBlock = async (
   const activeBlockSub = activeSubscriptions?.find(index => index.type === 'block');
 
   if (activeBlockSub) {
-    const message = prepareMessage(activeBlockSub.id, latestBlock);
+    const message = prepareMessage(activeBlockSub.id, clientId, latestBlock);
 
     ws.send(message);
   }
@@ -155,7 +155,7 @@ export const onBlock = async (
     }
 
     logger.debug(`Sent tx notification to client ${clientId}`);
-    const message = prepareMessage(activeAddressSub.id, notifications);
+    const message = prepareMessage(activeAddressSub.id, clientId, notifications);
 
     ws.send(message);
   }
