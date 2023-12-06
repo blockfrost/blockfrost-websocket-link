@@ -17,8 +17,8 @@
   "dependencies": {
     "@blockfrost/blockfrost-js": "5.4.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^11.4.0",
-    "@esbuild/darwin-arm64": "npm:0.19.8",
-    "@esbuild/linux-x64": "npm:0.19.8",
+    "@esbuild/darwin-arm64": "npm:0.18.20",
+    "@esbuild/linux-x64": "npm:0.18.20",
     "@sentry/integrations": "^7.85.0",
     "@sentry/node": "^7.85.0",
     "@sentry/tracing": "^7.85.0",

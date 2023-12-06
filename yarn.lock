@@ -83,8 +83,8 @@ __metadata:
   dependencies:
     "@blockfrost/blockfrost-js": "npm:5.4.0"
     "@emurgo/cardano-serialization-lib-nodejs": "npm:^11.4.0"
-    "@esbuild/darwin-arm64": "npm:0.19.8"
-    "@esbuild/linux-x64": "npm:0.19.8"
+    "@esbuild/darwin-arm64": "npm:0.18.20"
+    "@esbuild/linux-x64": "npm:0.18.20"
     "@sentry/integrations": "npm:^7.85.0"
     "@sentry/node": "npm:^7.85.0"
     "@sentry/tracing": "npm:^7.85.0"
@@ -196,6 +196,7 @@ __metadata:
 "@esbuild/darwin-arm64@npm:0.18.20":
   version: 0.18.20
   resolution: "@esbuild/darwin-arm64@npm:0.18.20"
+  checksum: cae57074985fd2c8f95534cf54c99b42d075f38cdc2fe183460a12076ef69aa79d4762a68737efb394ab08a87652defcf3fc6e873122edfbe29eac457fe6a9f8
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
@@ -203,7 +204,6 @@ __metadata:
 "@esbuild/darwin-arm64@npm:0.19.8":
   version: 0.19.8
   resolution: "@esbuild/darwin-arm64@npm:0.19.8"
-  checksum: 869c5ded228fe18c5d1790672336ff7cabd20aff5af98b6ce5461048d063a28bd2c89ff495b349ce044628f829836fde6cbbdb00a39d663099f5675f78be2a2d
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
@@ -365,6 +365,7 @@ __metadata:
 "@esbuild/linux-x64@npm:0.18.20":
   version: 0.18.20
   resolution: "@esbuild/linux-x64@npm:0.18.20"
+  checksum: 8d55c62c9c1bc0556c39d1c6662c4d07d35e4baf6bb2b67f44fea24047b7e3eae5df9e6afc6eab6b671c1b24884ebb73be55a3072465c6c2328a8bdb885dcea1
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
@@ -372,7 +373,6 @@ __metadata:
 "@esbuild/linux-x64@npm:0.19.8":
   version: 0.19.8
   resolution: "@esbuild/linux-x64@npm:0.19.8"
-  checksum: 5f08ec37084f49213bf82fdb2f7f8ab005bf038a2b0b0f971502481fe93ac8f30f865d5212f5a423f4504a8c21ca7e309302b56b9c8750b6d34a6ab20c7ebfdb
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
