@@ -26,6 +26,7 @@ import { getAffectedAddresses } from './utils/address.js';
 import { logger } from './utils/logger.js';
 import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config.js';
 import { getPort } from './utils/server.js';
+import { connectionLimiter } from './utils/connection-limiter.js';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -141,6 +142,15 @@ wss.on('connection', async (ws: Server.Ws) => {
   const clientId = uuidv4();
 
   ws.uid = clientId;
+
+  if (!connectionLimiter.allowNewConnection(clientId)) {
+    const delay = connectionLimiter.getDelayTime();
+
+    logger.info(`[${clientId}] Delayed connection for ${delay} ms.`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    connectionLimiter.resolveQueuedConnection(clientId);
+  }
+
   addressesSubscribed[clientId] = [];
   activeSubscriptions[clientId] = [];
   clients.push({
@@ -155,7 +165,20 @@ wss.on('connection', async (ws: Server.Ws) => {
         addressesSubscribed[clientId],
       ),
   });
-  logger.info(`[${clientId}] Client connected. Total clients connected: ${clients.length}.`);
+
+  if (!connectionLimiter.allowNewConnection(clientId)) {
+    const delay = connectionLimiter.getDelayTime();
+
+    logger.info(
+      `[${clientId}] Delayed connection for ${delay} ms. Queued connections ${
+        connectionLimiter.getQueuedConnections().length
+      }`,
+    );
+    await new Promise(resolve => setTimeout(resolve, delay));
+    connectionLimiter.resolveQueuedConnection(clientId);
+  }
+
+  logger.info(`[${clientId}] Client connected. Total clients connected: ${wss.clients.size}.`);
 
   // general messages
   ws.on('message', async (message: string) => {
@@ -370,6 +393,7 @@ wss.on('connection', async (ws: Server.Ws) => {
     );
     delete activeSubscriptions[clientId];
     delete addressesSubscribed[clientId];
+    connectionLimiter.resolveQueuedConnection(clientId);
   });
 });
 
