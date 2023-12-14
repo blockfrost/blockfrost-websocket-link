@@ -4,6 +4,7 @@ import {
   BLOCKFROST_REQUEST_CONCURRENCY,
 } from '../constants/config.js';
 import { logger } from './logger.js';
+import { BlockfrostServerError } from '@blockfrost/blockfrost-js';
 
 export const pLimiter = new PQueue({ concurrency: BLOCKFROST_REQUEST_CONCURRENCY });
 
@@ -17,7 +18,11 @@ export const ratesLimiter = new PQueue({
 });
 
 pLimiter.on('error', error => {
-  logger.error(`pLimiter error`, error);
+  if (error instanceof BlockfrostServerError && error.status_code === 404) {
+    // do not log 404 errors
+  } else {
+    logger.error(`pLimiter error`, error);
+  }
 });
 
 ratesLimiter.on('error', error => {
