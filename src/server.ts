@@ -114,6 +114,12 @@ setInterval(() => {
     if (ws.isAlive === false) {
       logger.debug(`Terminating stale connection for client ${ws.uid}.`);
       ws.terminate();
+
+      // remove client
+      clients.splice(
+        clients.findIndex(c => c.clientId === ws.uid),
+        1,
+      );
       continue;
     }
 
