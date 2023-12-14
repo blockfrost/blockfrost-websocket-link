@@ -115,6 +115,12 @@ setInterval(() => {
     if (ws.isAlive === false) {
       logger.debug(`Terminating stale connection for client ${ws.uid}.`);
       ws.terminate();
+
+      // remove client
+      clients.splice(
+        clients.findIndex(c => c.clientId === ws.uid),
+        1,
+      );
       continue;
     }
 
@@ -146,7 +152,11 @@ wss.on('connection', async (ws: Server.Ws) => {
   if (!connectionLimiter.allowNewConnection(clientId)) {
     const delay = connectionLimiter.getDelayTime();
 
-    logger.info(`[${clientId}] Delayed connection for ${delay} ms.`);
+    logger.info(
+      `[${clientId}] Delayed connection for ${delay} ms. Queued connections ${
+        connectionLimiter.getQueuedConnections().length
+      }`,
+    );
     await new Promise(resolve => setTimeout(resolve, delay));
     connectionLimiter.resolveQueuedConnection(clientId);
   }

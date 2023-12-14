@@ -26,6 +26,10 @@ export class ConnectionLimiter {
     return false;
   }
 
+  public getQueuedConnections = () => {
+    return this.queuedConnections;
+  };
+
   public resolveQueuedConnection(id: string) {
     const now = Date.now();
 
