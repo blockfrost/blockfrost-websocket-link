@@ -131,7 +131,6 @@ export const getAccountBalanceHistory = async (
   const { txIds, addresses } = await getAccountTransactionHistory({ accountPublicKey: publicKey });
 
   // fetch all transactions and filter only those that are from within from-to interval
-  logger.debug('getAccountBalanceHistory', `Fetching ${txIds.length} txs`);
   const txs = (
     await txIdsToTransactions(
       txIds.map(tx => ({
@@ -148,7 +147,6 @@ export const getAccountBalanceHistory = async (
     // txs are sorted from newest to oldest, we need exact opposite
     .reverse();
 
-  logger.debug('getAccountBalanceHistory', `aggregating ${txs.length} txs`);
   const bins = await aggregateTransactions(txs, addresses, groupBy);
 
   if (blockfrostAPI.options.network !== 'mainnet' && !FIAT_RATES_ENABLE_ON_TESTNET) {
@@ -157,7 +155,6 @@ export const getAccountBalanceHistory = async (
   }
 
   // fetch fiat rate for each bin
-  logger.debug('getAccountBalanceHistory', `fetching fiat rates for ${bins.length} time intervals`);
   const binRatesPromises = bins.map(bin => getRatesForDate(bin.time));
   const binRates = await Promise.allSettled(binRatesPromises);
 
@@ -174,14 +171,15 @@ export const getAccountBalanceHistory = async (
 };
 
 export default async (
-  id: number,
+  msgId: number,
+  clientId: string,
   publicKey: string,
   groupBy: number,
   from?: number,
   to?: number,
 ): Promise<string> => {
   if (!publicKey) {
-    const message = prepareMessage(id, 'Missing parameter descriptor');
+    const message = prepareMessage(msgId, clientId, 'Missing parameter descriptor');
 
     return message;
   }
@@ -190,18 +188,18 @@ export default async (
 
   try {
     const data = await getAccountBalanceHistory(publicKey, groupBy, from, to);
-    const message = prepareMessage(id, data);
+    const message = prepareMessage(msgId, clientId, data);
 
     return message;
   } catch (error) {
     logger.error(error);
-    const message = prepareErrorMessage(id, error);
+    const message = prepareErrorMessage(msgId, clientId, error);
 
     return message;
   } finally {
     const t2 = Date.now();
     const diff = t2 - t1;
 
-    logger.debug(`getBalanceHistory for public key ${publicKey} took ${diff} ms`);
+    logger.debug(`[${clientId}] getBalanceHistory for public key ${publicKey} took ${diff} ms`);
   }
 };

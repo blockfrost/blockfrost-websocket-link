@@ -3,17 +3,21 @@ import { prepareErrorMessage, prepareMessage } from '../utils/message.js';
 import { txClient } from '../utils/blockfrost-api.js';
 import { logger } from '../utils/logger.js';
 
-export default async (id: number, transaction: Uint8Array | string): Promise<string> => {
+export default async (
+  id: number,
+  clientId: string,
+  transaction: Uint8Array | string,
+): Promise<string> => {
   try {
     const submitTransactionResult = await txClient.txSubmit(transaction);
-    const message = prepareMessage(id, submitTransactionResult);
+    const message = prepareMessage(id, clientId, submitTransactionResult);
 
     return message;
   } catch (error) {
     if (error instanceof BlockfrostClientError && error.code === 'ETIMEDOUT') {
       // Request timed out. Most likely mempool is full since that's the only reason why submit api should get stuck
       const errorMessage = 'Mempool is full, please try resubmitting again later.';
-      const message = prepareErrorMessage(id, errorMessage);
+      const message = prepareErrorMessage(id, clientId, errorMessage);
 
       logger.error(error);
       return message;
@@ -24,7 +28,7 @@ export default async (id: number, transaction: Uint8Array | string): Promise<str
         message: error.body ?? error.message,
         body: undefined,
       };
-      const message = prepareErrorMessage(id, formattedError);
+      const message = prepareErrorMessage(id, clientId, formattedError);
 
       logger.error(
         new BlockfrostServerError({
@@ -39,7 +43,7 @@ export default async (id: number, transaction: Uint8Array | string): Promise<str
       return message;
     } else {
       logger.error(error);
-      const message = prepareErrorMessage(id, error);
+      const message = prepareErrorMessage(id, clientId, error);
 
       return message;
     }

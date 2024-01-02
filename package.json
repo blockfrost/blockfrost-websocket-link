@@ -9,7 +9,7 @@
     "lint": "eslint ./src/**/*.ts",
     "start": "yarn build && yarn node ./dist/server.js",
     "start:profiler": "yarn build && NODE_ENV=production yarn node --prof ./dist/server.js",
-    "test-performance": "yarn build && yarn node ./dist/scripts/performance/index.ts",
+    "test-performance": "yarn build && yarn node ./dist/scripts/performance/index.js",
     "test": "BLOCKFROST_PROJECT_ID='none' vitest",
     "coverage": "vitest run --coverage",
     "type-check": "tsc --project tsconfig.json"

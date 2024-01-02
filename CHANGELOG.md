@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Timeout for requests dispatched by blockfrost SDK set to 30s
+- (Internal) Switched from PNP to node-modules linker
+
+### Fixed
+- Remove client from the list of clients on missed heartbeat
+
+### Changed
 
 - process exits after health check fails for more than `HEALTHCHECK_FAIL_THRESHOLD_MS` (default 60s)
 - upgrade codebase to ESM

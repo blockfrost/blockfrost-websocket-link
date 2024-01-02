@@ -108,11 +108,13 @@ function noop() {}
 
 // ping all clients every 30s to keep connection alive
 setInterval(() => {
+  const connectedClientsIds: string[] = [];
+
   for (const w of wss.clients) {
     const ws = w as Server.Ws;
 
     if (ws.isAlive === false) {
-      logger.debug(`Terminating stale connection for client ${ws.uid}.`);
+      logger.debug(`[${ws.uid}] Terminating stale connection for the client.`);
       ws.terminate();
       continue;
     }
@@ -120,6 +122,20 @@ setInterval(() => {
     ws.isAlive = false;
     logger.debug(`Sending ping for client ${ws.uid}`);
     ws.ping(noop);
+    connectedClientsIds.push(ws.uid);
+  }
+
+  // remove subscriptions for disconnected clients
+  // (synchronizes list of clients' subscriptions with the list of the clients still connected to websocket)
+  for (let i = clients.length - 1; i >= 0; i--) {
+    const client = clients[i];
+    // If client for which we store a subscription is not in list of websocket clients then delete its subscription
+
+    if (!connectedClientsIds.includes(client.clientId)) {
+      const index = clients.findIndex(c => c.clientId === client.clientId);
+
+      clients.splice(index, 1);
+    }
   }
 }, 30_000);
 
@@ -135,13 +151,12 @@ events.on('newBlock', async (latestBlock: Responses['block_content']) => {
   for (const client of clients) client.newBlockCallback(latestBlock, affectedAddresses);
 });
 
-wss.on('connection', (ws: Server.Ws) => {
+wss.on('connection', async (ws: Server.Ws) => {
   ws.isAlive = true;
   // generate unique client ID and set callbacks
   const clientId = uuidv4();
 
   ws.uid = clientId;
-  logger.info(`Client ${clientId} connected`);
   addressesSubscribed[clientId] = [];
   activeSubscriptions[clientId] = [];
   clients.push({
@@ -157,54 +172,56 @@ wss.on('connection', (ws: Server.Ws) => {
       ),
   });
 
+  logger.info(`[${clientId}] Client connected. Total clients connected: ${wss.clients.size}.`);
+
   // general messages
   ws.on('message', async (message: string) => {
     const data = getMessage(message);
 
     if (!data) {
-      const message = prepareErrorMessage(-1, 'Cannot parse the message');
+      const message = prepareErrorMessage(-1, 'Cannot parse the message', clientId);
 
-      logger.debug(`Received invalid message from client ${clientId}:`, message);
+      logger.debug(`[${clientId}] Received invalid message`, message);
       ws.send(message);
       return;
     }
     logger.debug(
-      `RECV MSG ID ${
-        data.id
-      } "${data?.command}" from client ${clientId} with params: ${JSON.stringify(data.params)}`,
+      `[${clientId}] RECV MSG ID ${data.id} "${data?.command}" with params: ${JSON.stringify(
+        data.params,
+      )}`,
     );
 
     switch (data.command) {
       case MESSAGES.GET_SERVER_INFO: {
-        const message = await getServerInfo(data.id);
+        const message = await getServerInfo(data.id, clientId);
 
         ws.send(message);
         break;
       }
 
       case MESSAGES.GET_TRANSACTION: {
-        const message = await getTransaction(data.id, data.params.txId);
+        const message = await getTransaction(data.id, clientId, data.params.txId);
 
         ws.send(message);
         break;
       }
 
       case MESSAGES.GET_BLOCK: {
-        const message = await getBlock(data.id, data.params.hashOrNumber);
+        const message = await getBlock(data.id, clientId, data.params.hashOrNumber);
 
         ws.send(message);
         break;
       }
 
       case MESSAGES.GET_ACCOUNT_UTXO: {
-        const message = await getAccountUtxo(data.id, data.params.descriptor);
+        const message = await getAccountUtxo(data.id, clientId, data.params.descriptor);
 
         ws.send(message);
         break;
       }
 
       case MESSAGES.ESTIMATE_FEE: {
-        const message = await estimateFee(data.id);
+        const message = await estimateFee(data.id, clientId);
 
         ws.send(message);
         break;
@@ -213,6 +230,7 @@ wss.on('connection', (ws: Server.Ws) => {
       case MESSAGES.GET_ACCOUNT_INFO: {
         const message = await getAccountInfo(
           data.id,
+          clientId,
           data.params.descriptor,
           data.params.details,
           data.params.page,
@@ -226,6 +244,7 @@ wss.on('connection', (ws: Server.Ws) => {
       case MESSAGES.GET_BALANCE_HISTORY: {
         const message = await getBalanceHistory(
           data.id,
+          clientId,
           data.params.descriptor,
           data.params.groupBy,
           data.params.from,
@@ -250,7 +269,7 @@ wss.on('connection', (ws: Server.Ws) => {
           id: data.id,
         });
 
-        const message = prepareMessage(data.id, { subscribed: true });
+        const message = prepareMessage(data.id, clientId, { subscribed: true });
 
         ws.send(message);
 
@@ -266,7 +285,7 @@ wss.on('connection', (ws: Server.Ws) => {
           activeSubscriptions[clientId].splice(activeBlockSubIndex);
         }
 
-        const message = prepareMessage(data.id, {
+        const message = prepareMessage(data.id, clientId, {
           subscribed: false,
         });
 
@@ -297,7 +316,7 @@ wss.on('connection', (ws: Server.Ws) => {
           });
         }
 
-        const message = prepareMessage(data.id, { subscribed: true });
+        const message = prepareMessage(data.id, clientId, { subscribed: true });
 
         ws.send(message);
 
@@ -313,7 +332,7 @@ wss.on('connection', (ws: Server.Ws) => {
           activeSubscriptions[clientId].splice(activeAddressSubIndex);
         }
 
-        const message = prepareMessage(data.id, {
+        const message = prepareMessage(data.id, clientId, {
           subscribed: false,
         });
 
@@ -324,14 +343,22 @@ wss.on('connection', (ws: Server.Ws) => {
       }
 
       case MESSAGES.PUSH_TRANSACTION: {
-        const submitTransactionMessage = await submitTransaction(data.id, data.params.txData);
+        const submitTransactionMessage = await submitTransaction(
+          data.id,
+          clientId,
+          data.params.txData,
+        );
 
         ws.send(submitTransactionMessage);
         break;
       }
 
       default: {
-        const message = prepareErrorMessage(data.id, `Unknown message id: ${data.command}`);
+        const message = prepareErrorMessage(
+          data.id,
+          `Unknown message id: ${data.command}`,
+          clientId,
+        );
 
         ws.send(message);
       }
@@ -339,19 +366,19 @@ wss.on('connection', (ws: Server.Ws) => {
   });
 
   ws.on('pong', () => {
-    logger.debug(`Received pong from client ${clientId}`);
+    logger.debug(`[${clientId}] Received pong from client.`);
     heartbeat(ws);
   });
 
   ws.on('error', error => {
-    const message = prepareErrorMessage(-1, error);
+    const message = prepareErrorMessage(-1, clientId, error);
 
-    logger.warn(`Received error ${JSON.stringify(message)} for client ${clientId}.`);
+    logger.warn(`[${clientId}] Received error ${JSON.stringify(message)}.`);
     ws.send(message);
   });
 
   ws.on('close', (code, reason) => {
-    logger.info(`Client ${clientId} disconnected. Code: ${code}, reason: ${reason}`);
+    logger.info(`[${clientId}] Client disconnected. Code: ${code}, reason: ${reason}`);
 
     // remove subscriptions on close
     clients.splice(

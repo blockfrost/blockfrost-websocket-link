@@ -2,9 +2,9 @@ import { prepareMessage, prepareErrorMessage } from '../utils/message.js';
 import { discoverAddresses, addressesToUtxos, utxosWithBlocks } from '../utils/address.js';
 import { logger } from '../utils/logger.js';
 
-export default async (id: number, publicKey: string): Promise<string> => {
+export default async (msgId: number, clientId: string, publicKey: string): Promise<string> => {
   if (!publicKey) {
-    const message = prepareMessage(id, 'Missing parameter descriptor');
+    const message = prepareMessage(msgId, 'Missing parameter descriptor', clientId);
 
     return message;
   }
@@ -17,12 +17,12 @@ export default async (id: number, publicKey: string): Promise<string> => {
     const utxosResult = await addressesToUtxos(addresses);
     const utxosBlocks = await utxosWithBlocks(utxosResult);
 
-    const message = prepareMessage(id, utxosBlocks);
+    const message = prepareMessage(msgId, clientId, utxosBlocks);
 
     return message;
   } catch (error) {
     logger.error(error);
-    const message = prepareErrorMessage(id, error);
+    const message = prepareErrorMessage(msgId, clientId, error);
 
     return message;
   }

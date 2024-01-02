@@ -1,6 +1,7 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { Options } from '@blockfrost/blockfrost-js/lib/types/index.js';
 import { createRequire } from 'module';
+import { BLOCKFROST_REQUEST_TIMEOUT } from '../constants/config.js';
 const require = createRequire(import.meta.url);
 const packageJson = require('../../package.json');
 
@@ -12,6 +13,7 @@ export const getBlockfrostClient = (options?: Partial<Options>) => {
     network: process.env.BLOCKFROST_NETWORK,
     userAgent: `${packageJson.name}@${packageJson.version}`,
     rateLimiter: false,
+    requestTimeout: BLOCKFROST_REQUEST_TIMEOUT,
     ...options,
   });
 };

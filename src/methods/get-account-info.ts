@@ -144,7 +144,7 @@ export const getAccountInfo = async (
 
   if (duration > 7) {
     logger.warn(
-      `Warning: getAccountInfo-${details} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} Tokens: ${tokensBalances.length} `,
+      `Warning: getAccountInfo-${details} ${publicKey} took ${duration}s. Transactions: ${txCount} Addresses: ${_addressesCount} Tokens: ${tokensBalances.length} `,
     );
   }
 
@@ -152,7 +152,8 @@ export const getAccountInfo = async (
 };
 
 export default async (
-  id: number,
+  msgId: number,
+  clientId: string,
   publicKey: string,
   details: Messages.Details,
   page = 1,
@@ -160,12 +161,12 @@ export default async (
 ): Promise<string> => {
   try {
     const accountInfo = await getAccountInfo(publicKey, details, page, pageSize);
-    const message = prepareMessage(id, accountInfo);
+    const message = prepareMessage(msgId, clientId, accountInfo);
 
     return message;
   } catch (error) {
     logger.error(error);
-    const message = prepareErrorMessage(id, error);
+    const message = prepareErrorMessage(msgId, clientId, error);
 
     return message;
   }
