@@ -10,7 +10,7 @@ rec {
     let
       project = pkgs.callPackage ./yarn-project.nix
         {
-          nodejs = pkgs.nodejs-18_x;
+          nodejs = pkgs.nodejs_20;
         }
         {
           src = pkgs.lib.cleanSource ./.;
@@ -28,7 +28,7 @@ rec {
         mkdir -p $out/bin
         cat <<EOF > $out/bin/${name}
         #!${pkgs.runtimeShell}
-        ${pkgs.nodejs-18_x}/bin/node $out/libexec/source/dist/server.js
+        ${pkgs.nodejs_20}/bin/node $out/libexec/source/dist/server.js
         EOF
         chmod +x $out/bin/${name}
       '';
