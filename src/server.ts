@@ -26,7 +26,6 @@ import { getAffectedAddresses } from './utils/address.js';
 import { logger } from './utils/logger.js';
 import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config.js';
 import { getPort } from './utils/server.js';
-import { connectionLimiter } from './utils/connection-limiter.js';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -109,24 +108,34 @@ function noop() {}
 
 // ping all clients every 30s to keep connection alive
 setInterval(() => {
+  const connectedClientsIds: string[] = [];
+
   for (const w of wss.clients) {
     const ws = w as Server.Ws;
 
     if (ws.isAlive === false) {
-      logger.debug(`Terminating stale connection for client ${ws.uid}.`);
+      logger.debug(`[${ws.uid}] Terminating stale connection for the client.`);
       ws.terminate();
-
-      // remove client
-      clients.splice(
-        clients.findIndex(c => c.clientId === ws.uid),
-        1,
-      );
       continue;
     }
 
     ws.isAlive = false;
     logger.debug(`Sending ping for client ${ws.uid}`);
     ws.ping(noop);
+    connectedClientsIds.push(ws.uid);
+  }
+
+  // remove subscriptions for disconnected clients
+  // (synchronizes list of clients' subscriptions with the list of the clients still connected to websocket)
+  for (let i = clients.length - 1; i >= 0; i--) {
+    const client = clients[i];
+    // If client for which we store a subscription is not in list of websocket clients then delete its subscription
+
+    if (!connectedClientsIds.includes(client.clientId)) {
+      const index = clients.findIndex(c => c.clientId === client.clientId);
+
+      clients.splice(index, 1);
+    }
   }
 }, 30_000);
 
@@ -149,18 +158,6 @@ wss.on('connection', async (ws: Server.Ws) => {
 
   ws.uid = clientId;
 
-  if (!connectionLimiter.allowNewConnection(clientId)) {
-    const delay = connectionLimiter.getDelayTime();
-
-    logger.info(
-      `[${clientId}] Delayed connection for ${delay} ms. Queued connections ${
-        connectionLimiter.getQueuedConnections().length
-      }`,
-    );
-    await new Promise(resolve => setTimeout(resolve, delay));
-    connectionLimiter.resolveQueuedConnection(clientId);
-  }
-
   addressesSubscribed[clientId] = [];
   activeSubscriptions[clientId] = [];
   clients.push({
@@ -175,18 +172,6 @@ wss.on('connection', async (ws: Server.Ws) => {
         addressesSubscribed[clientId],
       ),
   });
-
-  if (!connectionLimiter.allowNewConnection(clientId)) {
-    const delay = connectionLimiter.getDelayTime();
-
-    logger.info(
-      `[${clientId}] Delayed connection for ${delay} ms. Queued connections ${
-        connectionLimiter.getQueuedConnections().length
-      }`,
-    );
-    await new Promise(resolve => setTimeout(resolve, delay));
-    connectionLimiter.resolveQueuedConnection(clientId);
-  }
 
   logger.info(`[${clientId}] Client connected. Total clients connected: ${wss.clients.size}.`);
 
@@ -403,7 +388,6 @@ wss.on('connection', async (ws: Server.Ws) => {
     );
     delete activeSubscriptions[clientId];
     delete addressesSubscribed[clientId];
-    connectionLimiter.resolveQueuedConnection(clientId);
   });
 });
 
