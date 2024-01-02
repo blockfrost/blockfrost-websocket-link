@@ -108,24 +108,34 @@ function noop() {}
 
 // ping all clients every 30s to keep connection alive
 setInterval(() => {
+  const connectedClientsIds: string[] = [];
+
   for (const w of wss.clients) {
     const ws = w as Server.Ws;
 
     if (ws.isAlive === false) {
-      logger.debug(`Terminating stale connection for client ${ws.uid}.`);
+      logger.debug(`[${ws.uid}] Terminating stale connection for the client.`);
       ws.terminate();
-
-      // remove client
-      clients.splice(
-        clients.findIndex(c => c.clientId === ws.uid),
-        1,
-      );
       continue;
     }
 
     ws.isAlive = false;
     logger.debug(`Sending ping for client ${ws.uid}`);
     ws.ping(noop);
+    connectedClientsIds.push(ws.uid);
+  }
+
+  // remove subscriptions for disconnected clients
+  // (synchronizes list of clients' subscriptions with the list of the clients still connected to websocket)
+  for (let i = clients.length - 1; i >= 0; i--) {
+    const client = clients[i];
+    // If client for which we store a subscription is not in list of websocket clients then delete its subscription
+
+    if (!connectedClientsIds.includes(client.clientId)) {
+      const index = clients.findIndex(c => c.clientId === client.clientId);
+
+      clients.splice(index, 1);
+    }
   }
 }, 30_000);
 
@@ -161,7 +171,8 @@ wss.on('connection', async (ws: Server.Ws) => {
         addressesSubscribed[clientId],
       ),
   });
-  logger.info(`[${clientId}] Client connected. Total clients connected: ${clients.length}.`);
+
+  logger.info(`[${clientId}] Client connected. Total clients connected: ${wss.clients.size}.`);
 
   // general messages
   ws.on('message', async (message: string) => {
