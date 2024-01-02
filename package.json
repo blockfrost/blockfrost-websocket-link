@@ -15,8 +15,8 @@
     "type-check": "tsc --project tsconfig.json"
   },
   "dependencies": {
-    "@blockfrost/blockfrost-js": "5.4.0",
-    "@emurgo/cardano-serialization-lib-nodejs": "^11.4.0",
+    "@blockfrost/blockfrost-js": "5.5.0",
+    "@emurgo/cardano-serialization-lib-nodejs": "^11.5.0",
     "@esbuild/darwin-arm64": "npm:0.19.8",
     "@esbuild/linux-x64": "npm:0.19.8",
     "@sentry/integrations": "^7.85.0",
@@ -53,9 +53,9 @@
     "prettier": "^3.0.0",
     "rimraf": "^5.0.1",
     "sinon": "^15.2.0",
-    "typescript": "5.3.2",
-    "vite": "4.4.12",
-    "vitest": "0.34.6"
+    "typescript": "5.3.3",
+    "vite": "5.0.5",
+    "vitest": "1.1.1"
   },
   "engines": {
     "node": ">=18"
