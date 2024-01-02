@@ -85,6 +85,8 @@ __metadata:
     "@emurgo/cardano-serialization-lib-nodejs": "npm:^11.5.0"
     "@esbuild/darwin-arm64": "npm:0.19.8"
     "@esbuild/linux-x64": "npm:0.19.8"
+    "@rollup/rollup-darwin-arm64": "npm:4.6.1"
+    "@rollup/rollup-linux-x64-gnu": "npm:4.6.1"
     "@sentry/integrations": "npm:^7.85.0"
     "@sentry/node": "npm:^7.85.0"
     "@sentry/tracing": "npm:^7.85.0"
@@ -534,6 +536,7 @@ __metadata:
 "@rollup/rollup-darwin-arm64@npm:4.6.1":
   version: 4.6.1
   resolution: "@rollup/rollup-darwin-arm64@npm:4.6.1"
+  checksum: 567a97e627a442e170648f7062f2b934d5379115c4270fe8bdc0334c9b068a29d9fee6c6e9632397a796fea7fa02c0e319e3ee2601e9a964af409835109fafb2
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
@@ -569,6 +572,7 @@ __metadata:
 "@rollup/rollup-linux-x64-gnu@npm:4.6.1":
   version: 4.6.1
   resolution: "@rollup/rollup-linux-x64-gnu@npm:4.6.1"
+  checksum: b92ddb5dbfe324cf70684d977410c579e499aef6676ba80ce77796d205a6743ad81180807bc187eaf0dd375b708d713be64b1802a3c29938850124f21bf73fcf
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard

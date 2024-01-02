@@ -7,19 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Timeout for requests dispatched by blockfrost SDK set to 30s
-- (Internal) Switched from PNP to node-modules linker
-
 ### Fixed
 - Remove client from the list of clients on missed heartbeat
 
 ### Changed
 
 - process exits after health check fails for more than `HEALTHCHECK_FAIL_THRESHOLD_MS` (default 60s)
-- upgrade codebase to ESM
-- bump Blockfrost SDK (memory leak in deriveAddress) and other dependencies
-- refactored build step, entrypoint is now `dist/server.js` (previously `dist/src/server.js`)
+- Bump Blockfrost SDK (memory leak in deriveAddress) and other dependencies
+- Timeout for requests dispatched by blockfrost SDK set to 30s
+- (Internal) Refactored build step, entrypoint is now `dist/server.js` (previously `dist/src/server.js`)
+- (Internal) Upgrade codebase to ESM
+- (Internal) Switched from PNP to node-modules linker
 
 ### Removed
 - `ts-node-dev` (`yarn dev` no longer auto reloads on code change)
