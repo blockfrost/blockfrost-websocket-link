@@ -1,7 +1,7 @@
 { pkgs ? import
     (builtins.fetchTarball {
-      url = "https://github.com/NixOS/nixpkgs/archive/9790f3242da2152d5aa1976e3e4b8b414f4dd206.tar.gz";
-      sha256 = "1y6zipys4803ckvnamfljb8raglgkbz1fz1fg03cxp4jqiiva5s1";
+      url = "https://github.com/NixOS/nixpkgs/archive/933d7dc155096e7575d207be6fb7792bc9f34f6d.tar.gz";
+      sha256 = "1gcqpm7v42wfmq0wrl4dym9kg4y7n4f5wsgvisq52zr90vjvylwx";
     })
     { }
 }:
@@ -28,7 +28,7 @@ rec {
         mkdir -p $out/bin
         cat <<EOF > $out/bin/${name}
         #!${pkgs.runtimeShell}
-        ${pkgs.nodejs_20}/bin/node $out/libexec/source/dist/server.js
+        ${pkgs.nodejs_20}/bin/node $out/libexec/${name}/dist/server.js
         EOF
         chmod +x $out/bin/${name}
       '';
