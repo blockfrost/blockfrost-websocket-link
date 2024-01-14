@@ -56,7 +56,9 @@ export const getRatesForDateNoLimit = async (date: number): Promise<Record<strin
     }
 
     if (!response?.market_data) {
-      throw new Error(`Failed to fetch exchange rate for ${coingeckoDateFormat}`);
+      throw new Error(
+        `Failed to fetch exchange rate for ${coingeckoDateFormat}. Invalid response.`,
+      );
     }
 
     return response.market_data?.current_price;
