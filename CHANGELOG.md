@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - process exits after health check fails for more than `HEALTHCHECK_FAIL_THRESHOLD_MS` (default 60s)
 - Bump Blockfrost SDK (memory leak in deriveAddress) and other dependencies
 - Timeout for requests dispatched by blockfrost SDK set to 30s
+- Log errors while fetching fiat rates as a warnings rather than errors
 - (Internal) Refactored build step, entrypoint is now `dist/server.js` (previously `dist/src/server.js`)
 - (Internal) Upgrade codebase to ESM
 - (Internal) Switched from PNP to node-modules linker

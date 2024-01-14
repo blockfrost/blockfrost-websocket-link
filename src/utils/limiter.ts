@@ -26,5 +26,5 @@ pLimiter.on('error', error => {
 });
 
 ratesLimiter.on('error', error => {
-  logger.error(`ratesLimiter error`, error);
+  logger.warn(`ratesLimiter error`, error);
 });
