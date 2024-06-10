@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2023-06-10
+
 ### Added
 
-- Token metadata in getAccountInfo response
+- Token metadata in assets transformations
 
 ### Fixed
 
