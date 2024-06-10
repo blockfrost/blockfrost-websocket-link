@@ -1,7 +1,7 @@
 export const aggregateTransactions = [
   {
     description: 'aggregateTransactions 4 txs',
-    groupBy: 86400,
+    groupBy: 86_400,
     addresses: {
       external: [
         {
@@ -1002,9 +1002,9 @@ export const aggregateTransactions = [
         txData: {
           hash: '2b5075d8a7b7a30c886204000d1c0da2ca6ad3b9e31bd7d3606be0d42dc03adc',
           block: '2e83c622461fe5a2ef075091ade3d9deb7428d20616772adaf50b482bb1899cf',
-          block_height: 2809530,
-          block_time: 1628179059,
-          slot: 33809843,
+          block_height: 2_809_530,
+          block_time: 1_628_179_059,
+          slot: 33_809_843,
           index: 0,
           output_amount: [{ unit: 'lovelace', quantity: '9881824527383', decimals: 6 }],
           fees: '168801',
@@ -1061,9 +1061,9 @@ export const aggregateTransactions = [
         txData: {
           hash: '115293f3a35ca4f4fc01fb0e083f85dde7e77435d53dc15f0a38fa591858bb99',
           block: '31df233d137e13dfc1b5d3722e44f366109830aa2e0b06c36c037ae4d8ab2d54',
-          block_height: 3006224,
-          block_time: 1634717057,
-          slot: 40347841,
+          block_height: 3_006_224,
+          block_time: 1_634_717_057,
+          slot: 40_347_841,
           index: 0,
           output_amount: [{ unit: 'lovelace', quantity: '9277036205016', decimals: 6 }],
           fees: '169021',
@@ -1120,9 +1120,9 @@ export const aggregateTransactions = [
         txData: {
           hash: 'fbeca73ccb565b195f45bacb0076ed14e3ecfe4520fc3d9d13407196a8babe59',
           block: '59806e72646fab4f21ad40abb42c29cdc7e6ed6eb926cd22f2cfde1576dd2d5d',
-          block_height: 3160912,
-          block_time: 1639749489,
-          slot: 45380273,
+          block_height: 3_160_912,
+          block_time: 1_639_749_489,
+          slot: 45_380_273,
           index: 29,
           output_amount: [{ unit: 'lovelace', quantity: '9981996789833', decimals: 6 }],
           fees: '169021',
@@ -1179,9 +1179,9 @@ export const aggregateTransactions = [
         txData: {
           hash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
           block: '3ea1e6aba27bb83fbefa0d6c1685af595e22c549ab8c5982132202ec33f5ad45',
-          block_height: 3160930,
-          block_time: 1639749965,
-          slot: 45380749,
+          block_height: 3_160_930,
+          block_time: 1_639_749_965,
+          slot: 45_380_749,
           index: 33,
           output_amount: [{ unit: 'lovelace', quantity: '672534317', decimals: 6 }],
           fees: '168009',
@@ -1238,9 +1238,9 @@ export const aggregateTransactions = [
         txData: {
           hash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
           block: '3ea1e6aba27bb83fbefa0d6c1685af595e22c549ab8c5982132202ec33f5ad45',
-          block_height: 3170930,
-          block_time: 1659670259,
-          slot: 45380749,
+          block_height: 3_170_930,
+          block_time: 1_659_670_259,
+          slot: 45_380_749,
           index: 33,
           output_amount: [{ unit: 'lovelace', quantity: '675048004', decimals: 6 }],
           fees: '168009',
@@ -1299,9 +1299,9 @@ export const aggregateTransactions = [
         txData: {
           hash: 'f1b59b047b57e09921d8e7f6f72648042e49a600c1ff3db8c3bddb00c4347519',
           block: '3ea1e6aba27bb83fbefa0d6c1685af595e22c549ab8c5982132202ec33f5ad45',
-          block_height: 3170930,
-          block_time: 1759670259,
-          slot: 45380749,
+          block_height: 3_170_930,
+          block_time: 1_759_670_259,
+          slot: 45_380_749,
           index: 33,
           output_amount: [{ unit: 'lovelace', quantity: '1831991', decimals: 6 }],
           fees: '168009',
@@ -1361,9 +1361,9 @@ export const aggregateTransactions = [
         txData: {
           hash: 'a3c85d7410ddd4ad896934bcac9645e09aaabba83d94c2d5f4870a2c733caff8',
           block: '6470c18faf529e4120391ceebfa7573333af7ff6b24c9fbd1fe400ca47dd1e8b',
-          block_height: 3234206,
-          block_time: 1842076281,
-          slot: 47707065,
+          block_height: 3_234_206,
+          block_time: 1_842_076_281,
+          slot: 47_707_065,
           index: 7,
           output_amount: [
             {
@@ -1433,9 +1433,9 @@ export const aggregateTransactions = [
         txData: {
           hash: '9f985ec092505a9a0b742a8eb54a17ac13f4be877f620868c37a5e27d849cdde',
           block: 'a965447692fbab51b25391b29742ecee92a15cc815b8fddd89c1e19bc2ff55cf',
-          block_height: 2821834,
-          block_time: 1928505459,
-          slot: 34232539,
+          block_height: 2_821_834,
+          block_time: 1_928_505_459,
+          slot: 34_232_539,
           index: 0,
           output_amount: [
             {
@@ -1503,28 +1503,28 @@ export const aggregateTransactions = [
         received: '9881824527383',
         sent: '9881824696184',
         sentToSelf: '9881824527383',
-        time: 1628179059,
+        time: 1_628_179_059,
         txs: 1,
       },
       {
         received: '9275806205016',
         sent: '9277036374037',
         sentToSelf: '9275806205016',
-        time: 1634659059,
+        time: 1_634_659_059,
         txs: 1,
       },
       {
         received: '1010000000',
         sent: '0',
         sentToSelf: '0',
-        time: 1639670259,
+        time: 1_639_670_259,
         txs: 2,
       },
       {
         received: '662534317',
         sent: '675048004',
         sentToSelf: '662534317',
-        time: 1659628659,
+        time: 1_659_628_659,
         txs: 1,
       },
       // withdrawal tx
@@ -1532,7 +1532,7 @@ export const aggregateTransactions = [
         received: '10831991', // 1 000 000 from withdrawal
         sent: '10000000',
         sentToSelf: '9831991',
-        time: 1759593459,
+        time: 1_759_593_459,
         txs: 1,
       },
       // withdrawal tx
@@ -1540,12 +1540,12 @@ export const aggregateTransactions = [
         received: '63716476',
         sent: '60000000',
         sentToSelf: '59828691',
-        time: 1842019059,
+        time: 1_842_019_059,
         txs: 1,
       },
       // deposit
       {
-        time: 1928505459,
+        time: 1_928_505_459,
         txs: 1,
         sent: '1796927308',
         received: '1794743318',
