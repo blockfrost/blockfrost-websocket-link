@@ -48,6 +48,8 @@ export const transformAsset = (
   return {
     ...token,
     fingerprint: parseAsset(token.unit).fingerprint,
+    ticker: tokenRegistryMetadata?.metadata?.ticker ?? null,
+    name: tokenRegistryMetadata?.metadata?.name ?? null,
     decimals,
   };
 };
