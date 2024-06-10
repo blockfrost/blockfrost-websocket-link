@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Token metadata in getAccountInfo response
+
 ### Fixed
+
 - Remove client from the list of clients on missed heartbeat
 
 ### Changed
@@ -21,7 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Internal) Switched from PNP to node-modules linker
 
 ### Removed
+
 - `ts-node-dev` (`yarn dev` no longer auto reloads on code change)
+
 ## [2.0.0] - 2023-04-05
 
 ### Added

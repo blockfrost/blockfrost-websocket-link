@@ -27,7 +27,9 @@ exports[`getAccountInfo > getAccountInfo basic 1`] = `
     {
       "decimals": 10,
       "fingerprint": "asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06",
+      "name": null,
       "quantity": "1",
+      "ticker": null,
       "unit": "2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79",
     },
   ],
@@ -781,13 +783,17 @@ exports[`getAccountInfo > getAccountInfo txs 1`] = `
             {
               "decimals": 10,
               "fingerprint": "asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06",
+              "name": null,
               "quantity": "1",
+              "ticker": null,
               "unit": "2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79",
             },
             {
               "decimals": 0,
               "fingerprint": "asset1pmmzqf2akudknt05ealtvcvsy7n6wnc9dd03mf",
+              "name": null,
               "quantity": "125000",
+              "ticker": null,
               "unit": "d894897411707efa755a76deb66d26dfd50593f2e70863e1661e98a07370616365636f696e73",
             },
           ],
@@ -816,7 +822,9 @@ exports[`getAccountInfo > getAccountInfo txs 1`] = `
                 {
                   "decimals": 10,
                   "fingerprint": "asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06",
+                  "name": null,
                   "quantity": "1",
+                  "ticker": null,
                   "unit": "2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79",
                 },
               ],
@@ -836,7 +844,9 @@ exports[`getAccountInfo > getAccountInfo txs 1`] = `
                 {
                   "decimals": 0,
                   "fingerprint": "asset1pmmzqf2akudknt05ealtvcvsy7n6wnc9dd03mf",
+                  "name": null,
                   "quantity": "125000",
+                  "ticker": null,
                   "unit": "d894897411707efa755a76deb66d26dfd50593f2e70863e1661e98a07370616365636f696e73",
                 },
               ],
@@ -858,7 +868,9 @@ exports[`getAccountInfo > getAccountInfo txs 1`] = `
                 {
                   "decimals": 10,
                   "fingerprint": "asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06",
+                  "name": null,
                   "quantity": "1",
+                  "ticker": null,
                   "unit": "2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79",
                 },
               ],
@@ -876,7 +888,9 @@ exports[`getAccountInfo > getAccountInfo txs 1`] = `
                 {
                   "decimals": 0,
                   "fingerprint": "asset1pmmzqf2akudknt05ealtvcvsy7n6wnc9dd03mf",
+                  "name": null,
                   "quantity": "125000",
+                  "ticker": null,
                   "unit": "d894897411707efa755a76deb66d26dfd50593f2e70863e1661e98a07370616365636f696e73",
                 },
               ],
@@ -1145,7 +1159,9 @@ exports[`getAccountInfo > getAccountInfo txs 1`] = `
     {
       "decimals": 10,
       "fingerprint": "asset1eevmdlaz5424s3663ypw8w4vyxdlxkm3lefz06",
+      "name": null,
       "quantity": "1",
+      "ticker": null,
       "unit": "2f712364ec46f0cf707d412106ce71ef3370f76e27fb56b6bb14708776657465726e696b4e657a6a6564656e79",
     },
   ],

@@ -21,6 +21,8 @@ type Transactions = TxIdsToTransactionsResponse[];
 export interface AssetBalance extends Balance {
   fingerprint?: string; // lovelace has no fingerprint
   decimals: number;
+  ticker?: string | null;
+  name?: string | null;
 }
 
 export interface AccountInfo {
