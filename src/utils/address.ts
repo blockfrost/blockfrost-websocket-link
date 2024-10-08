@@ -284,6 +284,7 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
       rewards: stakeAddressData.withdrawable_amount,
       isActive: stakeAddressData.active,
       poolId: stakeAddressData.pool_id,
+      drepId: stakeAddressData.drep_id ?? null,
     };
   } catch (error) {
     if (error instanceof BlockfrostServerError && error.status_code === 404) {
@@ -292,6 +293,7 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
         isActive: false,
         // eslint-disable-next-line unicorn/no-null
         poolId: null,
+        drepId: null,
       };
     }
     throw error;
