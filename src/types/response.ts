@@ -54,6 +54,7 @@ export interface AccountInfo {
       isActive: boolean;
       rewards: string;
       poolId: string | null;
+      drepId: string | null;
     };
   };
 }
