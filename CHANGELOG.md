@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- DRep data in `GET_ACCOUNT_INFO` method
+
 ### Changed
 
 - more verbose healthcheck error log

@@ -95,6 +95,7 @@ export const getAccountInfo = async (
         rewards: stakingData.rewards,
         isActive: stakingData.isActive,
         poolId: stakingData.poolId,
+        drep: stakingData.drep,
       },
     },
   };

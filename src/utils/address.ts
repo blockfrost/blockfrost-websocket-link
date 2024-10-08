@@ -282,11 +282,15 @@ export const getAddressesData = async (
 export const getStakingData = async (stakeAddress: string): Promise<Addresses.StakingData> => {
   try {
     const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
+    const drepData = stakeAddressData.drep_id
+      ? await blockfrostAPI.governance.drepsById(stakeAddressData.drep_id)
+      : null;
 
     return {
       rewards: stakeAddressData.withdrawable_amount,
       isActive: stakeAddressData.active,
       poolId: stakeAddressData.pool_id,
+      drep: drepData,
     };
   } catch (error) {
     if (error instanceof BlockfrostServerError && error.status_code === 404) {
@@ -295,6 +299,7 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
         isActive: false,
 
         poolId: null,
+        drep: null,
       };
     }
     throw error;
