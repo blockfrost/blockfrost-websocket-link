@@ -48,8 +48,7 @@ export const getLogger = (options: LoggerOptions): Logger => {
 
   const getMethod = (methodLevel: Level) => {
     return requestedLevel > LevelMap[methodLevel]
-      ? // eslint-disable-next-line @typescript-eslint/no-empty-function
-        () => {}
+      ? () => {}
       : (...arguments_: unknown[]) => onMessage({ ...options, level: methodLevel }, ...arguments_);
   };
 

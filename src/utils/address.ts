@@ -134,7 +134,11 @@ export const addressesToUtxos = async (
 
   for (const addressUtxos of allUtxos)
     for (const utxo of addressUtxos)
-      for (const a of utxo.amount) a.unit !== 'lovelace' ? assets.add(a.unit) : undefined;
+      for (const a of utxo.amount) {
+        if (a.unit !== 'lovelace') {
+          assets.add(a.unit);
+        }
+      }
 
   const tokenMetadata = await Promise.all(
     [...assets].map(a => assetMetadataLimiter.add(() => getAssetData(a), { throwOnTimeout: true })),
@@ -290,7 +294,7 @@ export const getStakingData = async (stakeAddress: string): Promise<Addresses.St
       return {
         rewards: '0',
         isActive: false,
-        // eslint-disable-next-line unicorn/no-null
+
         poolId: null,
       };
     }
