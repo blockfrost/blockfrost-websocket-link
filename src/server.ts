@@ -144,10 +144,21 @@ events.on('newBlock', async (latestBlock: Responses['block_content']) => {
   logger.info(
     `Retrieving affected addressed for newBlock ${latestBlock.hash} ${latestBlock.height}`,
   );
-  const affectedAddresses = await getAffectedAddresses(latestBlock.height);
+  try {
+    // TODO: move fetching affected address for the block to newBlock emitter
+    // So if fetching affected addresses returns 404 due to block rollback it won't be emitted
+    const affectedAddresses = await getAffectedAddresses(latestBlock.height);
 
-  logger.debug(`Running newBlock callback for ${clients.length} clients`);
-  for (const client of clients) client.newBlockCallback(latestBlock, affectedAddresses);
+    logger.debug(`Running newBlock callback for ${clients.length} clients`);
+    for (const client of clients) {
+      client.newBlockCallback(latestBlock, affectedAddresses);
+    }
+  } catch (error) {
+    logger.error(
+      `Failed to notify clients about new block ${latestBlock.hash} ${latestBlock.height}.`,
+      error,
+    );
+  }
 });
 
 wss.on('connection', async (ws: Server.Ws) => {

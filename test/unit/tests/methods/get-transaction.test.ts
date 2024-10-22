@@ -10,6 +10,7 @@ describe('getTransaction', () => {
       const mock1 = sinon.stub(blockfrostAPI, 'txs').resolves(fixture.txs);
       const result = await getTransaction(
         1,
+        'client-id',
         '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
       );
 

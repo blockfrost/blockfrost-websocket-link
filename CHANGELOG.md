@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- crash while fetching affected addresses for a block undergoing a rollback
+
 ## [2.1.0] - 2023-06-10
 
 ### Added
