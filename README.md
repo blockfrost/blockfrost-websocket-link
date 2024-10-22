@@ -21,7 +21,6 @@
 
 WebSocket Link is a server-side application that serves as a WebSocket bridge to the Cardano blockchain using the Blockfrost API.
 
-
 ## Installation
 
 ### Dev
@@ -45,11 +44,14 @@ $ nix-build
 
 To start the server, you need to configure the following environmental variables.
 
-* `BLOCKFROST_BACKEND_URL` points to the Blockfrost backends
-* `BLOCKFROST_NETWORK` let you choose which network it should connect to (_mainnet_ or _testnet_)
-* `BLOCKFROST_PROJECT_ID` Blockfrost.io`s project token
-* `BLOCKFROST_BLOCK_LISTEN_INTERVAL` how often should be the server pulling the backend for new data
-* `PORT` which port the server should listen to (default `3005`)
+- `BLOCKFROST_PROJECT_ID` Blockfrost.io`s project token
+- `BLOCKFROST_NETWORK` let you choose which network it should connect to (_mainnet_ or _testnet_)
+
+Optional configuration:
+
+- `BLOCKFROST_BACKEND_URL` URL pointing to your own ([Blockfrost Backend RYO](https://github.com/blockfrost/blockfrost-backend-ryo)) if you prefer not to use the public Blockfrost API
+- `BLOCKFROST_BLOCK_LISTEN_INTERVAL` how often should be the server pulling the backend for new data (in milliseconds, default `5000`)
+- `PORT` which port the server should listen to (default `3005`)
 
 Once your server has started, you can connect to it.
 
@@ -60,7 +62,7 @@ Connected (press CTRL+C to quit)
 < {"id":0,"type":"message","data":{"name":"Cardano","shortcut":"ada","testnet":false,"version":"0.14.0","decimals":6,"blockHeight":6576695,"blockHash":"2f82b09b22c54806cd61d83d814151bf11fdcd3fb46af231a5c3ec8c85bbb5e3"}}
 > {"id":1,"command":"GET_BLOCK","params":{"hashOrNumber":"5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb"}}
 < {"id":1,"type":"message","data":{"time":1506203091,"height":null,"hash":"5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb","slot":null,"epoch":null,"epoch_slot":null,"slot_leader":"Genesis slot leader","size":0,"tx_count":14505,"output":"31112484745000000","fees":"0","block_vrf":null,"previous_block":null,"next_block":"89d9b5a5b8ddc8d7e5a6795e9774d97faf1efea59b2caf7eaf9f8c5b32059df4","confirmations":6576696}}
-> {"id":2,"command":"SUBSCRIBE_BLOCK","params":{}}	
+> {"id":2,"command":"SUBSCRIBE_BLOCK","params":{}}
 < {"id":2,"type":"message","data":{"subscribed":true}}
 < {"id":2,"type":"message","data":{"time":1638458991,"height":6576700,"hash":"4f4ebd2246a7c9f61624c6eaf09038d36474ba9be788526637a0d68ccb50ad93","slot":46892700,"epoch":306,"epoch_slot":63900,"slot_leader":"pool12g6gfm5c4q7rzwwxdmh0xdxk07tyvujp6d9tke2m46k7q7cz7p0","size":71037,"tx_count":37,"output":"5608976268607","fees":"10040718","block_vrf":"vrf_vk1tpln5vj8nlgrlxac5t0umc546mqdusvq9y2ldr6k3fjrsjscqhaqtzvcth","previous_block":"469de7723eddc90504769cb9e1ef1252c7d84aa0dcdc728d4e3524db923db651","next_block":null,"confirmations":0}}
 < {"id":2,"type":"message","data":{"time":1638459043,"height":6576701,"hash":"edd0d8eec73a043615fdd51b76c929f2231418bafc976ca0531d497ab5581ce4","slot":46892752,"epoch":306,"epoch_slot":63952,"slot_leader":"pool166vvvlk496szmtn4uz6wgcq6djryjk70grpap02yxyspjzkr490","size":68826,"tx_count":42,"output":"2196392602738","fees":"10265229","block_vrf":"vrf_vk1kmvctdxmaqz8tp04tsdgqrk7vfmdutmyq782rd6yvz3zlugqmezq2kf3yf","previous_block":"4f4ebd2246a7c9f61624c6eaf09038d36474ba9be788526637a0d68ccb50ad93","next_block":null,"confirmations":0}}
@@ -71,4 +73,3 @@ Connected (press CTRL+C to quit)
 ## UI explorer
 
 There is a handly UI for this project called [blockfrost-websocket-link-ui](https://github.com/blockfrost/blockfrost-websocket-link-ui) and you can find its hosted version at [websocket-link.blockfrost.dev](https://websocket-link.blockfrost.dev/).
-
