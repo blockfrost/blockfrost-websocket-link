@@ -103,7 +103,6 @@ const heartbeat = (ws: Server.Ws) => {
   ws.isAlive = true;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 function noop() {}
 
 // ping all clients every 30s to keep connection alive
