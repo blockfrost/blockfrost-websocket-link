@@ -24,6 +24,7 @@ export default [
       '**/.eslintrc.js',
       '**/jest.config.js',
       '**/babel.config.js',
+      '**/test',
     ],
   },
   ...fixupConfigRules(

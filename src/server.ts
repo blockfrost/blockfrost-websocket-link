@@ -13,7 +13,7 @@ import * as Server from './types/server.js';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants/index.js';
 import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message.js';
 import { MetricsCollector } from './utils/prometheus.js';
-import { events, onBlock, startEmitter } from './events.js';
+import { SubscribedAddress, events, onBlock, startEmitter } from './events.js';
 import getServerInfo from './methods/get-server-info.js';
 import getAccountInfo from './methods/get-account-info.js';
 import getAccountUtxo from './methods/get-account-utxo.js';
@@ -67,7 +67,7 @@ const wss = new WebSocketServer({ server });
 server.keepAliveTimeout = 65_000;
 
 const activeSubscriptions: Record<string, Server.Subscription[]> = {};
-const addressesSubscribed: Record<string, string[]> = {};
+const addressesSubscribed: Record<string, SubscribedAddress[]> = {};
 
 const clients: Array<{
   clientId: string;
@@ -305,11 +305,18 @@ wss.on('connection', async (ws: Server.Ws) => {
       }
 
       case MESSAGES.SUBSCRIBE_ADDRESS: {
-        if (data.params.addresses && data.params.addresses.length > 0) {
-          for (const addressInput of data.params.addresses) {
-            if (!addressesSubscribed[clientId].includes(addressInput)) {
-              addressesSubscribed[clientId].push(addressInput);
-            }
+        const { addresses, cbor } = { ...data.params };
+
+        if (addresses && addresses.length > 0) {
+          for (const address of addresses) {
+            const subscriptionIndex = addressesSubscribed[clientId].findIndex(
+              addr => addr.address === address,
+            );
+
+            // Subscribe to new address...
+            if (subscriptionIndex === -1) addressesSubscribed[clientId].push({ address, cbor });
+            // ... or update the cbor option
+            else addressesSubscribed[clientId][subscriptionIndex].cbor ||= cbor;
           }
 
           const activeAddressSubIndex = activeSubscriptions[clientId].findIndex(

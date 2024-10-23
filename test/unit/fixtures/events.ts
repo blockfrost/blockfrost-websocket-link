@@ -1,3 +1,5 @@
+// cSpell: disable
+
 export const emitBlock = [
   {
     description: 'one block',
@@ -44,7 +46,7 @@ export const emitMissedBlock = [
 export const onBlock = [
   {
     description: "1 of client's addresses affected in a block (real data)",
-    subscribedAddresses: ['addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h'],
+    subscribedAddresses: [{address:'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h',cbor:true}],
     mocks: {
       block: {
         time: 1639491936,
@@ -337,6 +339,9 @@ export const onBlock = [
               },
             ],
           },
+          txCbor: {
+            cbor: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+          }
         },
       ],
     },
@@ -592,6 +597,7 @@ export const onBlock = [
               ],
             },
             txHash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
+            txCbor: {cbor:'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'}
           },
         ],
       },
@@ -600,9 +606,9 @@ export const onBlock = [
   {
     description: "2 of the client's addresses affected, 1 address affected in multiple txs",
     subscribedAddresses: [
-      'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h',
-      'addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t',
-      'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h', // random address, should not be affected
+      {address:'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h'},
+      {address:'addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'},
+      {address:'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h'}, // random address, should not be affected
     ],
     mocks: {
       block: {
@@ -788,7 +794,7 @@ export const onBlock = [
   {
     description: 'subscribed address was not affected',
     subscribedAddresses: [
-      'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h', // random address, should not be affected
+      {address:'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h'}, // random address, should not be affected
     ],
     mocks: {
       block: {

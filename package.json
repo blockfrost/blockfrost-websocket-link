@@ -13,12 +13,12 @@
     "start": "yarn build && yarn node ./dist/server.js",
     "start:profiler": "yarn build && NODE_ENV=production yarn node --prof ./dist/server.js",
     "test-performance": "yarn build && yarn node ./dist/scripts/performance/index.js",
-    "test": "BLOCKFROST_PROJECT_ID='none' vitest",
+    "test": "BLOCKFROST_PROJECT_ID='mainnet_none' vitest",
     "coverage": "vitest run --coverage",
     "type-check": "tsc --project tsconfig.json"
   },
   "dependencies": {
-    "@blockfrost/blockfrost-js": "5.5.0",
+    "@blockfrost/blockfrost-js": "5.6.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^11.5.0",
     "@sentry/integrations": "^7.85.0",
     "@sentry/node": "^7.85.0",

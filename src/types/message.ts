@@ -62,7 +62,10 @@ export type Messages =
   | {
       id: number;
       command: 'SUBSCRIBE_ADDRESS';
-      params: { addresses: string[] };
+      params: {
+        addresses: string[];
+        cbor?: boolean;
+      };
     }
   | {
       id: number;
