@@ -1,9 +1,11 @@
+// cSpell: disable
+
 export const emitBlock = [
   {
     description: 'one block',
     blocks: [
       {
-        time: 1506203091,
+        time: 1_506_203_091,
         height: 1,
         hash: 'a',
       },
@@ -16,24 +18,24 @@ export const emitMissedBlock = [
     description: 'missed 2 blocks',
     latestBlocks: [
       {
-        time: 1506203091,
+        time: 1_506_203_091,
         height: 1,
         hash: 'a',
       },
       {
-        time: 1506203091,
+        time: 1_506_203_091,
         height: 4,
         hash: 'd',
       },
     ],
     missedBlocks: [
       {
-        time: 1506203091,
+        time: 1_506_203_091,
         height: 2,
         hash: 'b',
       },
       {
-        time: 1506203091,
+        time: 1_506_203_091,
         height: 3,
         hash: 'c',
       },
@@ -44,17 +46,19 @@ export const emitMissedBlock = [
 export const onBlock = [
   {
     description: "1 of client's addresses affected in a block (real data)",
-    subscribedAddresses: ['addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h'],
+    subscribedAddresses: [
+      { address: 'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h' },
+    ],
     mocks: {
       block: {
-        time: 1639491936,
-        height: 3152805,
+        time: 1_639_491_936,
+        height: 3_152_805,
         hash: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-        slot: 45122720,
+        slot: 45_122_720,
         epoch: 174,
-        epoch_slot: 324320,
+        epoch_slot: 324_320,
         slot_leader: 'pool1weu4vlg9t8knma7t2j5y3w2k3vzdr9mtnynd2jhfalwn76nwh48',
-        size: 15416,
+        size: 15_416,
         tx_count: 2,
         output: '3371541981',
         fees: '1458019',
@@ -119,9 +123,9 @@ export const onBlock = [
           txData: {
             hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
             block: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-            block_height: 3152805,
-            block_time: 1639491936,
-            slot: 45122720,
+            block_height: 3_152_805,
+            block_time: 1_639_491_936,
+            slot: 45_122_720,
             index: 0,
             output_amount: [
               {
@@ -151,7 +155,7 @@ export const onBlock = [
             ],
             fees: '1270914',
             deposit: '0',
-            size: 14796,
+            size: 14_796,
             invalid_before: '45122712',
             invalid_hereafter: '45126311',
             utxo_count: 9,
@@ -345,14 +349,14 @@ export const onBlock = [
         id: 1,
         type: 'message',
         data: {
-          time: 1639491936,
-          height: 3152805,
+          time: 1_639_491_936,
+          height: 3_152_805,
           hash: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-          slot: 45122720,
+          slot: 45_122_720,
           epoch: 174,
           epoch_slot: 324_320,
           slot_leader: 'pool1weu4vlg9t8knma7t2j5y3w2k3vzdr9mtnynd2jhfalwn76nwh48',
-          size: 15416,
+          size: 15_416,
           tx_count: 2,
           output: '3371541981',
           fees: '1458019',
@@ -373,9 +377,9 @@ export const onBlock = [
             txData: {
               hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
               block: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-              block_height: 3152805,
-              block_time: 1639491936,
-              slot: 45122720,
+              block_height: 3_152_805,
+              block_time: 1_639_491_936,
+              slot: 45_122_720,
               index: 0,
               output_amount: [
                 {
@@ -405,7 +409,7 @@ export const onBlock = [
               ],
               fees: '1270914',
               deposit: '0',
-              size: 14796,
+              size: 14_796,
               invalid_before: '45122712',
               invalid_hereafter: '45126311',
               utxo_count: 9,
@@ -600,20 +604,20 @@ export const onBlock = [
   {
     description: "2 of the client's addresses affected, 1 address affected in multiple txs",
     subscribedAddresses: [
-      'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h',
-      'addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t',
-      'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h', // random address, should not be affected
+      { address: 'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h' },
+      { address: 'addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t' },
+      { address: 'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h' }, // random address, should not be affected
     ],
     mocks: {
       block: {
-        time: 1639491936,
-        height: 3152805,
+        time: 1_639_491_936,
+        height: 3_152_805,
         hash: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-        slot: 45122720,
+        slot: 45_122_720,
         epoch: 174,
-        epoch_slot: 324320,
+        epoch_slot: 324_320,
         slot_leader: 'pool1weu4vlg9t8knma7t2j5y3w2k3vzdr9mtnynd2jhfalwn76nwh48',
-        size: 15416,
+        size: 15_416,
         tx_count: 2,
         output: '3371541981',
         fees: '1458019',
@@ -678,8 +682,8 @@ export const onBlock = [
           txData: {
             hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
             block: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-            block_height: 3152805,
-            block_time: 1639491936,
+            block_height: 3_152_805,
+            block_time: 1_639_491_936,
           },
           txUtxos: {
             hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
@@ -692,8 +696,8 @@ export const onBlock = [
           txData: {
             hash: '4f18be04c3587d49ae1ce32ceaf841c58ab7ab459847b4943bbd02309315ec72',
             block: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-            block_height: 3152805,
-            block_time: 1639491936,
+            block_height: 3_152_805,
+            block_time: 1_639_491_936,
           },
           txUtxos: {
             hash: '4f18be04c3587d49ae1ce32ceaf841c58ab7ab459847b4943bbd02309315ec72',
@@ -710,14 +714,14 @@ export const onBlock = [
         id: 1,
         type: 'message',
         data: {
-          time: 1639491936,
-          height: 3152805,
+          time: 1_639_491_936,
+          height: 3_152_805,
           hash: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-          slot: 45122720,
+          slot: 45_122_720,
           epoch: 174,
-          epoch_slot: 324320,
+          epoch_slot: 324_320,
           slot_leader: 'pool1weu4vlg9t8knma7t2j5y3w2k3vzdr9mtnynd2jhfalwn76nwh48',
-          size: 15416,
+          size: 15_416,
           tx_count: 2,
           output: '3371541981',
           fees: '1458019',
@@ -738,8 +742,8 @@ export const onBlock = [
             txData: {
               hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
               block: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-              block_height: 3152805,
-              block_time: 1639491936,
+              block_height: 3_152_805,
+              block_time: 1_639_491_936,
             },
             txUtxos: {
               hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
@@ -753,8 +757,8 @@ export const onBlock = [
             txData: {
               hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
               block: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-              block_height: 3152805,
-              block_time: 1639491936,
+              block_height: 3_152_805,
+              block_time: 1_639_491_936,
             },
             txUtxos: {
               hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
@@ -769,8 +773,8 @@ export const onBlock = [
             txData: {
               hash: '4f18be04c3587d49ae1ce32ceaf841c58ab7ab459847b4943bbd02309315ec72',
               block: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-              block_height: 3152805,
-              block_time: 1639491936,
+              block_height: 3_152_805,
+              block_time: 1_639_491_936,
             },
             txUtxos: {
               hash: '4f18be04c3587d49ae1ce32ceaf841c58ab7ab459847b4943bbd02309315ec72',
@@ -788,18 +792,18 @@ export const onBlock = [
   {
     description: 'subscribed address was not affected',
     subscribedAddresses: [
-      'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h', // random address, should not be affected
+      { address: 'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h' }, // random address, should not be affected
     ],
     mocks: {
       block: {
-        time: 1639491936,
-        height: 3152805,
+        time: 1_639_491_936,
+        height: 3_152_805,
         hash: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-        slot: 45122720,
+        slot: 45_122_720,
         epoch: 174,
-        epoch_slot: 324320,
+        epoch_slot: 324_320,
         slot_leader: 'pool1weu4vlg9t8knma7t2j5y3w2k3vzdr9mtnynd2jhfalwn76nwh48',
-        size: 15416,
+        size: 15_416,
         tx_count: 2,
         output: '3371541981',
         fees: '1458019',
@@ -833,14 +837,14 @@ export const onBlock = [
         id: 1,
         type: 'message',
         data: {
-          time: 1639491936,
-          height: 3152805,
+          time: 1_639_491_936,
+          height: 3_152_805,
           hash: '9b4f18889ea91b644462ea50d733a372313222d71ecc60d18c2d7f3f5db1f2de',
-          slot: 45122720,
+          slot: 45_122_720,
           epoch: 174,
-          epoch_slot: 324320,
+          epoch_slot: 324_320,
           slot_leader: 'pool1weu4vlg9t8knma7t2j5y3w2k3vzdr9mtnynd2jhfalwn76nwh48',
-          size: 15416,
+          size: 15_416,
           tx_count: 2,
           output: '3371541981',
           fees: '1458019',

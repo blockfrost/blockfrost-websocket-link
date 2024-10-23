@@ -1,5 +1,9 @@
 export type Details = 'basic' | 'tokens' | 'tokenBalances' | 'txids' | 'txs';
 
+export interface SubscribeAddressOptions {
+  cbor?: boolean;
+}
+
 export type Messages =
   | {
       id: number;
@@ -62,7 +66,10 @@ export type Messages =
   | {
       id: number;
       command: 'SUBSCRIBE_ADDRESS';
-      params: { addresses: string[] };
+      params: {
+        addresses: string[];
+        options?: SubscribeAddressOptions;
+      };
     }
   | {
       id: number;

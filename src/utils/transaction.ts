@@ -68,18 +68,23 @@ export const txIdsToTransactions = async (
   return sortedTxs;
 };
 
-export const getTransactionsWithUtxo = async (
-  txids: string[],
+export interface GetTransactionsDetails {
+  txid: string;
+  cbor?: boolean;
+}
+
+export const getTransactionsWithDetails = async (
+  txs: GetTransactionsDetails[],
 ): Promise<{ txData: TransformedTransaction; txUtxos: TransformedTransactionUtxo }[]> => {
   const txsData = await Promise.all(
-    txids.map(txid =>
+    txs.map(({ txid }) =>
       pLimiter.add(() => blockfrostAPI.txs(txid).then(data => transformTransactionData(data)), {
         throwOnTimeout: true,
       }),
     ),
   );
   const txsUtxo = await Promise.all(
-    txids.map(txid =>
+    txs.map(({ txid }) =>
       pLimiter.add(
         () => blockfrostAPI.txsUtxos(txid).then(data => transformTransactionUtxo(data)),
         { throwOnTimeout: true },
@@ -87,7 +92,7 @@ export const getTransactionsWithUtxo = async (
     ),
   );
 
-  return txids.map((_txid, index) => ({
+  return txs.map((_tx, index) => ({
     txData: txsData[index],
     txUtxos: txsUtxo[index],
   }));
