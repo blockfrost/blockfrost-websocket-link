@@ -10,6 +10,7 @@ import {
   TransformedTransaction,
   TransformedTransactionUtxo,
 } from '../../../../src/types/transactions.js';
+import { GetTransactionsDetails } from '../../../../src/utils/transaction.js';
 
 describe('events', () => {
   for (const fixture of fixtures.emitBlock) {
@@ -139,22 +140,24 @@ describe('events', () => {
         send: (message: string) => mockedSend(message),
       };
 
-      vi.spyOn(txUtils, 'getTransactionsWithUtxo').mockImplementation((txids: string[]) => {
-        return new Promise(resolve => {
-          // sanity check that the test really wanted to fetch transactions that we expected
-          for (const mockedTx of fixture.mocks.txsWithUtxo) {
-            if (!txids.find(txid => mockedTx.txData.hash === txid)) {
-              throw new Error('Unexpected list of affected addresses');
+      vi.spyOn(txUtils, 'getTransactionsWithDetails').mockImplementation(
+        (txs: GetTransactionsDetails[]) => {
+          return new Promise(resolve => {
+            // sanity check that the test really wanted to fetch transactions that we expected
+            for (const mockedTx of fixture.mocks.txsWithUtxo) {
+              if (!txs.find(({ txid }) => mockedTx.txData.hash === txid)) {
+                throw new Error('Unexpected list of affected addresses');
+              }
             }
-          }
-          resolve(
-            fixture.mocks.txsWithUtxo as unknown as {
-              txData: TransformedTransaction;
-              txUtxos: TransformedTransactionUtxo;
-            }[],
-          );
-        });
-      });
+            resolve(
+              fixture.mocks.txsWithUtxo as unknown as {
+                txData: TransformedTransaction;
+                txUtxos: TransformedTransactionUtxo;
+              }[],
+            );
+          });
+        },
+      );
 
       // subscribe both to block and addresses
       const subscription = [

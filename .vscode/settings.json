@@ -3,6 +3,7 @@
     "addresses",
     "bech",
     "blockfrost",
+    "cbor",
     "emurgo",
     "from",
     "HEALTHCHECK",
@@ -10,9 +11,12 @@
     "libc",
     "tailwindcss",
     "to",
+    "txid",
     "txids",
     "uninstantiated",
-    "utxos"
+    "utxo",
+    "utxos",
+    "uuidv4"
   ],
   "search.exclude": {
     "**/.yarn": true,
