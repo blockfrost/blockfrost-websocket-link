@@ -30,6 +30,8 @@ export class MetricsCollector {
 
   private _collect = async () => {
     logger.info('[HealthCheck] Running health check');
+    const t0 = Date.now();
+
     try {
       await healthCheck(`ws://localhost:${port}`);
       this.healthy = true;
@@ -51,7 +53,11 @@ export class MetricsCollector {
         this.healthCheckFailingSince = Date.now();
       }
     }
-    logger.info('[HealthCheck] Health check done');
+    const t1 = Date.now();
+
+    const durationSeconds = Math.floor(((t1 - t0) / 1000) * 100) / 100; // 2 decimals
+
+    logger.info(`[HealthCheck] Health check done in ${durationSeconds} seconds.`);
     return {
       is_healthy: this.healthy ? 1 : 0,
       websocket_link_clients: this.wss.clients.size,

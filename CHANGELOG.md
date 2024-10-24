@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- more verbose healthcheck error log
+
 ### Fixed
 
 - crash while fetching affected addresses for a block undergoing a rollback
