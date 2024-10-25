@@ -51,6 +51,7 @@ Optional configuration:
 
 - `BLOCKFROST_BACKEND_URL` URL pointing to your own backend (blockfrost-backend-ryo) if you prefer not to use the public Blockfrost API
 - `BLOCKFROST_BLOCK_LISTEN_INTERVAL` how often should be the server pulling the backend for new data (in milliseconds, default `5000`)
+- `METRICS_COLLECTOR_INTERVAL_MS` frequency for refreshing metrics and performing health check (default `10000`)
 - `PORT` which port the server should listen to (default `3005`)
 
 Once your server has started, you can connect to it.

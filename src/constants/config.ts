@@ -22,7 +22,9 @@ export const FIAT_RATES_ENABLE_ON_TESTNET = false;
 export const BLOCKFROST_REQUEST_CONCURRENCY = 500;
 
 // How often should metrics be updated
-export const METRICS_COLLECTOR_INTERVAL_MS = 10_000;
+export const METRICS_COLLECTOR_INTERVAL_MS = Number(
+  process.env.METRICS_COLLECTOR_INTERVAL_MS ?? 10_000,
+);
 
 // If healthcheck repeatedly fails for duration longer than this constant the process exits
 export const HEALTHCHECK_FAIL_THRESHOLD_MS = 6 * METRICS_COLLECTOR_INTERVAL_MS; // 6 health checks

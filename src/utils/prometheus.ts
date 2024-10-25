@@ -42,7 +42,7 @@ export class MetricsCollector {
       if (this.healthCheckFailingSince) {
         const failDurationMs = Date.now() - this.healthCheckFailingSince;
 
-        if (failDurationMs > HEALTHCHECK_FAIL_THRESHOLD_MS) {
+        if (HEALTHCHECK_FAIL_THRESHOLD_MS > 0 && failDurationMs > HEALTHCHECK_FAIL_THRESHOLD_MS) {
           logger.error(
             `Healthcheck failing for longer than ${HEALTHCHECK_FAIL_THRESHOLD_MS} ms. Exiting process.`,
           );
@@ -79,10 +79,12 @@ export class MetricsCollector {
   };
 
   startCollector = async (interval: number) => {
-    this.metrics = await this._collect();
-    this.intervalId = setInterval(async () => {
+    if (interval > 0) {
       this.metrics = await this._collect();
-    }, interval);
+      this.intervalId = setInterval(async () => {
+        this.metrics = await this._collect();
+      }, interval);
+    }
   };
 
   stopCollector = () => {
