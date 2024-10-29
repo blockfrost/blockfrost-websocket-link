@@ -48,11 +48,11 @@ export const buildTx = async (amountInLovelace: string, receivingAddress: string
     throw new Error(`You should send ADA to ${address} to have enough funds to sent a transaction`);
   }
 
-  const { txBody } = composeTransaction(address, receivingAddress, amountInLovelace, utxo, {
+  const { txBody, txHash } = composeTransaction(address, receivingAddress, amountInLovelace, utxo, {
     protocolParams: protocolParameters,
   });
 
   const transaction = signTransaction(txBody, signKey);
 
-  return transaction;
+  return { transaction, txHash };
 };

@@ -11,7 +11,7 @@ describe('getLatestBlock', () => {
     test(fixture.testName, async () => {
       await ws.waitForConnection();
       const response = await ws.sendAndWait('GET_TRANSACTION', {
-        txId: 'ed7e75df5a1d4925cc642ba6360d0dd031bfff54d0314757cfcbf2448a5e8c33',
+        txId: fixture.txID,
       });
 
       expect(response.data).toMatchObject(fixture.result);

@@ -1,7 +1,7 @@
-export const getFixtures = async (testType: string) => {
+export const getFixtures = async (fixtureTestName: string) => {
   try {
     const fixtures = await import(
-      `../fixtures/${process.env.BLOCKFROST_NETWORK}/${testType}.e2e.ts`
+      `../fixtures/${process.env.BLOCKFROST_NETWORK}/${fixtureTestName}.e2e.ts`
     );
 
     return fixtures.default;

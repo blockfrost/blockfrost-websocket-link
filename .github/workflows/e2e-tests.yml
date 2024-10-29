@@ -24,9 +24,9 @@ jobs:
       BLOCKFROST_PROJECT_ID: ${{
         github.event.inputs.network == 'mainnet' && secrets.BLOCKFROST_MAINNET_PROJECT_ID ||
         github.event.inputs.network == 'preprod' && secrets.BLOCKFROST_PREPROD_PROJECT_ID ||
-        secrets.BLOCKFROST_PREPROD_PROJECT_ID
+        'preprod1abiUKhLuQ3Ic1n6ctxilFMtlGNozC5h'
         }}
-      BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'mainnet' }}
+      BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'preprod' }}
     strategy:
       matrix:
         node-version: [20.x]
@@ -39,5 +39,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: yarn
       - run: yarn run build
-      - run: yarn start
+      - name: Start service
+        run: |
+          yarn start &
+          npx wait-on http://localhost:3005
       - run: yarn run test:e2e

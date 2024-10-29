@@ -1,6 +1,7 @@
 export default [
   {
     testName: 'GET_TRANSACTION success - mainnet',
+    txID: 'ed7e75df5a1d4925cc642ba6360d0dd031bfff54d0314757cfcbf2448a5e8c33',
     result: {
       hash: '28172ea876c3d1e691284e5179fae2feb3e69d7d41e43f8023dc380115741026',
       block: 'e6369fee087d31192016b1659f1c381e9fc4925339278a4eef6f340c96c1947f',
