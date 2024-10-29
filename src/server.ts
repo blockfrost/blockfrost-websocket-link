@@ -22,12 +22,12 @@ import getTransaction from './methods/get-transaction.js';
 import submitTransaction from './methods/push-transaction.js';
 import estimateFee from './methods/estimate-fee.js';
 import getBalanceHistory from './methods/get-balance-history.js';
-import { getAffectedAddresses } from './utils/address.js';
 import { logger } from './utils/logger.js';
 import { METRICS_COLLECTOR_INTERVAL_MS } from './constants/config.js';
 import { getPort } from './utils/server.js';
 
 import { createRequire } from 'module';
+import { AffectedAddressesInBlock } from './types/events.js';
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
@@ -139,27 +139,24 @@ setInterval(() => {
 }, 30_000);
 
 startEmitter();
-// this event is triggered with every new block see events.ts
-events.on('newBlock', async (latestBlock: Responses['block_content']) => {
-  logger.info(
-    `Retrieving affected addressed for newBlock ${latestBlock.hash} ${latestBlock.height}`,
-  );
-  try {
-    // TODO: move fetching affected address for the block to newBlock emitter
-    // So if fetching affected addresses returns 404 due to block rollback it won't be emitted
-    const affectedAddresses = await getAffectedAddresses(latestBlock.height);
 
+// this event is triggered with every new block see events.ts
+events.on(
+  'newBlock',
+  async (latestBlock: Responses['block_content'], affectedAddresses: AffectedAddressesInBlock) => {
     logger.debug(`Running newBlock callback for ${clients.length} clients`);
-    for (const client of clients) {
-      client.newBlockCallback(latestBlock, affectedAddresses);
+    try {
+      for (const client of clients) {
+        client.newBlockCallback(latestBlock, affectedAddresses);
+      }
+    } catch (error) {
+      logger.error(
+        `Failed to notify client about new block ${latestBlock.hash} ${latestBlock.height}.`,
+        error,
+      );
     }
-  } catch (error) {
-    logger.error(
-      `Failed to notify clients about new block ${latestBlock.hash} ${latestBlock.height}.`,
-      error,
-    );
-  }
-});
+  },
+);
 
 wss.on('connection', async (ws: Server.Ws) => {
   ws.isAlive = true;
