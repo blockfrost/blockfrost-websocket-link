@@ -1,25 +1,26 @@
 [![Made by Five Binaries](https://img.shields.io/badge/made%20by-Five%20Binaries-darkviolet.svg?style=flat-square)](https://fivebinaries.com/)
 
 <img src="https://blockfrost.io/images/logo.svg" width="250" align="right" height="90">
+<br/>
 
 # blockfrost-websocket-link
 
 <br/>
-
 <p align="center">WebSocket link for <a href="https://blockfrost.io">Blockfrost.io</a> API.</p>
 <p align="center">
   <a href="#about">About</a> •
   <a href="#installation">Installation</a> •
-  <a href="#usage">Usage</a>  •
-  <a href="#ui-explorer">UI Explorer</a>
-
+  <a href="#usage">Usage</a> •
+  <a href="#ui-explorer">UI Explorer</a> •
+  <a href="#documentation">Documentation</a>
 </p>
-
-<br/>
 
 ## About
 
-WebSocket Link is a server-side application that serves as a WebSocket bridge to the Cardano blockchain using the Blockfrost API.
+**WebSocket Link** is a _server-side application_ that serves as a WebSocket bridge to the Cardano blockchain using the
+**Blockfrost REST API**.
+`blockfrost-websocket-link` is designed to be run in your infrastructure. It can connect to the public **Blockfrost
+REST API** (using your token) or to your own local `blockfrost-backend-ryo` instance.
 
 ## Installation
 
@@ -42,21 +43,13 @@ $ nix-build
 
 ## Usage
 
-To start the server, you need to configure the following environmental variables.
-
-- `BLOCKFROST_PROJECT_ID` Blockfrost.io`s project token
-- `BLOCKFROST_NETWORK` let you choose which network it should connect to (_mainnet_ or _testnet_)
-
-Optional configuration:
-
-- `BLOCKFROST_BACKEND_URL` URL pointing to your own backend (blockfrost-backend-ryo) if you prefer not to use the public Blockfrost API
-- `BLOCKFROST_BLOCK_LISTEN_INTERVAL` how often should be the server pulling the backend for new data (in milliseconds, default `5000`)
-- `METRICS_COLLECTOR_INTERVAL_MS` frequency for refreshing metrics and performing health check (default `10000`)
-- `PORT` which port the server should listen to (default `3005`)
+In order to start the server, you need to configure some [required](#required) environment variables.
 
 Once your server has started, you can connect to it.
 
-```console
+<!-- cSpell: disable -->
+
+```
 $ wscat -c ws://localhost:3005 -n
 Connected (press CTRL+C to quit)
 > {"id":0,"command":"GET_SERVER_INFO","params":{}}
@@ -71,6 +64,577 @@ Connected (press CTRL+C to quit)
 ...
 ```
 
+<!-- cSpell: enable -->
+
 ## UI explorer
 
-There is a handly UI for this project called [blockfrost-websocket-link-ui](https://github.com/blockfrost/blockfrost-websocket-link-ui) and you can find its hosted version at [websocket-link.blockfrost.dev](https://websocket-link.blockfrost.dev/).
+There is an example UI for this project called [blockfrost-websocket-link-ui](https://github.com/blockfrost/blockfrost-websocket-link-ui)
+and you can find its hosted version at [websocket-link.blockfrost.dev](https://websocket-link.blockfrost.dev/).
+
+## Documentation
+
+### Configuration
+
+`blockfrost-websocket-link` can be configured through environment variables.
+
+#### Required
+
+- `BLOCKFROST_NETWORK`: lets you choose which network it should connect to (_mainnet_ or _testnet_)
+- `BLOCKFROST_PROJECT_ID`: **Blockfrost.io**'s project token
+
+#### Optional
+
+- `BLOCKFROST_BACKEND_URL`: URL pointing to your own backend (`blockfrost-backend-ryo`) if you prefer not to use the
+public **Blockfrost REST API**
+- `BLOCKFROST_BLOCK_LISTEN_INTERVAL`: how often should be the server pulling the backend for new data (in milliseconds,
+default `5000`)
+- `BLOCKFROST_FIAT_RATES_PROXY`: the proxy used to fetch fiat rates
+- `BLOCKFROST_SENTRY_DSN`: the **Sentry** data source name to optionally monitor the service
+- `BLOCKFROST_WSLINK_DEBUG`: enables `debug` logging level
+- `BUILD_COMMIT`: provided by `/status` endpoint
+- `METRICS_COLLECTOR_INTERVAL_MS`: frequency for refreshing metrics and performing health check (default `10000`)
+- `PORT`: which port the server should listen to (default `3005`)
+
+### API
+
+As its name suggests, `blockfrost-websocket-link` offers a web socket based API: the client needs to connect to it
+through a web socket. Once the web socket connection is correctly established the server is immediately ready to accept
+commands. The communication (both ways) is _JSON encoded_: the server expects JSON encoded messages and will respond
+using the same encoding.
+
+Each input message requires a nonce which is mirrored by the server in the output message; it
+is not actually used by the server but it useful for the client to reconcile output messages to relative input message.
+
+Each input message requires a command as well (details will follow) and optionally a set of parameters, depending on
+the command.
+
+The payload of an input message is:
+
+```
+{
+  "id": ...,        // string or number nonce
+  "command": "...", // command
+  "params": {       // optional
+    ...             // varying parameters based on command
+  }
+}
+```
+
+Commands are divided in two main categories:
+- _request / response_ commands: each one of them originates one response output message;
+- _subscription_ commands: each one of them originates one immediate response output message with a feedback about the
+  requested operation; later, in case of successful subscription, more output messages will be generated based on the
+  event the command subscribed.
+
+The payload of an output message of a successful action is:
+
+```
+{
+  "id": ...,   // nonce
+  "data": ..., // message data
+  "type": "message"
+}
+```
+
+The payload of an output message of a unsuccessful action is:
+
+```
+{
+  "id": ..., // nonce
+  "data": {
+    "error": {
+      ...    // error details
+    }
+  },
+  "type": "error"
+}
+```
+
+#### Request / response commands
+
+- [`ESTIMATE_FEE`](#estimate_fee) - estimate transaction submission fee
+- [`GET_ACCOUNT_INFO`](#get_account_info) - get general information about an account
+- [`GET_ACCOUNT_UTXO`](#get_account_utxo) - get unspent UTxOs of an account
+- [`GET_BALANCE_HISTORY`](#get_balance_history) - get balance history of an account
+- [`GET_BLOCK`](#get_block) - get details of a block
+- [`GET_TRANSACTION`](#get_transaction) - get details of a transaction
+- [`GET_SERVER_INFO`](#get_server_info) - get information about the server
+- [`PUSH_TRANSACTION`](#push_transaction) - submits a transaction to the network
+- [`UNSUBSCRIBE_ADDRESS`](#unsubscribe_address) - cancel all new transactions subscriptions
+- [`UNSUBSCRIBE_BLOCK`](#unsubscribe_block) - cancel new blocks subscription
+
+#### Subscription commands
+
+- [`SUBSCRIBE_ADDRESS`](#subscribe_addresses) - subscribe to new transactions for given addresses
+- [`SUBSCRIBE_BLOCK`](#subscribe_block) - subscribe to new blocks
+
+#### ESTIMATE_FEE
+
+Input message:
+
+```
+{
+  "id": ..., // nonce
+  "command": "ESTIMATE_FEE"
+}
+```
+
+Response output message `data` type:
+
+``` TypeScript
+{
+  /** The linear factor for the minimum fee calculation for given epoch */
+  lovelacePerByte: number;
+}
+```
+
+#### GET_ACCOUNT_INFO
+
+Input message:
+
+```
+{
+  "id": ...,             // nonce
+  "command": "GET_ACCOUNT_INFO",
+  "params": {
+    "descriptor": "...", // public key
+    "details": "...",    // TODO
+    "page": ...,         // optional - page number
+    "pageSize": ...      // optional - page size
+  }
+}
+```
+
+Response output message `data` type:
+
+``` TypeScript
+{
+  balance: string;
+  addresses?: {
+    change: AddressData[];
+    used: AddressData[];
+    unused: AddressData[];
+  };
+  empty: boolean;
+  availableBalance: string;
+  descriptor: string;
+  tokens?: AssetBalance[];
+  history: {
+    total: number;               // total transactions
+    tokens?: number;             // tokens transactions
+    unconfirmed: number;         // unconfirmed transactions
+    transactions?: Transactions; // list of transactions
+    txids?: string[];
+  };
+  page: {
+    size: number;
+    total: number;
+    index: number;
+  };
+  misc: {
+    staking: {
+      address: string;
+      isActive: boolean;
+      rewards: string;
+      poolId: string | null;
+      drep: {
+        drep_id: string;
+        hex: string;
+        amount: string;
+        active: boolean;
+        active_epoch: number | null;
+        has_script: boolean;
+      } | null;
+    };
+  };
+}
+```
+
+#### GET_ACCOUNT_UTXO
+
+Input message:
+
+```
+{
+  "id": ...,            // nonce
+  "command": "GET_ACCOUNT_UTXO",
+  "params": {
+    "descriptor": "..." // public key
+  }
+}
+```
+
+Response output message `data` type:
+
+``` TypeScript
+{
+  address: string;
+  utxoData: {
+    tx_hash: string;
+    tx_index: number;
+    output_index: number;
+    amount: AssetBalance[];
+    block: string;
+    data_hash: string | null;
+  };
+  path: string;
+  blockInfo: BlockContent;
+}[]
+```
+
+See also [BlockContent](#blockcontent)
+
+#### GET_BALANCE_HISTORY
+
+Input message:
+
+```
+{
+  "id": ...,             // nonce
+  "command": "GET_BALANCE_HISTORY",
+  "params": {
+    "descriptor": "...", // public key
+    "groupBy": ...,      // TODO
+    "from": ...,         // TODO
+    "to": ...            // TODO
+  }
+}
+```
+
+Response output message `data` type:
+
+``` TypeScript
+{
+  time: number;
+  txs: number;
+  received: string;
+  sent: string;
+  sentToSelf: string;
+  rates?: { [k: string]: number | undefined };
+}[]
+```
+
+#### GET_BLOCK
+
+Input message:
+
+```
+{
+  "id": ...,            // nonce
+  "command": "GET_BLOCK",
+  "params": {
+    "hashOrNumber": ... // block id - block hash or block number
+  }
+}
+```
+
+Response output message `data` type: [BlockContent](#blockcontent)
+
+#### GET_TRANSACTION
+
+Input message:
+
+```
+{
+  "id": ...,      // nonce
+  "command": "GET_TRANSACTION",
+  "params": {
+    "txId": "..." // transaction id
+  }
+}
+```
+
+Response output message `data` type: [TransformedTransaction](#transformedtransaction)
+
+#### GET_SERVER_INFO
+
+Input message:
+
+```
+{
+  "id": ..., // nonce
+  "command": "GET_SERVER_INFO"
+}
+```
+
+Response output message `data` type:
+
+``` TypeScript
+{
+  hostname: string;
+  name: string;
+  shortcut: string;
+  testnet: boolean;
+  version: string;
+  decimals: number;
+  blockHeight: number;
+  blockHash: string;
+}
+```
+
+#### PUSH_TRANSACTION
+
+Input message:
+
+```
+{
+  "id": ...,        // nonce
+  "command": "PUSH_TRANSACTION",
+  "params": {
+    "txData": "..." // the CBOR representation of the transaction
+  }
+}
+```
+
+Response output message:
+
+```
+{
+  "id": ...,     // nonce
+  "data": "...", // transaction id
+  "type": "message"
+}
+```
+
+#### SUBSCRIBE_ADDRESS
+
+Input message:
+
+```
+{
+  "id": ...,                       // nonce
+  "command": "SUBSCRIBE_ADDRESS",
+  "params": {
+    "addresses": ["address", ...], // list of addresses
+    "cbor": true                   // optional - request for CBOR representation of the transaction
+  }
+}
+```
+
+Response output message:
+
+```
+{
+  "id": ...,           // nonce
+  "data": {
+    "subscribed": true // successful subscription confirmation
+  },
+  "type": "message"
+}
+```
+
+Subscription output message `data` type:
+
+``` TypeScript
+{
+  address: string;
+  txHash: string;
+  txData: TransformedTransaction;
+  txUtxos: {
+    /** Transaction hash */
+    hash: string;
+    inputs: {
+      /** Input address */
+      address: string;
+      amount: AssetBalance[];
+      /** Hash of the UTXO transaction */
+      tx_hash: string;
+      /** UTXO index in the transaction */
+      output_index: number;
+      /** The hash of the transaction output datum */
+      data_hash: string | null;
+      /** Whether the input is a collateral consumed on script validation failure */
+      collateral: boolean;
+    }[];
+    outputs: {
+      /** Output address */
+      address: string;
+      amount: AssetBalance[];
+      /** UTXO index in the transaction */
+      output_index: number;
+      /** The hash of the transaction output datum */
+      data_hash: string | null;
+    }[];
+  };
+  txCbor?: string;
+}[]
+```
+
+See also [AssetBalance](#assetbalance) and [TransformedTransaction](#transformedtransaction)
+
+#### SUBSCRIBE_BLOCK
+
+Input message:
+
+```
+{
+  "id": ..., // nonce
+  "command": "SUBSCRIBE_BLOCK"
+}
+```
+
+Response output message:
+
+```
+{
+  "id": ...,           // nonce
+  "data": {
+    "subscribed": true // successful subscription confirmation
+  },
+  "type": "message"
+}
+```
+
+Subscription output message `data` type: [BlockContent](#blockcontent)
+
+#### UNSUBSCRIBE_ADDRESS
+
+Input message:
+
+```
+{
+  "id": ..., // nonce
+  "command": "UNSUBSCRIBE_ADDRESS"
+}
+```
+
+Output message:
+
+```
+{
+  "id": ...,            // nonce
+  "data": {
+    "subscribed": false // successful un-subscription confirmation
+  },
+  "type": "message"
+}
+```
+
+#### UNSUBSCRIBE_BLOCK
+
+Input message:
+
+```
+{
+  "id": ..., // nonce
+  "command": "UNSUBSCRIBE_BLOCK"
+}
+```
+
+Output message:
+
+```
+{
+  "id": ...,            // nonce
+  "data": {
+    "subscribed": false // successful un-subscription confirmation
+  },
+  "type": "message"
+}
+```
+
+#### Common types
+
+##### AssetBalance
+
+``` TypeScript
+interface AssetBalance {
+  unit: string;
+  quantity: string;
+  fingerprint?: string; // lovelace has no fingerprint
+  decimals: number;
+  ticker?: string | null;
+  name?: string | null;
+}
+```
+
+##### BlockContent
+
+``` TypeScript
+interface BlockContent {
+  /** Block creation time in UNIX time */
+  time: number;
+  /** Block number */
+  height: number | null;
+  /** Hash of the block */
+  hash: string;
+  /** Slot number */
+  slot: number | null;
+  /** Epoch number */
+  epoch: number | null;
+  /** Slot within the epoch */
+  epoch_slot: number | null;
+  /** Bech32 ID of the slot leader or specific block description in case there is no slot leader */
+  slot_leader: string;
+  /** Block size in Bytes */
+  size: number;
+  /** Number of transactions in the block */
+  tx_count: number;
+  /** Total output within the block in Lovelaces */
+  output: string | null;
+  /** Total fees within the block in Lovelaces */
+  fees: string | null;
+  /** VRF key of the block */
+  block_vrf: string | null;
+  /** The hash of the operational certificate of the block producer */
+  op_cert: string | null;
+  /** The value of the counter used to produce the operational certificate */
+  op_cert_counter: string | null;
+  /** Hash of the previous block */
+  previous_block: string | null;
+  /** Hash of the next block */
+  next_block: string | null;
+  /** Number of block confirmations */
+  confirmations: number;
+};
+```
+
+##### TransformedTransaction
+
+``` TypeScript
+interface TransformedTransaction {
+  /** Transaction hash */
+  hash: string;
+  /** Block hash */
+  block: string;
+  /** Block number */
+  block_height: number;
+  /** Block creation time in UNIX time */
+  block_time: number;
+  /** Slot number */
+  slot: number;
+  /** Transaction index within the block */
+  index: number;
+  output_amount: AssetBalance[];
+  /** Fees of the transaction in Lovelaces */
+  fees: string;
+  /** Deposit within the transaction in Lovelaces */
+  deposit: string;
+  /** Size of the transaction in Bytes */
+  size: number;
+  /** Left (included) endpoint of the timelock validity intervals */
+  invalid_before: string | null;
+  /** Right (excluded) endpoint of the timelock validity intervals */
+  invalid_hereafter: string | null;
+  /** Count of UTXOs within the transaction */
+  utxo_count: number;
+  /** Count of the withdrawals within the transaction */
+  withdrawal_count: number;
+  /** Count of the MIR certificates within the transaction */
+  mir_cert_count: number;
+  /** Count of the delegations within the transaction */
+  delegation_count: number;
+  /** Count of the stake keys (de)registration within the transaction */
+  stake_cert_count: number;
+  /** Count of the stake pool registration and update certificates within the transaction */
+  pool_update_count: number;
+  /** Count of the stake pool retirement certificates within the transaction */
+  pool_retire_count: number;
+  /** Count of asset mints and burns within the transaction */
+  asset_mint_or_burn_count: number;
+  /** Count of redeemers within the transaction */
+  redeemer_count: number;
+  /** True if contract script passed validation */
+  valid_contract: boolean;
+}
+```

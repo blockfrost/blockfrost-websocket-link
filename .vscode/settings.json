@@ -12,11 +12,12 @@
     "dreps",
     "emurgo",
     "from",
-    "HEALTHCHECK",
+    "healthcheck",
     "keyhash",
     "libc",
     "lovelaces",
     "memoizee",
+    "nixify",
     "tailwindcss",
     "timelock",
     "txid",
@@ -24,7 +25,8 @@
     "uninstantiated",
     "utxo",
     "utxos",
-    "uuidv4"
+    "uuidv4",
+    "wslink"
   ],
   "search.exclude": {
     "**/.yarn": true,
