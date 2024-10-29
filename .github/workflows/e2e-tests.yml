@@ -1,0 +1,43 @@
+name: E2E tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      network:
+        default: mainnet
+        type: choice
+        description: network to use
+        options:
+          - mainnet
+          - preprod
+
+run-name: "E2E Test | network: ${{ github.event.inputs.network }} | #${{ github.run_number }}"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BLOCKFROST_PROJECT_ID: ${{
+        github.event.inputs.network == 'mainnet' && secrets.BLOCKFROST_MAINNET_PROJECT_ID ||
+        github.event.inputs.network == 'preprod' && secrets.BLOCKFROST_PREPROD_PROJECT_ID ||
+        secrets.BLOCKFROST_PREPROD_PROJECT_ID
+        }}
+      BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'mainnet' }}
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: yarn
+      - run: yarn run build
+      - run: yarn start
+      - run: yarn run test:e2e
