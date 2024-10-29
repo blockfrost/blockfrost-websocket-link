@@ -63,6 +63,7 @@ export interface TxNotification {
   txHash: string;
   txData: TransformedTransaction;
   txUtxos: TransformedTransactionUtxo;
+  txCbor?: string;
 }
 
 export interface BalanceHistoryData {

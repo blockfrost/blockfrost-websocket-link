@@ -4,7 +4,7 @@ import { prepareMessage } from './utils/message.js';
 import { blockfrostAPI } from './utils/blockfrost-api.js';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { promiseTimeout } from './utils/common.js';
-import { getTransactionsWithUtxo } from './utils/transaction.js';
+import { getTransactionsWithDetails } from './utils/transaction.js';
 import { TxNotification } from './types/response.js';
 import { EMIT_MAX_MISSED_BLOCKS } from './constants/config.js';
 import { logger } from './utils/logger.js';
@@ -12,6 +12,11 @@ import { logger } from './utils/logger.js';
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;
   maxMissedBlocks?: number;
+}
+
+export interface SubscribedAddress {
+  address: string;
+  cbor?: boolean;
 }
 
 // eslint-disable-next-line unicorn/prefer-event-target
@@ -94,7 +99,7 @@ export const onBlock = async (
   latestBlock: Responses['block_content'],
   affectedAddressesInBlock: Responses['block_content_addresses'],
   activeSubscriptions: Server.Subscription[] | undefined,
-  subscribedAddresses: string[] | undefined,
+  subscribedAddresses: SubscribedAddress[] | undefined,
 ) => {
   // client has no subscription
   if (!activeSubscriptions) return;
@@ -113,7 +118,7 @@ export const onBlock = async (
 
   if (activeAddressSub && subscribedAddresses) {
     const affectedAddresses = affectedAddressesInBlock.filter(a =>
-      subscribedAddresses.includes(a.address),
+      subscribedAddresses.some(addr => addr.address === a.address),
     );
 
     if (affectedAddresses.length === 0) {
@@ -122,15 +127,22 @@ export const onBlock = async (
     }
 
     // get list of unique txids (same tx could affect multiple client's addresses, but we want to fetch it only once)
-    const txIdsSet = new Set<string>();
+    const txsCbor: Record<string, boolean | undefined> = {};
 
     for (const address of affectedAddresses) {
+      const { cbor } = subscribedAddresses.find(
+        subscription => subscription.address === address.address,
+      )!;
+
       for (const tx of address.transactions) {
-        txIdsSet.add(tx.tx_hash);
+        txsCbor[tx.tx_hash] ||= cbor;
       }
     }
+
     // fetch txs that include client's address with their utxo data
-    const txs = await getTransactionsWithUtxo([...txIdsSet]);
+    const txs = await getTransactionsWithDetails(
+      Object.entries(txsCbor).map(([txid, cbor]) => ({ txid, cbor })),
+    );
 
     const notifications: TxNotification[] = [];
 
@@ -149,6 +161,7 @@ export const onBlock = async (
             txData: enhancedTx.txData,
             txUtxos: enhancedTx.txUtxos,
             txHash: enhancedTx.txData.hash,
+            txCbor: enhancedTx.txCbor,
           });
         }
       }
