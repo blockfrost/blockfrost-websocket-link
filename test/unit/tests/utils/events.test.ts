@@ -16,23 +16,28 @@ describe('events', () => {
   for (const fixture of fixtures.emitBlock) {
     test(fixture.description, async () => {
       // @ts-ignore
-      const mock1 = sinon.stub(blockfrostAPI, 'blocksLatest').resolves(fixture.blocks[0]);
+      const mock1 = sinon.stub(blockfrostAPI, 'blocksLatest').resolves(fixture.data[0].block);
+      const mockBlockAddresses = sinon
+        .stub(blockfrostAPI, 'blocksAddressesAll')
+        .resolves(fixture.data[0].blockAddresses ?? []);
       const callback = vi.fn();
 
       events.on('newBlock', callback);
       await emitBlock();
+
       mock1.restore();
+      mockBlockAddresses.restore();
       events.removeAllListeners();
       _resetPreviousBlock();
       expect(callback).toBeCalledTimes(1);
-      expect(callback).toHaveBeenCalledWith(fixture.blocks[0]);
+      expect(callback).toHaveBeenCalledWith(fixture.data[0].block, fixture.data[0].blockAddresses);
     });
   }
 
   for (const fixture of fixtures.emitMissedBlock) {
     test(fixture.description, async () => {
       const mock1 = sinon.stub(blockfrostAPI, 'blocks');
-
+      const mockBlockAddresses = sinon.stub(blockfrostAPI, 'blocksAddressesAll').resolves([]);
       mock1
         .onCall(0)
         // @ts-ignore
@@ -57,21 +62,23 @@ describe('events', () => {
 
       await emitBlock();
       expect(callback).toBeCalledTimes(1);
-      expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0]);
+      expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0], []);
 
       await emitBlock({ maxMissedBlocks: 10 });
       expect(callback).toBeCalledTimes(4); // one time from the first emit, 3 times from 2nd emit (2 missed blocks + latest)
-      expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0]);
-      expect(callback).toHaveBeenNthCalledWith(3, fixture.missedBlocks[1]);
-      expect(callback).toHaveBeenNthCalledWith(4, fixture.latestBlocks[1]);
+      expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0], []);
+      expect(callback).toHaveBeenNthCalledWith(3, fixture.missedBlocks[1], []);
+      expect(callback).toHaveBeenNthCalledWith(4, fixture.latestBlocks[1], []);
       mock1.restore();
       mock2.restore();
+      mockBlockAddresses.restore();
       events.removeAllListeners();
       _resetPreviousBlock();
     });
 
     test(`${fixture.description} - timeout test`, async () => {
       const blockLatestMock = sinon.stub(blockfrostAPI, 'blocksLatest');
+      const mockBlockAddresses = sinon.stub(blockfrostAPI, 'blocksAddressesAll').resolves([]);
 
       blockLatestMock
         .onCall(0)
@@ -96,13 +103,13 @@ describe('events', () => {
           setTimeout(() => {
             // @ts-ignore
             resolve(fixture.missedBlocks[1]);
-          }, 4000);
+          }, 10000);
         }),
       ); // delay 2nd response by 5s, which should trigger timeout
 
       await emitBlock();
       expect(callback).toBeCalledTimes(1);
-      expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0]);
+      expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0], []);
 
       await emitBlock({ fetchTimeoutMs: 3000, maxMissedBlocks: 10 });
 
@@ -120,10 +127,11 @@ describe('events', () => {
       });
 
       expect(callback).toBeCalledTimes(3); // one time from the first emit, 2 times from 2nd emit (just 1 missed block (because 2nd block will timeout) + latest block)
-      expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0]);
-      expect(callback).toHaveBeenNthCalledWith(3, fixture.latestBlocks[1]);
+      expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0], []);
+      expect(callback).toHaveBeenNthCalledWith(3, fixture.latestBlocks[1], []);
       blockLatestMock.restore();
       blockMock.restore();
+      mockBlockAddresses.restore();
       events.removeAllListeners();
       _resetPreviousBlock();
     });

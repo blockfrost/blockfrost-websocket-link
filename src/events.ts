@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import * as Server from './types/server.js';
 import { prepareMessage } from './utils/message.js';
-import { blockfrostAPI } from './utils/blockfrost-api.js';
+import { getBlockData } from './utils/blockfrost-api.js';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { promiseTimeout } from './utils/common.js';
 import { getTransactionsWithDetails } from './utils/transaction.js';
@@ -30,18 +30,17 @@ export const _resetPreviousBlock = () => {
 
 export const emitBlock = async (options?: EmitBlockOptions) => {
   try {
-    const latestBlock = await blockfrostAPI.blocksLatest();
+    const { latestBlock, affectedAddresses } = await getBlockData();
 
     if ((latestBlock.height ?? 0) < (previousBlock?.height ?? 0)) {
       // rollback
       logger.warn(
-        `Rollback detected. Previous block height: ${previousBlock?.height}, current block height: ${latestBlock.height}`,
+        `[BLOCK EMITTER] Rollback detected. Previous block height: ${previousBlock?.height}, current block height: ${latestBlock.height}`,
       );
       previousBlock = undefined;
     }
 
     const currentPreviousBlock = previousBlock;
-    // update previousBlock ASAP (before fetching missing blocks)) so next run won't have stale data
 
     previousBlock = latestBlock;
 
@@ -54,7 +53,7 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
         if (missedBlocks > (options?.maxMissedBlocks ?? EMIT_MAX_MISSED_BLOCKS)) {
           // too many missed blocks, skip emitting
           logger.warn(
-            `newBlock emitter: Emitting skipped. Too many missed blocks: ${
+            `[BLOCK EMITTER] Emitting skipped. Too many missed blocks: ${
               currentPreviousBlock.height + 1
             }-${latestBlock.height - 1}`,
           );
@@ -62,20 +61,24 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
           for (let index = currentPreviousBlock.height + 1; index < latestBlock.height; index++) {
             // emit previously missed blocks
             try {
-              const missedBlock = await promiseTimeout(
-                blockfrostAPI.blocks(index),
-                options?.fetchTimeoutMs ?? 2000,
-              );
+              const missedBlockData = (await promiseTimeout(
+                getBlockData({ block: index }),
+                options?.fetchTimeoutMs ?? 8000,
+              )) as Awaited<ReturnType<typeof getBlockData>>;
 
               logger.warn(
-                `newBlock emitter: Emitting missed block: ${index} (current block: ${latestBlock.height})`,
+                `[BLOCK EMITTER] Emitting missed block: ${index} (current block: ${latestBlock.height})`,
               );
-              events.emit('newBlock', missedBlock);
+              events.emit(
+                'newBlock',
+                missedBlockData.latestBlock,
+                missedBlockData.affectedAddresses,
+              );
             } catch (error) {
               if (error instanceof Error && error.message === 'PROMISE_TIMEOUT') {
-                logger.warn(`newBlock emitter: Skipping block ${index}. Fetch takes too long.`);
+                logger.warn(`[BLOCK EMITTER] Skipping block ${index}. Fetch takes too long.`);
               } else {
-                logger.warn(`newBlock emitter: Skipping block ${index}.`);
+                logger.warn(`[BLOCK EMITTER] Skipping block ${index}.`);
 
                 logger.warn(error);
               }
@@ -84,12 +87,12 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
         }
       }
 
-      logger.info(`Emitting new block ${latestBlock.hash} (${latestBlock.height})`);
+      logger.info(`[BLOCK EMITTER] Emitting new block ${latestBlock.hash} (${latestBlock.height})`);
       // emit latest block
-      events.emit('newBlock', latestBlock);
+      events.emit('newBlock', latestBlock, affectedAddresses);
     }
   } catch (error) {
-    logger.error('newBlock emitter error', error);
+    logger.error('[BLOCK EMITTER] error', error);
   }
 };
 
@@ -174,14 +177,20 @@ export const onBlock = async (
   }
 };
 
-export const startEmitter = () => {
-  logger.info('Started block emitter');
-  setInterval(
-    emitBlock,
-    process.env.BLOCKFROST_BLOCK_LISTEN_INTERVAL
-      ? Number.parseInt(process.env.BLOCKFROST_BLOCK_LISTEN_INTERVAL, 10)
-      : 5000,
-  );
+export const startEmitter = async () => {
+  const interval = process.env.BLOCKFROST_BLOCK_LISTEN_INTERVAL
+    ? Number.parseInt(process.env.BLOCKFROST_BLOCK_LISTEN_INTERVAL, 10)
+    : 5000;
+
+  const t0 = Date.now();
+
+  await emitBlock();
+  const t1 = Date.now();
+  const durationMs = t1 - t0;
+
+  const delay = Math.max(interval - durationMs, 0);
+
+  setTimeout(startEmitter, delay);
 };
 
 export { events };

@@ -8,7 +8,6 @@ import {
 } from '@blockfrost/blockfrost-js';
 import memoizee from 'memoizee';
 import { getAssetData, transformAsset } from './asset.js';
-import { logger } from './logger.js';
 import { assetMetadataLimiter, pLimiter } from './limiter.js';
 
 export const deriveAddress = (
@@ -317,24 +316,6 @@ export const getStakingAccountTotal = async (
         sent_sum: [],
         tx_count: 0,
       };
-    }
-    throw error;
-  }
-};
-
-export const getAffectedAddresses = async (
-  blockHeight: number | null,
-): Promise<Responses['block_content_addresses']> => {
-  if (blockHeight === null) {
-    throw new Error('Cannot fetch block transactions. Invalid block height.');
-  }
-  try {
-    const addresses = await blockfrostAPI.blocksAddressesAll(blockHeight, { batchSize: 2 });
-
-    return addresses;
-  } catch (error) {
-    if (error instanceof BlockfrostServerError && error.status_code === 404) {
-      logger.warn(`Failed to fetch addresses for a block ${blockHeight}. Block not found.`);
     }
     throw error;
   }

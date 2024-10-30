@@ -3,11 +3,24 @@
 export const emitBlock = [
   {
     description: 'one block',
-    blocks: [
+    data: [
       {
-        time: 1506203091,
-        height: 1,
-        hash: 'a',
+        block: {
+          time: 1506203091,
+          height: 1,
+          hash: 'a',
+        },
+        blockAddresses: [
+          {
+            address:
+              'addr1q9ld26v2lv8wvrxxmvg90pn8n8n5k6tdst06q2s856rwmvnueldzuuqmnsye359fqrk8hwvenjnqultn7djtrlft7jnq7dy7wv',
+            transactions: [
+              {
+                tx_hash: '1a0570af966fb355a7160e4f82d5a80b8681b7955f5d44bec0dce628516157f0',
+              },
+            ],
+          },
+        ],
       },
     ],
   },
@@ -46,7 +59,9 @@ export const emitMissedBlock = [
 export const onBlock = [
   {
     description: "1 of client's addresses affected in a block (real data)",
-    subscribedAddresses: [{address:'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h',cbor:true}],
+    subscribedAddresses: [
+      { address: 'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h', cbor: true },
+    ],
     mocks: {
       block: {
         time: 1639491936,
@@ -340,8 +355,8 @@ export const onBlock = [
             ],
           },
           txCbor: {
-            cbor: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
-          }
+            cbor: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+          },
         },
       ],
     },
@@ -597,7 +612,9 @@ export const onBlock = [
               ],
             },
             txHash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
-            txCbor: {cbor:'0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'}
+            txCbor: {
+              cbor: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+            },
           },
         ],
       },
@@ -606,9 +623,9 @@ export const onBlock = [
   {
     description: "2 of the client's addresses affected, 1 address affected in multiple txs",
     subscribedAddresses: [
-      {address:'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h'},
-      {address:'addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'},
-      {address:'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h'}, // random address, should not be affected
+      { address: 'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g77pj9h' },
+      { address: 'addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t' },
+      { address: 'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h' }, // random address, should not be affected
     ],
     mocks: {
       block: {
@@ -794,7 +811,7 @@ export const onBlock = [
   {
     description: 'subscribed address was not affected',
     subscribedAddresses: [
-      {address:'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h'}, // random address, should not be affected
+      { address: 'addr_test1wpfzvzpa046hkfy65mp4ez6vgjunmytzg0ye0ds7mm26v0g770j9h' }, // random address, should not be affected
     ],
     mocks: {
       block: {

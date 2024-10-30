@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - crash while fetching affected addresses for a block undergoing a rollback
+- emit block event only after all data are retrieved making address subscriptions more reliable
 
 ## [2.1.0] - 2023-06-10
 
