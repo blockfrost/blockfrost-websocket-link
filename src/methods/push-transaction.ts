@@ -2,9 +2,10 @@ import { BlockfrostClientError, BlockfrostServerError } from '@blockfrost/blockf
 import { prepareErrorMessage, prepareMessage } from '../utils/message.js';
 import { txClient } from '../utils/blockfrost-api.js';
 import { logger } from '../utils/logger.js';
+import { MessageId } from '../types/message.js';
 
 export default async (
-  id: number,
+  id: MessageId,
   clientId: string,
   transaction: Uint8Array | string,
 ): Promise<string> => {

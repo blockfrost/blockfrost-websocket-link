@@ -1,6 +1,6 @@
 import * as Responses from '../types/response.js';
 import { BigNumber } from 'bignumber.js';
-import * as Messages from '../types/message.js';
+import { Details, MessageId } from '../types/message.js';
 import {
   discoverAddresses,
   getStakingData,
@@ -18,7 +18,7 @@ import { assetMetadataLimiter } from '../utils/limiter.js';
 
 export const getAccountInfo = async (
   publicKey: string,
-  details: Messages.Details,
+  details: Details,
   page = 1,
   pageSize = 25,
 ): Promise<Responses.AccountInfo> => {
@@ -153,21 +153,21 @@ export const getAccountInfo = async (
 };
 
 export default async (
-  msgId: number,
+  id: MessageId,
   clientId: string,
   publicKey: string,
-  details: Messages.Details,
+  details: Details,
   page = 1,
   pageSize = 25,
 ): Promise<string> => {
   try {
     const accountInfo = await getAccountInfo(publicKey, details, page, pageSize);
-    const message = prepareMessage(msgId, clientId, accountInfo);
+    const message = prepareMessage(id, clientId, accountInfo);
 
     return message;
   } catch (error) {
     logger.error(error);
-    const message = prepareErrorMessage(msgId, clientId, error);
+    const message = prepareErrorMessage(id, clientId, error);
 
     return message;
   }

@@ -1,6 +1,6 @@
 import { BlockfrostClientError, BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import { serializeError } from 'serialize-error';
-import { Messages } from '../types/message.js';
+import { MessageId, Messages } from '../types/message.js';
 import * as TxTypes from '../types/transactions.js';
 import { UtxosWithBlockResponse } from '../types/address.js';
 import { AccountInfo, BalanceHistoryData, ServerInfo } from '../types/response.js';
@@ -16,7 +16,7 @@ export const getMessage = (message: string): Messages | undefined => {
   }
 };
 
-export const prepareErrorMessage = (id: number, clientId: string, error: unknown): string => {
+export const prepareErrorMessage = (id: MessageId, clientId: string, error: unknown): string => {
   logger.debug(`[${clientId}] Prepared error response for id ${id}.`, error);
 
   if (
@@ -50,7 +50,7 @@ export const prepareErrorMessage = (id: number, clientId: string, error: unknown
 };
 
 export const prepareMessage = (
-  id: string | number,
+  id: MessageId,
   clientId: string,
   data:
     | ServerInfo
