@@ -10,8 +10,8 @@ export default async (
   transaction: Uint8Array | string,
 ): Promise<string> => {
   try {
-    const submitTransactionResult = await txClient.txSubmit(transaction);
-    const message = prepareMessage(id, clientId, submitTransactionResult);
+    const data = await txClient.txSubmit(transaction);
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } catch (error) {

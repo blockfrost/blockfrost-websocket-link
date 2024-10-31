@@ -1,4 +1,6 @@
-import { Balance, AddressData } from './address.js';
+import { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api.js';
+import { Balance, AddressData, UtxosWithBlockResponse } from './address.js';
+import { MessageId } from './message.js';
 import {
   TransformedTransaction,
   TransformedTransactionUtxo,
@@ -82,3 +84,19 @@ export interface BalanceHistoryData {
   sentToSelf: string;
   rates?: { [k: string]: number | undefined };
 }
+
+export type Responses = {
+  id: MessageId;
+  clientId: string;
+  data:
+    | ServerInfo
+    | AccountInfo
+    | string
+    | Schemas['block_content']
+    | BalanceHistoryData[]
+    | TxIdsToTransactionsResponse[]
+    | TransformedTransaction
+    | UtxosWithBlockResponse[]
+    | { subscribed: boolean }
+    | { lovelacePerByte: number };
+};

@@ -9,7 +9,7 @@ import {
 } from '../utils/address.js';
 import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/account.js';
 import { txIdsToTransactions } from '../utils/transaction.js';
-import { prepareMessage, prepareErrorMessage } from '../utils/message.js';
+import { MessageError, prepareErrorMessage, prepareMessage } from '../utils/message.js';
 import { paginate } from '../utils/common.js';
 import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
@@ -28,11 +28,7 @@ export const getAccountInfo = async (
   const pageIndex = Number(page) - 1;
 
   if (page < 1) {
-    throw new Error('Invalid page number - first page is 1');
-  }
-
-  if (!publicKey) {
-    throw new Error('Missing parameter descriptor');
+    throw new MessageError('Invalid page number - first page is 1');
   }
 
   const { address: stakeAddress } = memoizedDeriveAddress(
@@ -161,8 +157,8 @@ export default async (
   pageSize = 25,
 ): Promise<string> => {
   try {
-    const accountInfo = await getAccountInfo(publicKey, details, page, pageSize);
-    const message = prepareMessage(id, clientId, accountInfo);
+    const data = await getAccountInfo(publicKey, details, page, pageSize);
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } catch (error) {

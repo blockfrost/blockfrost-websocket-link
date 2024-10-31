@@ -179,17 +179,11 @@ export default async (
   from?: number,
   to?: number,
 ): Promise<string> => {
-  if (!publicKey) {
-    const message = prepareMessage(id, clientId, 'Missing parameter descriptor');
-
-    return message;
-  }
-
   const t1 = Date.now();
 
   try {
     const data = await getAccountBalanceHistory(publicKey, groupBy, from, to);
-    const message = prepareMessage(id, clientId, data);
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } catch (error) {

@@ -1,4 +1,5 @@
-export type Details = 'basic' | 'tokens' | 'tokenBalances' | 'txids' | 'txs';
+export const Details = ['basic', 'tokens', 'tokenBalances', 'txids', 'txs'] as const;
+export type Details = (typeof Details)[number];
 
 export type MessageId = string | number;
 
@@ -49,7 +50,7 @@ export type Messages = BaseMessage &
     | {
         command: 'PUSH_TRANSACTION';
         params: {
-          txData: Uint8Array;
+          txData: string;
         };
       }
     | {

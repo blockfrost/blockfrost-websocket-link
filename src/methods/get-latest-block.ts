@@ -4,8 +4,8 @@ import { logger } from '../utils/logger.js';
 
 export default async (id: number, clientId: string): Promise<string> => {
   try {
-    const block = await blockfrostAPI.blocksLatest();
-    const message = prepareMessage(id, clientId, block);
+    const data = await blockfrostAPI.blocksLatest();
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } catch (error) {

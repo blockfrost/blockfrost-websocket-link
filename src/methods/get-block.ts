@@ -9,8 +9,8 @@ export default async (
   hashOrNumber: string | number,
 ): Promise<string> => {
   try {
-    const block = await blockfrostAPI.blocks(hashOrNumber);
-    const message = prepareMessage(id, clientId, block);
+    const data = await blockfrostAPI.blocks(hashOrNumber);
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } catch (error) {

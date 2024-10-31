@@ -23,8 +23,8 @@ export const getServerInfo = async () => {
 
 export default async (id: MessageId, clientId: string): Promise<string> => {
   try {
-    const serverInfo = await getServerInfo();
-    const message = prepareMessage(id, clientId, serverInfo);
+    const data = await getServerInfo();
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } catch (error) {

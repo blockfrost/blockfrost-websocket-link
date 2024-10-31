@@ -4,21 +4,15 @@ import { logger } from '../utils/logger.js';
 import { MessageId } from '../types/message.js';
 
 export default async (id: MessageId, clientId: string, publicKey: string): Promise<string> => {
-  if (!publicKey) {
-    const message = prepareMessage(id, 'Missing parameter descriptor', clientId);
-
-    return message;
-  }
-
   try {
     const externalAddresses = await discoverAddresses(publicKey, 0);
     const internalAddresses = await discoverAddresses(publicKey, 1);
     const addresses = [...externalAddresses, ...internalAddresses];
 
     const utxosResult = await addressesToUtxos(addresses);
-    const utxosBlocks = await utxosWithBlocks(utxosResult);
+    const data = await utxosWithBlocks(utxosResult);
 
-    const message = prepareMessage(id, clientId, utxosBlocks);
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } catch (error) {

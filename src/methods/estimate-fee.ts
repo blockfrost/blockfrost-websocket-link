@@ -8,11 +8,11 @@ export default async (id: MessageId, clientId: string): Promise<string> => {
     const epochsLatest = await blockfrostAPI.epochsLatest();
     const epochsParameters = await blockfrostAPI.epochsParameters(epochsLatest.epoch);
 
-    const result = {
-      lovelacePerByte: epochsParameters.min_fee_a,
-    };
-
-    const message = prepareMessage(id, clientId, result);
+    const message = prepareMessage({
+      id,
+      clientId,
+      data: { lovelacePerByte: epochsParameters.min_fee_a },
+    });
 
     return message;
   } catch (error) {
