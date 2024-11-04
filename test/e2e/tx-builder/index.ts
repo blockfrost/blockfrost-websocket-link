@@ -6,8 +6,8 @@ import { BlockfrostServerError } from '@blockfrost/blockfrost-js';
 import { composeTransaction } from './helpers/compose-transaction.js';
 import { signTransaction } from './helpers/sign-transaction.js';
 import { deriveAddressPrvKey, mnemonicToPrivateKey } from './helpers/key.js';
+import { blockfrostAPI } from '../../../src/utils/blockfrost-api.js';
 import { UTXO } from './types/index.js';
-import { blockfrostAPI } from '../../../src/utils/blockfrost-api';
 
 // BIP39 mnemonic (seed) from which we will generate address to retrieve utxo from and private key used for signing the transaction
 const MNEMONIC =

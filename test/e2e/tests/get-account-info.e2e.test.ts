@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { getFixtures } from '../utils/fixtures-loader';
-import { WebsocketClientE2e } from '../utils/websocket-client-e2e';
+import { getFixtures } from '../utils/fixtures-loader.js';
+import { WebsocketClientE2e } from '../utils/websocket-client-e2e.js';
 
 const fixtures = await getFixtures('get-account-info');
 
@@ -18,7 +18,7 @@ describe('get-account-info', () => {
       });
 
       expect(data).toMatchObject(fixture.result);
-      await ws.close();
+      ws.close();
     });
   }
 });

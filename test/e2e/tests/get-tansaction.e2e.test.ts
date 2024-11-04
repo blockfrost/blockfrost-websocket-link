@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { WebsocketClientE2e } from '../utils/websocket-client-e2e';
-import { getFixtures } from '../utils/fixtures-loader';
+import { WebsocketClientE2e } from '../utils/websocket-client-e2e.js';
+import { getFixtures } from '../utils/fixtures-loader.js';
 
 const fixtures = await getFixtures('get-transaction');
 
@@ -15,7 +15,7 @@ describe('getLatestBlock', () => {
       });
 
       expect(response.data).toMatchObject(fixture.result);
-      await ws.close();
+      ws.close();
     });
   }
 });

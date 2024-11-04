@@ -1,15 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import { WebsocketClientE2e } from '../utils/websocket-client-e2e';
-import { buildTx } from '../tx-builder';
-import { getFixtures } from '../utils/fixtures-loader';
+import { WebsocketClientE2e } from '../utils/websocket-client-e2e.js';
+import { buildTx } from '../tx-builder/index.js';
 
-
-const fixtures = await getFixtures('push-transaction');
 
 describe('push-transaction', () => {
   const ws = new WebsocketClientE2e('ws://localhost:3005', true);
 
-  for (const fixture of fixtures) {
     test('PUSH_TRANSACTION', async () => {
       await ws.waitForConnection();
       const receivingAddress =
@@ -19,8 +15,7 @@ describe('push-transaction', () => {
         txData: transaction.to_hex(),
       });
 
-      expect(resposne.data).toMatchObject(txHash);
-      await ws.close();
+      expect(resposne.data).toEqual(txHash);
+      ws.close();
     });
-  }
 });

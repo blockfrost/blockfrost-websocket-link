@@ -10,8 +10,10 @@ describe('estimateFee', () => {
       const mock1 = sinon.stub(blockfrostAPI, 'epochsLatest').resolves(fixture.epochLatest);
       const mock2 = sinon
         .stub(blockfrostAPI, 'epochsParameters')
+        // @ts-ignore
         .resolves(fixture.epochsParameters);
 
+      // @ts-ignore
       const result = await estimateFee(1);
 
       expect(result).toBe(JSON.stringify(fixture.result));

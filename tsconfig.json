@@ -4,7 +4,10 @@
     "target": "ES2022",
     "module": "Node16",
     "moduleResolution": "node16",
-    "rootDir": "src",
+    "rootDirs": [
+      "src",
+      "test"
+    ],
     "declaration": false,
     "isolatedModules": true,
     "strict": true,
@@ -21,7 +24,12 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "./package.json"
+  ]
 }

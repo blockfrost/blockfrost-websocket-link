@@ -1,8 +1,9 @@
-import { WebsocketClient } from '../../../src/utils/websocket-client.ts';
+import { WebsocketClient } from '../../../src/utils/websocket-client.js';
 
 export class WebsocketClientE2e extends WebsocketClient {
   private subscriptionMessages: any[] = [];
-  private subscriptionCallback?: (message: any) => void;
+  private messagePromiseResolve?: () => void;
+  private messageCountTarget: number = 0;
 
   constructor(url: string, debug = false) {
     super(url, debug);
@@ -20,25 +21,39 @@ export class WebsocketClientE2e extends WebsocketClient {
       this.responseWaitList.splice(index, 1);
     } else {
       this.subscriptionMessages.push(message);
-      if (this.subscriptionCallback) {
-        this.subscriptionCallback(message);
+
+      if (this.messagePromiseResolve && this.subscriptionMessages.length >= this.messageCountTarget) {
+        this.messagePromiseResolve();
+        this.messagePromiseResolve = undefined;
       }
     }
   };
 
-  setSubscriptionCallback(callback: (message: any) => void) {
-    this.subscriptionCallback = callback;
+  clearSubscriptionMessages() {
+    this.subscriptionMessages = [];
   }
 
-  clearSubscriptionCallback() {
-    this.subscriptionCallback = undefined;
-  }
-
-  getAllSubscriptionMessages(): any[] {
+  getSubscriptionMessages() {
     return this.subscriptionMessages;
   }
 
-  clearSubscriptionMessages() {
-    this.subscriptionMessages = [];
+  waitForSubscriptionMessages(count: number,timeout: number = 5000): Promise<any[]> {
+    this.messageCountTarget = count;
+
+    if (this.subscriptionMessages.length >= count) {
+      return Promise.resolve(this.subscriptionMessages);
+    }
+
+    const messagePromise = new Promise<any[]>((resolve) => {
+      this.messagePromiseResolve = () => {
+        resolve(this.subscriptionMessages);
+      };
+    });
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error(`Timeout after ${timeout} ms waiting for ${count} messages`)), timeout);
+    });
+
+    return Promise.race([messagePromise, timeoutPromise]);
   }
 }
