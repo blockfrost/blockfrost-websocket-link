@@ -8,6 +8,8 @@
     "cbor",
     "cbors",
     "compat",
+    "drep",
+    "dreps",
     "emurgo",
     "from",
     "HEALTHCHECK",
