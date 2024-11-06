@@ -1,16 +1,15 @@
 import { describe, test } from 'vitest';
-import { WebsocketClientE2e } from '../utils/websocket-client-e2e.js';
 import { getFixtures } from '../utils/fixtures-loader.js';
 import { expect } from 'vitest';
+import { getWebSocketClient } from '../utils/setup-websocket-client.js';
 
 const fixtures = await getFixtures('subscribe-block');
 
 describe('subscribe-block', () => {
-  const ws = new WebsocketClientE2e('ws://localhost:3005');
 
   for (const fixture of fixtures) {
     test(fixture.testName, async () => {
-      await ws.waitForConnection();
+      const ws = getWebSocketClient();
 
       const response = await ws.sendAndWait('SUBSCRIBE_BLOCK');
       expect(response.data).toMatchObject({
@@ -22,7 +21,6 @@ describe('subscribe-block', () => {
       expect(messages[0].data).toMatchObject(fixture.subscribe_message_schema);
       expect(messages[1].data).toMatchObject(fixture.subscribe_message_schema);
       expect(messages[1].data.previous_block).equals(messages[0].data.hash)
-      ws.close();
     });
   }
 });

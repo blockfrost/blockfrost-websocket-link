@@ -1,4 +1,4 @@
-import { expect } from 'vitest';
+import { afterEach, beforeEach, expect } from 'vitest';
 import * as jestExtendedMatchers from 'jest-extended';
 import {
   toBeBlake2b256Hash,
@@ -15,7 +15,15 @@ import {
   toBeInRange,
   toBeStakeAddress,
 } from './matchers.js';
+import { setupWebSocketClient, teardownWebSocketClient } from './utils/setup-websocket-client.js';
 
+beforeEach(async () => {
+  await setupWebSocketClient();
+});
+
+afterEach(() => {
+  teardownWebSocketClient();
+});
 
 expect.extend({
   ...jestExtendedMatchers,

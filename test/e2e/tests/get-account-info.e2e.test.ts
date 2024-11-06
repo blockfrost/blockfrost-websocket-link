@@ -1,15 +1,14 @@
 import { describe, expect, test } from 'vitest';
 import { getFixtures } from '../utils/fixtures-loader.js';
-import { WebsocketClientE2e } from '../utils/websocket-client-e2e.js';
+import { getWebSocketClient } from '../utils/setup-websocket-client.js';
 
 const fixtures = await getFixtures('get-account-info');
 
 describe('get-account-info', () => {
-  const ws = new WebsocketClientE2e('ws://localhost:3005');
 
   for (const fixture of fixtures) {
     test(fixture.testName, async () => {
-      await ws.waitForConnection();
+      const ws = getWebSocketClient();
       const { data } = await ws.sendAndWait('GET_ACCOUNT_INFO', {
         descriptor: fixture.descriptor,
         details: fixture.details,
@@ -18,7 +17,6 @@ describe('get-account-info', () => {
       });
 
       expect(data).toMatchObject(fixture.result);
-      ws.close();
     });
   }
 });
