@@ -1,0 +1,36 @@
+export default [
+  {
+    testName: 'GET_TRANSACTION success - mainnet',
+    txID: 'ed7e75df5a1d4925cc642ba6360d0dd031bfff54d0314757cfcbf2448a5e8c33',
+    result: {
+      hash: 'ed7e75df5a1d4925cc642ba6360d0dd031bfff54d0314757cfcbf2448a5e8c33',
+      block: 'c053f4bfbf7338b0c11a9a56302a4b51de9591f3366984660e9c9220009ad79f',
+      block_height: 2_832_902,
+      block_time: 1_730_201_618,
+      slot: 74_518_418,
+      index: 3,
+      output_amount: [
+        {
+          unit: 'lovelace',
+          quantity: '80487259',
+          decimals: 6,
+        },
+      ],
+      fees: '168053',
+      deposit: '0',
+      size: 283,
+      invalid_before: null,
+      invalid_hereafter: null,
+      utxo_count: 3,
+      withdrawal_count: 0,
+      mir_cert_count: 0,
+      delegation_count: 0,
+      stake_cert_count: 0,
+      pool_update_count: 0,
+      pool_retire_count: 0,
+      asset_mint_or_burn_count: 0,
+      redeemer_count: 0,
+      valid_contract: true,
+    },
+  },
+] as const;

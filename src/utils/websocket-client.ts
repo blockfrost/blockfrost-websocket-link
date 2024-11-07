@@ -6,8 +6,8 @@ export class WebsocketClient {
   client: WebSocket;
   pingTimeout: NodeJS.Timeout | undefined;
   responseWaitList: { id: number; dfd: Deferred<unknown> }[] = [];
-  debug = false;
-  private msgId = 0;
+  protected debug = false;
+  protected msgId = 0;
   private _connected = false;
 
   constructor(url: string, debug = false) {

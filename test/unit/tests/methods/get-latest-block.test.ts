@@ -8,6 +8,7 @@ describe('getLatestBlock', () => {
   for (const fixture of fixtures) {
     test(fixture.testName, async () => {
       const mock1 = sinon.stub(blockfrostAPI, 'blocksLatest').resolves(fixture.blocksLatest);
+      // @ts-ignore
       const result = await getLatestBlock(1);
 
       expect(result).toBe(JSON.stringify(fixture.result));
