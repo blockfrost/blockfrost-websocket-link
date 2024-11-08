@@ -11,7 +11,13 @@ import { CaptureConsole } from '@sentry/integrations';
 import { v4 as uuidv4 } from 'uuid';
 import * as Server from './types/server.js';
 import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants/index.js';
-import { getMessage, prepareErrorMessage, prepareMessage } from './utils/message.js';
+import {
+  getMessage,
+  prepareErrorMessage,
+  prepareMessage,
+  validators,
+  MessageError,
+} from './utils/message.js';
 import { MetricsCollector } from './utils/prometheus.js';
 import { SubscribedAddress, events, onBlock, startEmitter } from './events.js';
 import getServerInfo from './methods/get-server-info.js';
@@ -28,6 +34,8 @@ import { getPort } from './utils/server.js';
 
 import { createRequire } from 'module';
 import { AffectedAddressesInBlock } from './types/events.js';
+import { MessageId, Messages } from './types/message.js';
+
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
@@ -182,83 +190,73 @@ wss.on('connection', async (ws: Server.Ws) => {
   logger.info(`[${clientId}] Client connected. Total clients connected: ${wss.clients.size}.`);
 
   // general messages
-  ws.on('message', async (message: string) => {
-    const data = getMessage(message);
+  const onMessage = async (data: Messages) => {
+    const { command, id, params } = data;
+    let response: string;
 
-    if (!data) {
-      const message = prepareErrorMessage(-1, 'Cannot parse the message', clientId);
-
-      logger.debug(`[${clientId}] Received invalid message`, message);
-      ws.send(message);
-      return;
-    }
     logger.debug(
-      `[${clientId}] RECV MSG ID ${data.id} "${data?.command}" with params: ${JSON.stringify(
-        data.params,
-      )}`,
+      `[${clientId}] RECV MSG ID ${id} "${command}" with params: ${JSON.stringify(params)}`,
     );
 
-    switch (data.command) {
+    switch (command) {
       case MESSAGES.GET_SERVER_INFO: {
-        const message = await getServerInfo(data.id, clientId);
+        response = await getServerInfo(id, clientId);
 
-        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_TRANSACTION: {
-        const message = await getTransaction(data.id, clientId, data.params.txId);
+        validators.GET_TRANSACTION(params);
+        response = await getTransaction(id, clientId, params.txId);
 
-        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_BLOCK: {
-        const message = await getBlock(data.id, clientId, data.params.hashOrNumber);
+        validators.GET_BLOCK(params);
+        response = await getBlock(id, clientId, params.hashOrNumber);
 
-        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_ACCOUNT_UTXO: {
-        const message = await getAccountUtxo(data.id, clientId, data.params.descriptor);
+        validators.GET_ACCOUNT_UTXO(params);
+        response = await getAccountUtxo(id, clientId, params.descriptor);
 
-        ws.send(message);
         break;
       }
 
       case MESSAGES.ESTIMATE_FEE: {
-        const message = await estimateFee(data.id, clientId);
+        response = await estimateFee(id, clientId);
 
-        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_ACCOUNT_INFO: {
-        const message = await getAccountInfo(
-          data.id,
+        validators.GET_ACCOUNT_INFO(params);
+        response = await getAccountInfo(
+          id,
           clientId,
-          data.params.descriptor,
-          data.params.details,
-          data.params.page,
-          data.params.pageSize,
+          params.descriptor,
+          params.details,
+          params.page,
+          params.pageSize,
         );
 
-        ws.send(message);
         break;
       }
 
       case MESSAGES.GET_BALANCE_HISTORY: {
-        const message = await getBalanceHistory(
-          data.id,
+        validators.GET_BALANCE_HISTORY(params);
+        response = await getBalanceHistory(
+          id,
           clientId,
-          data.params.descriptor,
-          data.params.groupBy,
-          data.params.from,
-          data.params.to,
+          params.descriptor,
+          params.groupBy,
+          params.from,
+          params.to,
         );
 
-        ws.send(message);
         break;
       }
 
@@ -271,14 +269,9 @@ wss.on('connection', async (ws: Server.Ws) => {
           activeSubscriptions[clientId].splice(activeBlockSubIndex);
         }
 
-        activeSubscriptions[clientId].push({
-          type: 'block',
-          id: data.id,
-        });
+        activeSubscriptions[clientId].push({ id, type: 'block' });
 
-        const message = prepareMessage(data.id, clientId, { subscribed: true });
-
-        ws.send(message);
+        response = prepareMessage({ id, clientId, data: { subscribed: true } });
 
         break;
       }
@@ -292,17 +285,14 @@ wss.on('connection', async (ws: Server.Ws) => {
           activeSubscriptions[clientId].splice(activeBlockSubIndex);
         }
 
-        const message = prepareMessage(data.id, clientId, {
-          subscribed: false,
-        });
-
-        ws.send(message);
+        response = prepareMessage({ id, clientId, data: { subscribed: false } });
 
         break;
       }
 
       case MESSAGES.SUBSCRIBE_ADDRESS: {
-        const { addresses, cbor } = { ...data.params };
+        validators.SUBSCRIBE_ADDRESS(params);
+        const { addresses, cbor } = params;
 
         if (addresses && addresses.length > 0) {
           for (const address of addresses) {
@@ -324,15 +314,10 @@ wss.on('connection', async (ws: Server.Ws) => {
             activeSubscriptions[clientId].splice(activeAddressSubIndex);
           }
 
-          activeSubscriptions[clientId].push({
-            type: 'addresses',
-            id: data.id,
-          });
+          activeSubscriptions[clientId].push({ id, type: 'addresses' });
         }
 
-        const message = prepareMessage(data.id, clientId, { subscribed: true });
-
-        ws.send(message);
+        response = prepareMessage({ id, clientId, data: { subscribed: true } });
 
         break;
       }
@@ -346,36 +331,43 @@ wss.on('connection', async (ws: Server.Ws) => {
           activeSubscriptions[clientId].splice(activeAddressSubIndex);
         }
 
-        const message = prepareMessage(data.id, clientId, {
-          subscribed: false,
-        });
+        response = prepareMessage({ id, clientId, data: { subscribed: false } });
 
-        ws.send(message);
         addressesSubscribed[clientId] = [];
 
         break;
       }
 
       case MESSAGES.PUSH_TRANSACTION: {
-        const submitTransactionMessage = await submitTransaction(
-          data.id,
-          clientId,
-          data.params.txData,
-        );
+        validators.PUSH_TRANSACTION(params);
+        response = await submitTransaction(id, clientId, params.txData);
 
-        ws.send(submitTransactionMessage);
         break;
       }
 
       default: {
-        const message = prepareErrorMessage(
-          data.id,
-          `Unknown message id: ${data.command}`,
-          clientId,
-        );
-
-        ws.send(message);
+        response = prepareErrorMessage(id, clientId, `Unknown command: ${command}`);
       }
+    }
+
+    ws.send(response);
+  };
+
+  const handleError = (id: MessageId, error: unknown) => {
+    if (!(error instanceof MessageError)) logger.error(error);
+
+    const response = prepareErrorMessage(id, clientId, error);
+
+    ws.send(response);
+  };
+
+  ws.on('message', (message: string) => {
+    try {
+      const data = getMessage(message);
+
+      onMessage(data).catch(error => handleError(data.id, error));
+    } catch (error) {
+      handleError(-1, error);
     }
   });
 

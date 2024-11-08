@@ -2,15 +2,16 @@ import { BlockfrostClientError, BlockfrostServerError } from '@blockfrost/blockf
 import { prepareErrorMessage, prepareMessage } from '../utils/message.js';
 import { txClient } from '../utils/blockfrost-api.js';
 import { logger } from '../utils/logger.js';
+import { MessageId } from '../types/message.js';
 
 export default async (
-  id: number,
+  id: MessageId,
   clientId: string,
   transaction: Uint8Array | string,
 ): Promise<string> => {
   try {
-    const submitTransactionResult = await txClient.txSubmit(transaction);
-    const message = prepareMessage(id, clientId, submitTransactionResult);
+    const data = await txClient.txSubmit(transaction);
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } catch (error) {
@@ -41,11 +42,6 @@ export default async (
       );
 
       return message;
-    } else {
-      logger.error(error);
-      const message = prepareErrorMessage(id, clientId, error);
-
-      return message;
-    }
+    } else throw error;
   }
 };

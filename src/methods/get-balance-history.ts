@@ -5,11 +5,12 @@ import { TxIdsToTransactionsResponse } from '../types/transactions.js';
 import { getAccountTransactionHistory } from '../utils/account.js';
 import { sumAssetBalances } from '../utils/asset.js';
 import { getRatesForDate } from '../utils/rates.js';
-import { prepareErrorMessage, prepareMessage } from '../utils/message.js';
+import { prepareMessage } from '../utils/message.js';
 import { txIdsToTransactions } from '../utils/transaction.js';
 import { FIAT_RATES_ENABLE_ON_TESTNET } from '../constants/config.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { logger } from '../utils/logger.js';
+import { MessageId } from '../types/message.js';
 
 interface BalanceHistoryBin {
   from: number;
@@ -171,29 +172,18 @@ export const getAccountBalanceHistory = async (
 };
 
 export default async (
-  msgId: number,
+  id: MessageId,
   clientId: string,
   publicKey: string,
   groupBy: number,
   from?: number,
   to?: number,
 ): Promise<string> => {
-  if (!publicKey) {
-    const message = prepareMessage(msgId, clientId, 'Missing parameter descriptor');
-
-    return message;
-  }
-
   const t1 = Date.now();
 
   try {
     const data = await getAccountBalanceHistory(publicKey, groupBy, from, to);
-    const message = prepareMessage(msgId, clientId, data);
-
-    return message;
-  } catch (error) {
-    logger.error(error);
-    const message = prepareErrorMessage(msgId, clientId, error);
+    const message = prepareMessage({ id, clientId, data });
 
     return message;
   } finally {

@@ -1,22 +1,107 @@
-import { BlockfrostClientError, BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostClientError, BlockfrostServerError } from '@blockfrost/blockfrost-js';
 import { serializeError } from 'serialize-error';
-import { Messages } from '../types/message.js';
-import * as TxTypes from '../types/transactions.js';
-import { UtxosWithBlockResponse } from '../types/address.js';
-import { AccountInfo, BalanceHistoryData, ServerInfo } from '../types/response.js';
+import { Details, MessageId, Messages } from '../types/message.js';
+import { Responses } from '../types/response.js';
 import { logger } from './logger.js';
+import { Ajv } from 'ajv';
 
-export const getMessage = (message: string): Messages | undefined => {
+export class MessageError extends Error {}
+
+type Validators =
+  | 'root'
+  | Extract<Messages, { params: NonNullable<Messages['params']> }>['command'];
+
+const ajv = new Ajv({ allowUnionTypes: true });
+const schemas: { [k in Validators]: { properties: unknown; required?: string[] } } = {
+  GET_ACCOUNT_INFO: {
+    properties: {
+      descriptor: { type: 'string' },
+      details: { type: 'string', enum: Details },
+      page: { type: ['number', 'string', 'null'] },
+      pageSize: { type: ['number', 'string', 'null'] },
+    },
+    required: ['descriptor', 'details'],
+  },
+  GET_ACCOUNT_UTXO: {
+    properties: {
+      descriptor: { type: 'string' },
+    },
+    required: ['descriptor'],
+  },
+  GET_BALANCE_HISTORY: {
+    properties: {
+      descriptor: { type: 'string' },
+      groupBy: { type: ['number', 'string'] },
+      from: { type: ['number', 'string', 'null'] },
+      to: { type: ['number', 'string', 'null'] },
+    },
+    required: ['descriptor'],
+  },
+  GET_BLOCK: {
+    properties: {
+      hashOrNumber: { type: ['string', 'number'] },
+    },
+    required: ['hashOrNumber'],
+  },
+  GET_TRANSACTION: {
+    properties: {
+      txId: { type: 'string' },
+    },
+    required: ['txId'],
+  },
+  PUSH_TRANSACTION: {
+    properties: {
+      txData: { type: 'string' },
+    },
+    required: ['txData'],
+  },
+  SUBSCRIBE_ADDRESS: {
+    properties: {
+      addresses: { type: 'array', items: { type: 'string' } },
+      cbor: { type: 'boolean' },
+    },
+    required: ['txData'],
+  },
+  root: {
+    properties: {
+      command: { type: 'string' },
+      id: { type: ['string', 'number'] },
+    },
+    required: ['command', 'id'],
+  },
+} as const;
+
+export const validators = Object.fromEntries(
+  Object.entries(schemas).map(([title, schema]) => [
+    title,
+    (data: unknown) => {
+      const validator = ajv.compile({
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        title,
+        type: 'object',
+        ...schema,
+      });
+
+      if (!validator(data)) throw new MessageError(JSON.stringify(validator.errors));
+    },
+  ]),
+) as { [k in Validators]: (data: unknown) => void };
+
+export const getMessage = (message: string) => {
+  let parsedMessage: Messages;
+
   try {
-    const parsedMessage: Messages = JSON.parse(message);
-
-    return parsedMessage;
+    parsedMessage = JSON.parse(message);
   } catch {
-    return undefined;
+    throw new MessageError('Cannot parse the message as JSON');
   }
+
+  validators.root(parsedMessage);
+
+  return parsedMessage;
 };
 
-export const prepareErrorMessage = (id: number, clientId: string, error: unknown): string => {
+export const prepareErrorMessage = (id: MessageId, clientId: string, error: unknown): string => {
   logger.debug(`[${clientId}] Prepared error response for id ${id}.`, error);
 
   if (
@@ -49,21 +134,7 @@ export const prepareErrorMessage = (id: number, clientId: string, error: unknown
   }
 };
 
-export const prepareMessage = (
-  id: string | number,
-  clientId: string,
-  data:
-    | ServerInfo
-    | AccountInfo
-    | string
-    | Responses['block_content']
-    | BalanceHistoryData[]
-    | TxTypes.TxIdsToTransactionsResponse[]
-    | TxTypes.TransformedTransaction
-    | UtxosWithBlockResponse[]
-    | { subscribed: boolean }
-    | { lovelacePerByte: number },
-): string => {
+export const prepareMessage = ({ id, clientId, data }: Responses): string => {
   const message = JSON.stringify({ id, type: 'message', data });
 
   logger.debug(`[${clientId}] Prepared response for msg id ${id} with length ${message.length}`);

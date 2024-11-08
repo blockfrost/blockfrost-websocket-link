@@ -1,6 +1,6 @@
 import * as Responses from '../types/response.js';
 import { BigNumber } from 'bignumber.js';
-import * as Messages from '../types/message.js';
+import { Details, MessageId } from '../types/message.js';
 import {
   discoverAddresses,
   getStakingData,
@@ -9,7 +9,7 @@ import {
 } from '../utils/address.js';
 import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/account.js';
 import { txIdsToTransactions } from '../utils/transaction.js';
-import { prepareMessage, prepareErrorMessage } from '../utils/message.js';
+import { MessageError, prepareMessage } from '../utils/message.js';
 import { paginate } from '../utils/common.js';
 import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
@@ -18,7 +18,7 @@ import { assetMetadataLimiter } from '../utils/limiter.js';
 
 export const getAccountInfo = async (
   publicKey: string,
-  details: Messages.Details,
+  details: Details,
   page = 1,
   pageSize = 25,
 ): Promise<Responses.AccountInfo> => {
@@ -28,11 +28,7 @@ export const getAccountInfo = async (
   const pageIndex = Number(page) - 1;
 
   if (page < 1) {
-    throw new Error('Invalid page number - first page is 1');
-  }
-
-  if (!publicKey) {
-    throw new Error('Missing parameter descriptor');
+    throw new MessageError('Invalid page number - first page is 1');
   }
 
   const { address: stakeAddress } = memoizedDeriveAddress(
@@ -153,22 +149,15 @@ export const getAccountInfo = async (
 };
 
 export default async (
-  msgId: number,
+  id: MessageId,
   clientId: string,
   publicKey: string,
-  details: Messages.Details,
+  details: Details,
   page = 1,
   pageSize = 25,
 ): Promise<string> => {
-  try {
-    const accountInfo = await getAccountInfo(publicKey, details, page, pageSize);
-    const message = prepareMessage(msgId, clientId, accountInfo);
+  const data = await getAccountInfo(publicKey, details, page, pageSize);
+  const message = prepareMessage({ id, clientId, data });
 
-    return message;
-  } catch (error) {
-    logger.error(error);
-    const message = prepareErrorMessage(msgId, clientId, error);
-
-    return message;
-  }
+  return message;
 };
