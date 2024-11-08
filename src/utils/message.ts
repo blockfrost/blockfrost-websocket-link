@@ -72,19 +72,21 @@ const schemas: { [k in Validators]: { properties: unknown; required?: string[] }
 } as const;
 
 export const validators = Object.fromEntries(
-  Object.entries(schemas).map(([title, schema]) => [
-    title,
-    (data: unknown) => {
-      const validator = ajv.compile({
-        $schema: 'http://json-schema.org/draft-07/schema#',
-        title,
-        type: 'object',
-        ...schema,
-      });
+  Object.entries(schemas).map(([title, schema]) => {
+    const validator = ajv.compile({
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      title,
+      type: 'object',
+      ...schema,
+    });
 
-      if (!validator(data)) throw new MessageError(JSON.stringify(validator.errors));
-    },
-  ]),
+    return [
+      title,
+      (data: unknown) => {
+        if (!validator(data)) throw new MessageError(JSON.stringify(validator.errors));
+      },
+    ];
+  }),
 ) as { [k in Validators]: (data: unknown) => void };
 
 export const getMessage = (message: string) => {
