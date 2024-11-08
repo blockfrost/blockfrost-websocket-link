@@ -9,7 +9,7 @@ import {
 } from '../utils/address.js';
 import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/account.js';
 import { txIdsToTransactions } from '../utils/transaction.js';
-import { MessageError, prepareErrorMessage, prepareMessage } from '../utils/message.js';
+import { MessageError, prepareMessage } from '../utils/message.js';
 import { paginate } from '../utils/common.js';
 import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
@@ -156,15 +156,8 @@ export default async (
   page = 1,
   pageSize = 25,
 ): Promise<string> => {
-  try {
-    const data = await getAccountInfo(publicKey, details, page, pageSize);
-    const message = prepareMessage({ id, clientId, data });
+  const data = await getAccountInfo(publicKey, details, page, pageSize);
+  const message = prepareMessage({ id, clientId, data });
 
-    return message;
-  } catch (error) {
-    logger.error(error);
-    const message = prepareErrorMessage(id, clientId, error);
-
-    return message;
-  }
+  return message;
 };

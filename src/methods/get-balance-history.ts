@@ -5,7 +5,7 @@ import { TxIdsToTransactionsResponse } from '../types/transactions.js';
 import { getAccountTransactionHistory } from '../utils/account.js';
 import { sumAssetBalances } from '../utils/asset.js';
 import { getRatesForDate } from '../utils/rates.js';
-import { prepareErrorMessage, prepareMessage } from '../utils/message.js';
+import { prepareMessage } from '../utils/message.js';
 import { txIdsToTransactions } from '../utils/transaction.js';
 import { FIAT_RATES_ENABLE_ON_TESTNET } from '../constants/config.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
@@ -184,11 +184,6 @@ export default async (
   try {
     const data = await getAccountBalanceHistory(publicKey, groupBy, from, to);
     const message = prepareMessage({ id, clientId, data });
-
-    return message;
-  } catch (error) {
-    logger.error(error);
-    const message = prepareErrorMessage(id, clientId, error);
 
     return message;
   } finally {

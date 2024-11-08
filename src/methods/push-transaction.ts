@@ -42,11 +42,6 @@ export default async (
       );
 
       return message;
-    } else {
-      logger.error(error);
-      const message = prepareErrorMessage(id, clientId, error);
-
-      return message;
-    }
+    } else throw error;
   }
 };
