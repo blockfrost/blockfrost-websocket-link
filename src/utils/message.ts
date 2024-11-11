@@ -60,7 +60,7 @@ const schemas: { [k in Validators]: { properties: unknown; required?: string[] }
       addresses: { type: 'array', items: { type: 'string' } },
       cbor: { type: 'boolean' },
     },
-    required: ['txData'],
+    required: ['addresses'],
   },
   root: {
     properties: {
