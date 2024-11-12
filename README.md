@@ -156,6 +156,7 @@ For each of these commands the client receives an immediate response
 - [`ESTIMATE_FEE`](#estimate_fee) - estimate transaction submission fee
 - [`GET_ACCOUNT_INFO`](#get_account_info) - get general information about an account
 - [`GET_ACCOUNT_UTXO`](#get_account_utxo) - get unspent UTxOs of an account
+- [`GET_ADA_HANDLE`](#get_ada_handle) - resolves an Ada Handle
 - [`GET_BALANCE_HISTORY`](#get_balance_history) - get balance history of an account
 - [`GET_BLOCK`](#get_block) - get details of a block
 - [`GET_TRANSACTION`](#get_transaction) - get details of a transaction
@@ -465,6 +466,32 @@ Response:
     sentToSelf: string;
     rates?: { [k: string]: number | undefined };
   }[]
+}
+```
+
+### GET_ADA_HANDLE
+
+Resolves an Ada Handle providing the address holding it.
+
+Input message:
+
+```ts
+{
+  "id": number | string;
+  "command": "GET_ADA_HANDLE";
+  "params": {
+    "name": string; // Ada Handle name
+  }
+}
+```
+
+Response output message `data` type:
+
+```ts
+{
+  id: number | string;
+  type: 'message';
+  data: string | null;
 }
 ```
 

@@ -28,6 +28,12 @@ const schemas: { [k in Validators]: { properties: unknown; required?: string[] }
     },
     required: ['descriptor'],
   },
+  GET_ADA_HANDLE: {
+    properties: {
+      name: { type: 'string' },
+    },
+    required: ['name'],
+  },
   GET_BALANCE_HISTORY: {
     properties: {
       descriptor: { type: 'string' },
@@ -35,7 +41,7 @@ const schemas: { [k in Validators]: { properties: unknown; required?: string[] }
       from: { type: ['number', 'string', 'null'] },
       to: { type: ['number', 'string', 'null'] },
     },
-    required: ['descriptor'],
+    required: ['descriptor', 'groupBy'],
   },
   GET_BLOCK: {
     properties: {

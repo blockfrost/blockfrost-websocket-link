@@ -17,6 +17,12 @@ export type Messages = BaseMessage &
         };
       }
     | {
+        command: 'GET_ADA_HANDLE';
+        params: {
+          name: string;
+        };
+      }
+    | {
         command: 'GET_BALANCE_HISTORY';
         params: {
           descriptor: string;

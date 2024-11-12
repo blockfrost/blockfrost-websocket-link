@@ -91,6 +91,8 @@ export type Responses = {
     | ServerInfo
     | AccountInfo
     | string
+    | { address: string }
+    | null
     | Schemas['block_content']
     | BalanceHistoryData[]
     | TxIdsToTransactionsResponse[]

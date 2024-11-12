@@ -23,6 +23,7 @@ import { SubscribedAddress, events, onBlock, startEmitter } from './events.js';
 import getServerInfo from './methods/get-server-info.js';
 import getAccountInfo from './methods/get-account-info.js';
 import getAccountUtxo from './methods/get-account-utxo.js';
+import getAdaHandle from './methods/get-ada-handle.js';
 import getBlock from './methods/get-block.js';
 import getTransaction from './methods/get-transaction.js';
 import submitTransaction from './methods/push-transaction.js';
@@ -242,6 +243,13 @@ wss.on('connection', async (ws: Server.Ws) => {
           params.page,
           params.pageSize,
         );
+
+        break;
+      }
+
+      case 'GET_ADA_HANDLE': {
+        validators.GET_ADA_HANDLE(params);
+        response = await getAdaHandle(id, clientId, params.name);
 
         break;
       }
