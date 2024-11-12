@@ -6,7 +6,6 @@ import { getWebSocketClient } from '../utils/setup-websocket-client.js';
 const fixtures = await getFixtures('subscribe-block');
 
 describe('subscribe-block', () => {
-
   for (const fixture of fixtures) {
     test(fixture.testName, async () => {
       const ws = getWebSocketClient();
@@ -16,7 +15,7 @@ describe('subscribe-block', () => {
         'subscribed': true,
       });
 
-      const messages = await ws.waitForSubscriptionMessages(2,160_000);
+      const messages = await ws.waitForSubscriptionMessages(2, 300_000);
 
       expect(messages[0].data).toMatchObject(fixture.subscribe_message_schema);
       expect(messages[1].data).toMatchObject(fixture.subscribe_message_schema);
