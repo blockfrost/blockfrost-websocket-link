@@ -40,7 +40,6 @@ export interface AccountInfo {
   tokens?: AssetBalance[];
   history: {
     total: number; // total transactions
-    tokens?: number; // tokens transactions
     unconfirmed: number; // unconfirmed transactions
     transactions?: Transactions; // list of transactions
     txids?: string[];
