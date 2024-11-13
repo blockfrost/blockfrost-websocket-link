@@ -77,5 +77,5 @@ jobs:
           echo "AWS_REGION: $AWS_REGION"
           echo "AWS_ENDPOINT: $AWS_ENDPOINT"
           echo "AWS_REGION: $AWS_REGION"
-          echo "endpoint": https://${{secrets.S3_ENDPOINT}}"
-          echo "endpoint": $TEST"
+          echo "endpoint: https://${{secrets.S3_ENDPOINT}}"
+          echo "endpoint: $TEST"
