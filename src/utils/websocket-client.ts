@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import { Deferred } from '../scripts/performance/utils.js';
-import { MESSAGES } from '../constants/index.js';
+import { MessageParams, Messages } from '../types/message.js';
 
 export class WebsocketClient {
   client: WebSocket;
@@ -69,7 +69,7 @@ export class WebsocketClient {
     }
   };
 
-  send = (command: keyof typeof MESSAGES, parameters?: Record<string, unknown>) => {
+  send = <T extends Messages['command']>(command: T, parameters?: MessageParams<T>) => {
     const id = this.msgId;
     const stringifiedMessage = JSON.stringify({
       id: id,
@@ -84,9 +84,9 @@ export class WebsocketClient {
     this.msgId += 1;
   };
 
-  sendAndWait = async (
-    command: keyof typeof MESSAGES,
-    parameters?: Record<string, unknown>,
+  sendAndWait = async <T extends Messages['command']>(
+    command: T,
+    parameters?: MessageParams<T>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     const id = this.msgId;

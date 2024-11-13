@@ -21,8 +21,8 @@ export type Messages = BaseMessage &
         params: {
           descriptor: string;
           groupBy: number;
-          from: number;
-          to: number;
+          from?: number;
+          to?: number;
         };
       }
     | {
@@ -81,3 +81,8 @@ export type Messages = BaseMessage &
         params: null;
       }
   );
+
+export type MessageParams<T extends Messages['command']> = Extract<
+  Messages,
+  { command: T }
+>['params'];
