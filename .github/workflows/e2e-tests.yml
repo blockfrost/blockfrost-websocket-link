@@ -72,6 +72,7 @@ jobs:
           copyLatest: true
           ignoreMissingResults: true
       - name: Debug AWS configuration
+        if: always()
         run: |
           echo "AWS_REGION: $AWS_REGION"
           echo "AWS_ENDPOINT: $AWS_ENDPOINT"
