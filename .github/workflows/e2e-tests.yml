@@ -44,3 +44,27 @@ jobs:
           yarn start &
           npx wait-on http://localhost:3005
       - run: yarn run test:e2e
+
+      - name: Publish test artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-artifacts
+          path: |
+            ./allure-test-reports
+
+      - name: Publish allure report to S3
+        uses: andrcuns/allure-publish-action@v2.6.0
+        if: always()
+        env:
+          GITHUB_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
+        with:
+          storageType: s3
+          resultsGlob: './allure-test-reports/allure-results'
+          bucket: tests-results
+          prefix: $GITHUB_REF
+          copyLatest: true
+          updatePr: true
+          ignoreMissingResults: true

@@ -172,3 +172,6 @@ documentation/website/build
 result
 
 # End of https://www.gitignore.io/api/vim,node,macos
+
+# allure-reporting for e2e tests
+allure-test-reports
