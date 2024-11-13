@@ -27,7 +27,7 @@ jobs:
         github.event.inputs.network == 'preprod' && secrets.BLOCKFROST_PREPROD_PROJECT_ID ||
         'preprod1abiUKhLuQ3Ic1n6ctxilFMtlGNozC5h'
         }}
-      BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'preprod' }}\
+      BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'preprod' }}
       TEST: ${{ secrets.S3_ENDPOINT }}
 
     strategy:
