@@ -43,7 +43,25 @@ $ nix-build
 
 ## Usage
 
-In order to start the server, you need to configure some [required](#required) environment variables.
+In order to start the server, you need to configure some environment variables.
+
+### Required
+
+- `BLOCKFROST_NETWORK`: lets you choose which network it should connect to (_mainnet_ or _testnet_)
+- `BLOCKFROST_PROJECT_ID`: **Blockfrost.io**'s project token
+
+### Optional
+
+- `BLOCKFROST_BACKEND_URL`: URL pointing to your own backend (`blockfrost-backend-ryo`) if you prefer not to use the
+  public **Blockfrost REST API**
+- `BLOCKFROST_BLOCK_LISTEN_INTERVAL`: how often should be the server pulling the backend for new data (in milliseconds,
+  default `5000`)
+- `BLOCKFROST_FIAT_RATES_PROXY`: the proxy used to fetch fiat rates
+- `BLOCKFROST_SENTRY_DSN`: the **Sentry** data source name to optionally monitor the service
+- `BLOCKFROST_WSLINK_DEBUG`: enables `debug` logging level
+- `BUILD_COMMIT`: provided by `/status` endpoint
+- `METRICS_COLLECTOR_INTERVAL_MS`: frequency for refreshing metrics and performing health check (default `10000`)
+- `PORT`: which port the server should listen to (default `3005`)
 
 Once your server has started, you can connect to it.
 
@@ -71,86 +89,69 @@ Connected (press CTRL+C to quit)
 There is an example UI for this project called [blockfrost-websocket-link-ui](https://github.com/blockfrost/blockfrost-websocket-link-ui)
 and you can find its hosted version at [websocket-link.blockfrost.dev](https://websocket-link.blockfrost.dev/).
 
-## Documentation
+## API
 
-### Configuration
-
-`blockfrost-websocket-link` can be configured through environment variables.
-
-#### Required
-
-- `BLOCKFROST_NETWORK`: lets you choose which network it should connect to (_mainnet_ or _testnet_)
-- `BLOCKFROST_PROJECT_ID`: **Blockfrost.io**'s project token
-
-#### Optional
-
-- `BLOCKFROST_BACKEND_URL`: URL pointing to your own backend (`blockfrost-backend-ryo`) if you prefer not to use the
-public **Blockfrost REST API**
-- `BLOCKFROST_BLOCK_LISTEN_INTERVAL`: how often should be the server pulling the backend for new data (in milliseconds,
-default `5000`)
-- `BLOCKFROST_FIAT_RATES_PROXY`: the proxy used to fetch fiat rates
-- `BLOCKFROST_SENTRY_DSN`: the **Sentry** data source name to optionally monitor the service
-- `BLOCKFROST_WSLINK_DEBUG`: enables `debug` logging level
-- `BUILD_COMMIT`: provided by `/status` endpoint
-- `METRICS_COLLECTOR_INTERVAL_MS`: frequency for refreshing metrics and performing health check (default `10000`)
-- `PORT`: which port the server should listen to (default `3005`)
-
-### API
-
-As its name suggests, `blockfrost-websocket-link` offers a web socket based API: the client needs to connect to it
-through a web socket. Once the web socket connection is correctly established the server is immediately ready to accept
+As its name suggests, `blockfrost-websocket-link` provides a WebSocket-based API: the client needs to connect to it
+through a WebSocket. Once the WebSocket connection is correctly established the server is immediately ready to accept
 commands. The communication (both ways) is _JSON encoded_: the server expects JSON encoded messages and will respond
 using the same encoding.
 
-Each input message requires a nonce which is mirrored by the server in the output message; it
-is not actually used by the server but it useful for the client to reconcile output messages to relative input message.
+Each command message requires:
 
-Each input message requires a command as well (details will follow) and optionally a set of parameters, depending on
-the command.
+- `id`: an identifier which is mirrored by the server in the output message; This identifier, while unused by the server, is useful for the client to reconcile output messages to relative input message.
+- `command`: Command to execute (`ESTIMATE_FEE` | `GET_ACCOUNT_INFO` | `GET_ACCOUNT_UTXO` | `GET_BALANCE_HISTORY` | `GET_BLOCK` | `GET_SERVER_INFO` | `GET_TRANSACTION` | `PUSH_TRANSACTION` | `SUBSCRIBE_ADDRESS` | `SUBSCRIBE_BLOCK` | `UNSUBSCRIBE_ADDRESS` | `UNSUBSCRIBE_BLOCK`
+  )
+- `params`: optionally a set of parameters, depending on
+  the command.
 
-The payload of an input message is:
+**The structure of an input message is:**
 
-```
+```ts
 {
-  "id": ...,        // string or number nonce
-  "command": "...", // command
-  "params": {       // optional
-    ...             // varying parameters based on command
+  id: number | string; // Unique identifier for tracking responses
+  "command": string;     // Command
+  "params": {            // Parameters object based on the command
+    ...
   }
 }
 ```
 
-Commands are divided in two main categories:
-- _request / response_ commands: each one of them originates one response output message;
-- _subscription_ commands: each one of them originates one immediate response output message with a feedback about the
-  requested operation; later, in case of successful subscription, more output messages will be generated based on the
-  event the command subscribed.
+**General structure of a success response:**
 
-The payload of an output message of a successful action is:
-
-```
+```ts
 {
-  "id": ...,   // nonce
-  "data": ..., // message data
+  id: number | string; // Unique identifier for tracking responses
   "type": "message"
+  data: { // payload
+    ...
+  }
 }
 ```
 
-The payload of an output message of a unsuccessful action is:
+**Structure of an error response:**
 
-```
+```ts
 {
-  "id": ..., // nonce
-  "data": {
+  id: number | string; // identifier
+  "type": "error"
+  data: {
     "error": {
-      ...    // error details
+      "message": string;
+      // These optional properties below are set in case of BlockfrostServerError or BlockfrostClientError
+      // thrown by blockfrost-js https://github.com/blockfrost/blockfrost-js?tab=readme-ov-file#error-handling
+      "error"?: string;
+      "status_code"?: number;
+      "name"?: number;
+      "url"?: number;
+      "body"?: unknown;
     }
   },
-  "type": "error"
 }
 ```
 
-#### Request / response commands
+### Request / response commands
+
+For each of these commands the client receives an immediate response
 
 - [`ESTIMATE_FEE`](#estimate_fee) - estimate transaction submission fee
 - [`GET_ACCOUNT_INFO`](#get_account_info) - get general information about an account
@@ -160,206 +161,440 @@ The payload of an output message of a unsuccessful action is:
 - [`GET_TRANSACTION`](#get_transaction) - get details of a transaction
 - [`GET_SERVER_INFO`](#get_server_info) - get information about the server
 - [`PUSH_TRANSACTION`](#push_transaction) - submits a transaction to the network
-- [`UNSUBSCRIBE_ADDRESS`](#unsubscribe_address) - cancel all new transactions subscriptions
-- [`UNSUBSCRIBE_BLOCK`](#unsubscribe_block) - cancel new blocks subscription
 
-#### Subscription commands
+### Subscription commands
+
+Each subscription command immediately responds with a confirmation of the subscription status. Upon successful subscription, the client will receive additional messages whenever the subscribed events occur.
+
+When an unsubscribe command is sent, the client receives an immediate response confirming the unsubscribe status. Once successfully unsubscribed, the client will no longer receive messages for those events.
 
 - [`SUBSCRIBE_ADDRESS`](#subscribe_addresses) - subscribe to new transactions for given addresses
+- [`UNSUBSCRIBE_ADDRESS`](#unsubscribe_address) - cancel all new transactions subscriptions
 - [`SUBSCRIBE_BLOCK`](#subscribe_block) - subscribe to new blocks
+- [`UNSUBSCRIBE_BLOCK`](#unsubscribe_block) - cancel new blocks subscription
 
-#### ESTIMATE_FEE
+### ESTIMATE_FEE
+
+Estimates the minimum fee required for transaction submission based on the linear fee parameters for the current epoch.
 
 Input message:
 
-```
+```ts
 {
-  "id": ..., // nonce
+  id: number | string; // identifier
   "command": "ESTIMATE_FEE"
 }
 ```
 
-Response output message `data` type:
+Response:
 
-``` TypeScript
+```TypeScript
 {
-  /** The linear factor for the minimum fee calculation for given epoch */
-  lovelacePerByte: number;
-}
-```
-
-#### GET_ACCOUNT_INFO
-
-Input message:
-
-```
-{
-  "id": ...,             // nonce
-  "command": "GET_ACCOUNT_INFO",
-  "params": {
-    "descriptor": "...", // public key
-    "details": "...",    // TODO
-    "page": ...,         // optional - page number
-    "pageSize": ...      // optional - page size
+  id: number | string;
+  type: "message";
+  data: {
+    //The linear factor for the minimum fee calculation for given epoch (min_fee_a)
+    // https://docs.cardano.org/about-cardano/explore-more/parameter-guide/#a-list-of-updatable-protocol-parameters
+    lovelacePerByte: number;
   }
 }
 ```
 
-Response output message `data` type:
+### GET_ACCOUNT_INFO
 
-``` TypeScript
+Retrieves the account details such as current balance, basic staking information, list of used addresses, paginated list of transactions associated with the account (optional) and more.
+
+Input message:
+
+```ts
 {
-  balance: string;
-  addresses?: {
-    change: AddressData[];
-    used: AddressData[];
-    unused: AddressData[];
-  };
-  empty: boolean;
-  availableBalance: string;
-  descriptor: string;
-  tokens?: AssetBalance[];
-  history: {
-    total: number;               // total transactions
-    tokens?: number;             // tokens transactions
-    unconfirmed: number;         // unconfirmed transactions
-    transactions?: Transactions; // list of transactions
-    txids?: string[];
-  };
-  page: {
-    size: number;
-    total: number;
-    index: number;
-  };
-  misc: {
-    staking: {
-      address: string;
-      isActive: boolean;
-      rewards: string;
-      poolId: string | null;
-      drep: {
-        drep_id: string;
-        hex: string;
-        amount: string;
-        active: boolean;
-        active_epoch: number | null;
-        has_script: boolean;
-      } | null;
+  "id": number | string;
+  "command": "GET_ACCOUNT_INFO";
+  "params": {
+    "descriptor": string; // account public key in hex (eg. 6d17587575a3b4f0f86ebad3977e8f7e4981faa863eccf5c1467065c74fe3435943769446dd290d103fb3d360128e86de4b47faea73ffb0900c94c6a61ef9ea2)
+    "details": 'basic' | 'tokens' | 'tokenBalances' |'txids' | 'txs';
+    "page?": number; // optional, default 1
+    "pageSize?": number; // optional, default 20
+  }
+}
+```
+
+Response:
+
+```TypeScript
+{
+  id: number | string;
+  type: "message";
+  data {
+    balance: string;
+    addresses?: {
+      change: {
+        address: string;
+        path: string;
+        transfers: number;
+        balance?: string;
+        sent?: string;
+        received?: string;
+      }[];
+      used: {
+        address: string;
+        path: string;
+        transfers: number;
+        balance?: string;
+        sent?: string;
+        received?: string;
+      }[];
+      unused: {
+        address: string;
+        path: string;
+        transfers: number;
+        balance?: string;
+        sent?: string;
+        received?: string;
+      }[];
     };
-  };
-}
-```
-
-#### GET_ACCOUNT_UTXO
-
-Input message:
-
-```
-{
-  "id": ...,            // nonce
-  "command": "GET_ACCOUNT_UTXO",
-  "params": {
-    "descriptor": "..." // public key
+    empty: boolean;
+    availableBalance: string;
+    descriptor: string;
+    tokens?: {
+      unit: string;
+      quantity: string;
+      decimals: number;
+      name?: string | null;
+      ticker?: string | null;
+      fingerprint?: string;
+    }[];
+    history: {
+      total: number;               // total transactions
+      unconfirmed: number;         // unconfirmed transactions
+      transactions?: {             // List of transactions data, available with details set to "txs"
+        txUtxos: {                 // https://docs.blockfrost.io/#tag/cardano--transactions/GET/txs/{hash}/utxos
+          hash: string;
+          inputs: {
+            address: string;
+            amount: {
+              unit: string;
+              quantity: string;
+              decimals: number;
+              name?: string | null;
+              ticker?: string | null;
+              fingerprint?: string;
+            }[];
+            tx_hash: string;
+            output_index: number;
+            data_hash: string | null;
+            collateral: boolean;
+          }[];
+          outputs: {
+            address: string;
+            amount: {
+              unit: string;
+              quantity: string;
+              decimals: number;
+              name?: string | null;
+              ticker?: string | null;
+              fingerprint?: string;
+            }[];
+            output_index: number;
+            data_hash: string | null;
+          }[];
+        };
+        txData: { // https://docs.blockfrost.io/#tag/cardano--transactions/GET/txs/{hash}
+          hash: string;
+          block: string;
+          block_height: number;
+          block_time: number;
+          slot: number;
+          index: number;
+          output_amount: {
+            unit: string;
+            quantity: string;
+            decimals: number;
+            name?: string | null;
+            ticker?: string | null;
+            fingerprint?: string;
+          }[];
+          fees: string;
+          deposit: string;
+          size: number;
+          invalid_before: string | null;
+          invalid_hereafter: string | null;
+          utxo_count: number;
+          withdrawal_count: number;
+          mir_cert_count: number;
+          delegation_count: number;
+          stake_cert_count: number;
+          pool_update_count: number;
+          pool_retire_count: number;
+          asset_mint_or_burn_count: number;
+          redeemer_count: number;
+          valid_contract: boolean;
+        };
+        address: string;
+        txHash: string;
+        txCbor?: string;
+      }[];
+      txids?: string[];            // List of transaction ids, available with details set to "txids"
+    };
+    page: {
+      size: number;
+      total: number;
+      index: number;
+    };
+    misc: {
+      staking: {
+        address: string;
+        isActive: boolean;
+        rewards: string;
+        poolId: string | null;
+        drep: {
+          drep_id: string;
+          hex: string;
+          amount: string;
+          active: boolean;
+          active_epoch: number | null;
+          has_script: boolean;
+        } | null;
+      };
+    };
   }
 }
 ```
 
-Response output message `data` type:
+### GET_ACCOUNT_UTXO
 
-``` TypeScript
+Fetches all unspent transaction outputs (UTXOs) for the specified account.
+
+Input message:
+
+```ts
 {
-  address: string;
-  utxoData: {
-    tx_hash: string;
-    tx_index: number;
-    output_index: number;
-    amount: AssetBalance[];
+  "id": number | string;
+  "command": "GET_ACCOUNT_UTXO";
+  "params": {
+    "descriptor": string; // account public key
+  }
+}
+```
+
+Response:
+
+```TypeScript
+{
+  id: number | string;
+  type: "message";
+  data: {
+    address: string;
+    utxoData: {
+      tx_hash: string;
+      tx_index: number;
+      output_index: number;
+      amount: {
+        unit: string;
+        quantity: string;
+        decimals: number;
+        name?: string | null;
+        ticker?: string | null;
+        fingerprint?: string;
+      }[];
+      block: string;
+      data_hash: string | null;
+    };
+    path: string;
+    blockInfo: { // https://docs.blockfrost.io/#tag/cardano--blocks/GET/blocks/{hash_or_number}
+      hash: string;
+      block: string;
+      block_height: number;
+      block_time: number;
+      slot: number;
+      index: number;
+      output_amount: {
+          unit: string;
+          quantity: string;
+      }[];
+      fees: string;
+      deposit: string;
+      size: number;
+      invalid_before: string | null;
+      invalid_hereafter: string | null;
+      utxo_count: number;
+      withdrawal_count: number;
+      mir_cert_count: number;
+      delegation_count: number;
+      stake_cert_count: number;
+      pool_update_count: number;
+      pool_retire_count: number;
+      asset_mint_or_burn_count: number;
+      redeemer_count: number;
+      valid_contract: boolean;
+  };
+  }[];
+}
+```
+
+### GET_BALANCE_HISTORY
+
+Calculates a history of balance changes for an account within a specified date range.
+
+Input message:
+
+```ts
+{
+  "id": number | string;
+  "command": "GET_BALANCE_HISTORY";
+  "params": {
+    "descriptor": string; // account public key
+    "groupBy": number;
+    "from": number;
+    "to": number;
+  }
+}
+```
+
+Response:
+
+```TypeScript
+{
+  id: number | string;
+  type: "message";
+  data: {
+    time: number;
+    txs: number;
+    received: string;
+    sent: string;
+    sentToSelf: string;
+    rates?: { [k: string]: number | undefined };
+  }[]
+}
+```
+
+### GET_BLOCK
+
+Retrieves detailed information about a specific block using its hash or height.
+
+Input message:
+
+```ts
+{
+  "id": number | string;
+  "command": "GET_BLOCK";
+  "params": {
+    "hashOrNumber": number | string; // Block hash or block height
+  }
+}
+```
+
+Response:
+Payload contains [block data](https://docs.blockfrost.io/#tag/cardano--blocks/GET/blocks/{hash_or_number}).
+
+```ts
+{
+  id: number | string;
+  type: 'message';
+  data: {
+    hash: string;
     block: string;
-    data_hash: string | null;
+    block_height: number;
+    block_time: number;
+    slot: number;
+    index: number;
+    output_amount: {
+      unit: string;
+      quantity: string;
+    }
+    [];
+    fees: string;
+    deposit: string;
+    size: number;
+    invalid_before: string | null;
+    invalid_hereafter: string | null;
+    utxo_count: number;
+    withdrawal_count: number;
+    mir_cert_count: number;
+    delegation_count: number;
+    stake_cert_count: number;
+    pool_update_count: number;
+    pool_retire_count: number;
+    asset_mint_or_burn_count: number;
+    redeemer_count: number;
+    valid_contract: boolean;
+  }
+}
+```
+
+### GET_TRANSACTION
+
+Returns information about a specified transaction.
+
+Input message:
+
+```ts
+{
+  "id": number | string;
+  "command": "GET_TRANSACTION";
+  "params": {
+    "txId": string; // transaction id
+  }
+}
+```
+
+Response:
+Payload contains [transaction data](https://docs.blockfrost.io/#tag/cardano--transactions/GET/txs/{hash}).
+
+```TypeScript
+{
+  id: number | string;
+  type: "message";
+  data: { // https://docs.blockfrost.io/#tag/cardano--transactions/GET/txs/{hash}
+    hash: string;
+    block: string;
+    block_height: number;
+    block_time: number;
+    slot: number;
+    index: number;
+    output_amount: {
+      unit: string;
+      quantity: string;
+      decimals: number;
+      name?: string | null;
+      ticker?: string | null;
+      fingerprint?: string;
+    }[];
+    fees: string;
+    deposit: string;
+    size: number;
+    invalid_before: string | null;
+    invalid_hereafter: string | null;
+    utxo_count: number;
+    withdrawal_count: number;
+    mir_cert_count: number;
+    delegation_count: number;
+    stake_cert_count: number;
+    pool_update_count: number;
+    pool_retire_count: number;
+    asset_mint_or_burn_count: number;
+    redeemer_count: number;
+    valid_contract: boolean;
   };
-  path: string;
-  blockInfo: BlockContent;
-}[]
-```
-
-See also [BlockContent](#blockcontent)
-
-#### GET_BALANCE_HISTORY
-
-Input message:
-
-```
-{
-  "id": ...,             // nonce
-  "command": "GET_BALANCE_HISTORY",
-  "params": {
-    "descriptor": "...", // public key
-    "groupBy": ...,      // TODO
-    "from": ...,         // TODO
-    "to": ...            // TODO
-  }
 }
 ```
 
-Response output message `data` type:
+### GET_SERVER_INFO
 
-``` TypeScript
-{
-  time: number;
-  txs: number;
-  received: string;
-  sent: string;
-  sentToSelf: string;
-  rates?: { [k: string]: number | undefined };
-}[]
-```
-
-#### GET_BLOCK
+Fetches general information about the server, such as version, network, and the current block height.
 
 Input message:
 
-```
+```ts
 {
-  "id": ...,            // nonce
-  "command": "GET_BLOCK",
-  "params": {
-    "hashOrNumber": ... // block id - block hash or block number
-  }
+  "id": number | string;
+  "command": "GET_SERVER_INFO";
 }
 ```
 
-Response output message `data` type: [BlockContent](#blockcontent)
+Response:
 
-#### GET_TRANSACTION
-
-Input message:
-
-```
-{
-  "id": ...,      // nonce
-  "command": "GET_TRANSACTION",
-  "params": {
-    "txId": "..." // transaction id
-  }
-}
-```
-
-Response output message `data` type: [TransformedTransaction](#transformedtransaction)
-
-#### GET_SERVER_INFO
-
-Input message:
-
-```
-{
-  "id": ..., // nonce
-  "command": "GET_SERVER_INFO"
-}
-```
-
-Response output message `data` type:
-
-``` TypeScript
+```TypeScript
 {
   hostname: string;
   name: string;
@@ -372,269 +607,265 @@ Response output message `data` type:
 }
 ```
 
-#### PUSH_TRANSACTION
+Example:
+
+```json
+{
+  "id": 1,
+  "type": "message",
+  "data": {
+    "hostname": "wslink-backend1",
+    "name": "Cardano",
+    "shortcut": "ada",
+    "testnet": false,
+    "version": "2.1.1",
+    "decimals": 6,
+    "blockHeight": 11085275,
+    "blockHash": "e958bfd655844f763e7b6613ffbcf17bde09782bb66efaea67ed49e70261439c"
+  }
+}
+```
+
+### PUSH_TRANSACTION
+
+Submits a transaction to the network.
 
 Input message:
 
-```
+```ts
 {
-  "id": ...,        // nonce
-  "command": "PUSH_TRANSACTION",
+  "id": number | string;
+  "command": "PUSH_TRANSACTION";
   "params": {
-    "txData": "..." // the CBOR representation of the transaction
+    "txData": string; // CBOR representation of the transaction
   }
 }
 ```
 
 Response output message:
 
-```
+```ts
 {
-  "id": ...,     // nonce
-  "data": "...", // transaction id
-  "type": "message"
+  "id": number | string;
+  "type": "message";
+  "data": string; // transaction id
 }
 ```
 
-#### SUBSCRIBE_ADDRESS
+### SUBSCRIBE_ADDRESS
+
+Subscribes to transaction notifications for a specified list of addresses. The event consist of detailed information about a specified transaction, including inputs, outputs and transaction CBOR.
 
 Input message:
 
-```
+```ts
 {
-  "id": ...,                       // nonce
+  "id": number | string;
   "command": "SUBSCRIBE_ADDRESS",
   "params": {
-    "addresses": ["address", ...], // list of addresses
-    "cbor": true                   // optional - request for CBOR representation of the transaction
+    "addresses": string[], // list of bech32 addresses
+    "cbor": true           // optional - whether to include transaction CBOR
   }
 }
 ```
 
-Response output message:
+Confirmation of a subscription status:
 
-```
+```ts
 {
-  "id": ...,           // nonce
-  "data": {
-    "subscribed": true // successful subscription confirmation
-  },
-  "type": "message"
-}
-```
-
-Subscription output message `data` type:
-
-``` TypeScript
-{
-  address: string;
-  txHash: string;
-  txData: TransformedTransaction;
-  txUtxos: {
-    /** Transaction hash */
-    hash: string;
-    inputs: {
-      /** Input address */
-      address: string;
-      amount: AssetBalance[];
-      /** Hash of the UTXO transaction */
-      tx_hash: string;
-      /** UTXO index in the transaction */
-      output_index: number;
-      /** The hash of the transaction output datum */
-      data_hash: string | null;
-      /** Whether the input is a collateral consumed on script validation failure */
-      collateral: boolean;
-    }[];
-    outputs: {
-      /** Output address */
-      address: string;
-      amount: AssetBalance[];
-      /** UTXO index in the transaction */
-      output_index: number;
-      /** The hash of the transaction output datum */
-      data_hash: string | null;
-    }[];
+  "id": number | string;
+  "type": "message";
+  data: {
+    "subscribed": true; // successful subscription confirmation
   };
-  txCbor?: string;
-}[]
-```
-
-See also [AssetBalance](#assetbalance) and [TransformedTransaction](#transformedtransaction)
-
-#### SUBSCRIBE_BLOCK
-
-Input message:
-
-```
-{
-  "id": ..., // nonce
-  "command": "SUBSCRIBE_BLOCK"
 }
 ```
 
-Response output message:
+Event:
 
-```
+```ts
 {
-  "id": ...,           // nonce
-  "data": {
-    "subscribed": true // successful subscription confirmation
-  },
-  "type": "message"
+  id: number | string;
+  type: "message";
+  data: {
+    address: string;
+    txHash: string;
+    txData: { // https://docs.blockfrost.io/#tag/cardano--transactions/GET/txs/{hash}
+      hash: string;
+      block: string;
+      block_height: number;
+      block_time: number;
+      slot: number;
+      index: number;
+      output_amount: {
+        unit: string;
+        quantity: string;
+        decimals: number;
+        name?: string | null;
+        ticker?: string | null;
+        fingerprint?: string;
+      }[];
+      fees: string;
+      deposit: string;
+      size: number;
+      invalid_before: string | null;
+      invalid_hereafter: string | null;
+      utxo_count: number;
+      withdrawal_count: number;
+      mir_cert_count: number;
+      delegation_count: number;
+      stake_cert_count: number;
+      pool_update_count: number;
+      pool_retire_count: number;
+      asset_mint_or_burn_count: number;
+      redeemer_count: number;
+      valid_contract: boolean;
+    };
+    txUtxos: {
+      hash: string;
+      inputs: {
+        address: string;
+        amount: {
+          unit: string;
+          quantity: string;
+          fingerprint?: string; // lovelace has no fingerprint
+          decimals: number;
+          ticker?: string | null;
+          name?: string | null;
+        }[];
+        tx_hash: string;
+        output_index: number;
+        data_hash: string | null;
+        collateral: boolean;
+      }[];
+      outputs: {
+        address: string;
+        amount: {
+          unit: string;
+          quantity: string;
+          fingerprint?: string; // lovelace has no fingerprint
+          decimals: number;
+          ticker?: string | null;
+          name?: string | null;
+        }[];
+        output_index: number;
+        data_hash: string | null;
+      }[];
+    };
+    txCbor?: string;
+  }[];
 }
 ```
 
-Subscription output message `data` type: [BlockContent](#blockcontent)
+### SUBSCRIBE_BLOCK
 
-#### UNSUBSCRIBE_ADDRESS
+Subscribes to notifications for each new block added to the blockchain.
 
 Input message:
 
-```
+```ts
 {
-  "id": ..., // nonce
+  "id": number | string;
+  "command": "SUBSCRIBE_BLOCK";
+}
+```
+
+Confirmation of a subscription status:
+
+```ts
+{
+  id: number | string;
+  "type": "message";
+  data: {
+    "subscribed": true; // successful subscription confirmation
+  };
+}
+```
+
+Event message:
+
+```ts
+{
+  id: number | string;
+  type: 'message';
+  data: {
+    // https://docs.blockfrost.io/#tag/cardano--blocks/GET/blocks/latest
+    hash: string;
+    block: string;
+    block_height: number;
+    block_time: number;
+    slot: number;
+    index: number;
+    output_amount: {
+      unit: string;
+      quantity: string;
+    }
+    [];
+    fees: string;
+    deposit: string;
+    size: number;
+    invalid_before: string | null;
+    invalid_hereafter: string | null;
+    utxo_count: number;
+    withdrawal_count: number;
+    mir_cert_count: number;
+    delegation_count: number;
+    stake_cert_count: number;
+    pool_update_count: number;
+    pool_retire_count: number;
+    asset_mint_or_burn_count: number;
+    redeemer_count: number;
+    valid_contract: boolean;
+  }
+}
+```
+
+### UNSUBSCRIBE_ADDRESS
+
+Unsubscribes from transaction notifications for addresses.
+
+Input message:
+
+```ts
+{
+  "id": number | string;
   "command": "UNSUBSCRIBE_ADDRESS"
 }
 ```
 
 Output message:
 
-```
+```ts
 {
-  "id": ...,            // nonce
-  "data": {
-    "subscribed": false // successful un-subscription confirmation
+  id: number | string;
+  data: {
+    "subscribed": false; // successful un-subscription confirmation
   },
   "type": "message"
 }
 ```
 
-#### UNSUBSCRIBE_BLOCK
+### UNSUBSCRIBE_BLOCK
+
+Unsubscribes from block event notifications.
 
 Input message:
 
-```
+```ts
 {
-  "id": ..., // nonce
+  "id": number | string;
   "command": "UNSUBSCRIBE_BLOCK"
 }
 ```
 
-Output message:
+Confirmation of a subscription status:
 
-```
+```ts
 {
-  "id": ...,            // nonce
-  "data": {
-    "subscribed": false // successful un-subscription confirmation
-  },
-  "type": "message"
-}
-```
-
-#### Common types
-
-##### AssetBalance
-
-``` TypeScript
-interface AssetBalance {
-  unit: string;
-  quantity: string;
-  fingerprint?: string; // lovelace has no fingerprint
-  decimals: number;
-  ticker?: string | null;
-  name?: string | null;
-}
-```
-
-##### BlockContent
-
-``` TypeScript
-interface BlockContent {
-  /** Block creation time in UNIX time */
-  time: number;
-  /** Block number */
-  height: number | null;
-  /** Hash of the block */
-  hash: string;
-  /** Slot number */
-  slot: number | null;
-  /** Epoch number */
-  epoch: number | null;
-  /** Slot within the epoch */
-  epoch_slot: number | null;
-  /** Bech32 ID of the slot leader or specific block description in case there is no slot leader */
-  slot_leader: string;
-  /** Block size in Bytes */
-  size: number;
-  /** Number of transactions in the block */
-  tx_count: number;
-  /** Total output within the block in Lovelaces */
-  output: string | null;
-  /** Total fees within the block in Lovelaces */
-  fees: string | null;
-  /** VRF key of the block */
-  block_vrf: string | null;
-  /** The hash of the operational certificate of the block producer */
-  op_cert: string | null;
-  /** The value of the counter used to produce the operational certificate */
-  op_cert_counter: string | null;
-  /** Hash of the previous block */
-  previous_block: string | null;
-  /** Hash of the next block */
-  next_block: string | null;
-  /** Number of block confirmations */
-  confirmations: number;
-};
-```
-
-##### TransformedTransaction
-
-``` TypeScript
-interface TransformedTransaction {
-  /** Transaction hash */
-  hash: string;
-  /** Block hash */
-  block: string;
-  /** Block number */
-  block_height: number;
-  /** Block creation time in UNIX time */
-  block_time: number;
-  /** Slot number */
-  slot: number;
-  /** Transaction index within the block */
-  index: number;
-  output_amount: AssetBalance[];
-  /** Fees of the transaction in Lovelaces */
-  fees: string;
-  /** Deposit within the transaction in Lovelaces */
-  deposit: string;
-  /** Size of the transaction in Bytes */
-  size: number;
-  /** Left (included) endpoint of the timelock validity intervals */
-  invalid_before: string | null;
-  /** Right (excluded) endpoint of the timelock validity intervals */
-  invalid_hereafter: string | null;
-  /** Count of UTXOs within the transaction */
-  utxo_count: number;
-  /** Count of the withdrawals within the transaction */
-  withdrawal_count: number;
-  /** Count of the MIR certificates within the transaction */
-  mir_cert_count: number;
-  /** Count of the delegations within the transaction */
-  delegation_count: number;
-  /** Count of the stake keys (de)registration within the transaction */
-  stake_cert_count: number;
-  /** Count of the stake pool registration and update certificates within the transaction */
-  pool_update_count: number;
-  /** Count of the stake pool retirement certificates within the transaction */
-  pool_retire_count: number;
-  /** Count of asset mints and burns within the transaction */
-  asset_mint_or_burn_count: number;
-  /** Count of redeemers within the transaction */
-  redeemer_count: number;
-  /** True if contract script passed validation */
-  valid_contract: boolean;
+  id: number | string;
+  type: "message";
+  data: {
+    "subscribed": false; // successful un-subscription confirmation
+  };
 }
 ```
