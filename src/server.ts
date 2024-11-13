@@ -10,7 +10,7 @@ import * as Tracing from '@sentry/tracing';
 import { CaptureConsole } from '@sentry/integrations';
 import { v4 as uuidv4 } from 'uuid';
 import * as Server from './types/server.js';
-import { MESSAGES, WELCOME_MESSAGE, REPOSITORY_URL } from './constants/index.js';
+import { WELCOME_MESSAGE, REPOSITORY_URL } from './constants/index.js';
 import {
   getMessage,
   prepareErrorMessage,
@@ -199,40 +199,40 @@ wss.on('connection', async (ws: Server.Ws) => {
     );
 
     switch (command) {
-      case MESSAGES.GET_SERVER_INFO: {
+      case 'GET_SERVER_INFO': {
         response = await getServerInfo(id, clientId);
 
         break;
       }
 
-      case MESSAGES.GET_TRANSACTION: {
+      case 'GET_TRANSACTION': {
         validators.GET_TRANSACTION(params);
         response = await getTransaction(id, clientId, params.txId);
 
         break;
       }
 
-      case MESSAGES.GET_BLOCK: {
+      case 'GET_BLOCK': {
         validators.GET_BLOCK(params);
         response = await getBlock(id, clientId, params.hashOrNumber);
 
         break;
       }
 
-      case MESSAGES.GET_ACCOUNT_UTXO: {
+      case 'GET_ACCOUNT_UTXO': {
         validators.GET_ACCOUNT_UTXO(params);
         response = await getAccountUtxo(id, clientId, params.descriptor);
 
         break;
       }
 
-      case MESSAGES.ESTIMATE_FEE: {
+      case 'ESTIMATE_FEE': {
         response = await estimateFee(id, clientId);
 
         break;
       }
 
-      case MESSAGES.GET_ACCOUNT_INFO: {
+      case 'GET_ACCOUNT_INFO': {
         validators.GET_ACCOUNT_INFO(params);
         response = await getAccountInfo(
           id,
@@ -246,7 +246,7 @@ wss.on('connection', async (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.GET_BALANCE_HISTORY: {
+      case 'GET_BALANCE_HISTORY': {
         validators.GET_BALANCE_HISTORY(params);
         response = await getBalanceHistory(
           id,
@@ -260,7 +260,7 @@ wss.on('connection', async (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.SUBSCRIBE_BLOCK: {
+      case 'SUBSCRIBE_BLOCK': {
         const activeBlockSubIndex = activeSubscriptions[clientId].findIndex(
           index => index.type === 'block',
         );
@@ -276,7 +276,7 @@ wss.on('connection', async (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.UNSUBSCRIBE_BLOCK: {
+      case 'UNSUBSCRIBE_BLOCK': {
         const activeBlockSubIndex = activeSubscriptions[clientId].findIndex(
           index => index.type === 'block',
         );
@@ -290,7 +290,7 @@ wss.on('connection', async (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.SUBSCRIBE_ADDRESS: {
+      case 'SUBSCRIBE_ADDRESS': {
         validators.SUBSCRIBE_ADDRESS(params);
         const { addresses, cbor } = params;
 
@@ -322,7 +322,7 @@ wss.on('connection', async (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.UNSUBSCRIBE_ADDRESS: {
+      case 'UNSUBSCRIBE_ADDRESS': {
         const activeAddressSubIndex = activeSubscriptions[clientId].findIndex(
           index => index.type === 'addresses',
         );
@@ -338,7 +338,7 @@ wss.on('connection', async (ws: Server.Ws) => {
         break;
       }
 
-      case MESSAGES.PUSH_TRANSACTION: {
+      case 'PUSH_TRANSACTION': {
         validators.PUSH_TRANSACTION(params);
         response = await submitTransaction(id, clientId, params.txData);
 

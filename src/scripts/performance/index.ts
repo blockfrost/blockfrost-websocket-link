@@ -28,7 +28,7 @@ class TestSuite {
 
     // retrieve basic info and subscribe to block notifications
     c.send('GET_SERVER_INFO');
-    c.send('SUBSCRIBE_BLOCK', {});
+    c.send('SUBSCRIBE_BLOCK');
 
     const addresses: string[] = []; // for all user's accounts (xpubs)
 

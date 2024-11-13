@@ -26,7 +26,9 @@
     "utxo",
     "utxos",
     "uuidv4",
-    "wslink"
+    "wslink",
+    "xpub",
+    "xpubs"
   ],
   "search.exclude": {
     "**/.yarn": true,
