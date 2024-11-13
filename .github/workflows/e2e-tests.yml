@@ -28,7 +28,7 @@ jobs:
         'preprod1abiUKhLuQ3Ic1n6ctxilFMtlGNozC5h'
         }}
       BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'preprod' }}
-      TEST: ${{ env.S3_ENDPOINT }}
+      TEST: ${{ vars.S3_ENDPOINT }}
 
     strategy:
       matrix:
@@ -77,5 +77,5 @@ jobs:
           echo "AWS_REGION: $AWS_REGION"
           echo "AWS_ENDPOINT: $AWS_ENDPOINT"
           echo "AWS_REGION: $AWS_REGION"
-          echo "endpoint: https://${{secrets.S3_ENDPOINT}}"
+          echo "endpoint: https://${{vars.S3_ENDPOINT}}"
           echo "endpoint: $TEST"
