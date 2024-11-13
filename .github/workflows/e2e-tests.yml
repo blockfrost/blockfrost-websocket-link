@@ -27,7 +27,9 @@ jobs:
         github.event.inputs.network == 'preprod' && secrets.BLOCKFROST_PREPROD_PROJECT_ID ||
         'preprod1abiUKhLuQ3Ic1n6ctxilFMtlGNozC5h'
         }}
-      BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'preprod' }}
+      BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'preprod' }}\
+      TEST: ${{ secrets.S3_ENDPOINT }}
+
     strategy:
       matrix:
         node-version: [20.x]
@@ -69,3 +71,10 @@ jobs:
           prefix: '/websocket-link/${RUN}'
           copyLatest: true
           ignoreMissingResults: true
+      - name: Debug AWS configuration
+        run: |
+          echo "AWS_REGION: $AWS_REGION"
+          echo "AWS_ENDPOINT: $AWS_ENDPOINT"
+          echo "AWS_REGION: $AWS_REGION"
+          echo "endpoint": https://${{secrets.S3_ENDPOINT}}"
+          echo "endpoint": $TEST"
