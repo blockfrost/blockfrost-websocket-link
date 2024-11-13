@@ -73,8 +73,7 @@ jobs:
       - name: Debug AWS configuration
         if: always()
         run: |
-          echo "AWS_REGION: $AWS_REGION"
-          echo "AWS_ENDPOINT: $AWS_ENDPOINT"
-          echo "AWS_REGION: $AWS_REGION"
-          echo "endpoint: https://${{vars.S3_ENDPOINT}}"
-          echo "endpoint: $TEST"
+          echo ${{ secrets.S3_ACCESS_KEY}}
+          echo ${{ secrets.S3_SECRET_KEY}}
+          echo ${{ vars.S3_SECRET_KEY}}
+          echo ${{ vars.S3_ACCESS_KEY}}
