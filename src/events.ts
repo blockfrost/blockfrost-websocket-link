@@ -144,7 +144,7 @@ export const onBlock = async (
 
     // fetch txs that include client's address with their utxo data
     const txs = await getTransactionsWithDetails(
-      Object.entries(txsCbor).map(([txid, cbor]) => ({ txid, cbor })),
+      Object.entries(txsCbor).map(([txId, cbor]) => ({ txId, cbor })),
     );
 
     const notifications: TxNotification[] = [];

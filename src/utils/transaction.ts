@@ -23,12 +23,7 @@ const fetchTxWithUtxo = async (txHash: string, address: string) => {
     const txData = await transformTransactionData(tx);
     const txUtxos = await transformTransactionUtxo(txUtxo);
 
-    return {
-      txData,
-      txUtxos,
-      address: address,
-      txHash: txHash,
-    };
+    return { txData, txUtxos, address, txHash };
   } catch (error) {
     // WARNING: this will omit txs that returned 404, caller should be well aware of this fact
     if (error instanceof BlockfrostServerError && error.status_code === 404) {
@@ -43,7 +38,7 @@ const fetchTxWithUtxo = async (txHash: string, address: string) => {
 export const txIdsToTransactions = async (
   txidsPerAddress: {
     address: string;
-    data: string[];
+    txIds: string[];
   }[],
 ): Promise<Types.TxIdsToTransactionsResponse[]> => {
   if (txidsPerAddress.length === 0) return [];
@@ -51,9 +46,9 @@ export const txIdsToTransactions = async (
   const promises: Promise<Types.TxIdsToTransactionsResponse | undefined>[] = [];
 
   for (const item of txidsPerAddress) {
-    for (const tx of item.data) {
+    for (const txId of item.txIds) {
       promises.push(
-        pLimiter.add(() => fetchTxWithUtxo(tx, item.address), { throwOnTimeout: true }),
+        pLimiter.add(() => fetchTxWithUtxo(txId, item.address), { throwOnTimeout: true }),
       );
     }
   }
@@ -69,7 +64,7 @@ export const txIdsToTransactions = async (
 };
 
 export interface GetTransactionsDetails {
-  txid: string;
+  txId: string;
   cbor?: boolean;
 }
 
@@ -77,24 +72,24 @@ export const getTransactionsWithDetails = async (
   txs: GetTransactionsDetails[],
 ): Promise<Pick<TxIdsToTransactionsResponse, 'txData' | 'txUtxos' | 'txCbor'>[]> => {
   const txsData = await Promise.all(
-    txs.map(({ txid }) =>
-      pLimiter.add(() => blockfrostAPI.txs(txid).then(data => transformTransactionData(data)), {
+    txs.map(({ txId }) =>
+      pLimiter.add(() => blockfrostAPI.txs(txId).then(data => transformTransactionData(data)), {
         throwOnTimeout: true,
       }),
     ),
   );
   const txsUtxo = await Promise.all(
-    txs.map(({ txid }) =>
+    txs.map(({ txId }) =>
       pLimiter.add(
-        () => blockfrostAPI.txsUtxos(txid).then(data => transformTransactionUtxo(data)),
+        () => blockfrostAPI.txsUtxos(txId).then(data => transformTransactionUtxo(data)),
         { throwOnTimeout: true },
       ),
     ),
   );
   const txsCbors = await Promise.all(
-    txs.map(({ txid, cbor }) =>
+    txs.map(({ txId, cbor }) =>
       cbor
-        ? pLimiter.add(() => blockfrostAPI.txsCbor(txid).then(data => data.cbor), {
+        ? pLimiter.add(() => blockfrostAPI.txsCbor(txId).then(data => data.cbor), {
             throwOnTimeout: true,
           })
         : // eslint-disable-next-line unicorn/no-useless-undefined

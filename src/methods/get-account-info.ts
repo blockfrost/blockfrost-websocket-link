@@ -116,7 +116,7 @@ export const getAccountInfo = async (
     } else if (details === 'txs') {
       // fetch full transaction objects and set account.history.transactions
       const txs = await txIdsToTransactions(
-        requestedPageTxIds.map(item => ({ address: item.address, data: [item.tx_hash] })),
+        requestedPageTxIds.map(item => ({ address: item.address, txIds: [item.tx_hash] })),
       );
 
       accountInfo.history.transactions = txs;
