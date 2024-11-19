@@ -1,4 +1,4 @@
-import PQueue from 'p-queue';
+import PQueue, { QueueAddOptions } from 'p-queue';
 import {
   FIAT_RATES_REQUESTS_PER_SEC,
   BLOCKFROST_REQUEST_CONCURRENCY,
@@ -28,3 +28,8 @@ pLimiter.on('error', error => {
 ratesLimiter.on('error', error => {
   logger.warn(`ratesLimiter error`, error);
 });
+
+export const limiter = <T>(
+  task: () => PromiseLike<T>,
+  options?: Exclude<QueueAddOptions, 'throwOnTimeout'>,
+) => pLimiter.add<T>(task, { ...options, throwOnTimeout: true });
