@@ -3,7 +3,7 @@ import * as Types from '../types/transactions.js';
 import { TxIdsToTransactionsResponse } from '../types/transactions.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { getAssetData, transformAsset } from './asset.js';
-import { assetMetadataLimiter, pLimiter } from './limiter.js';
+import { assetMetadataLimiter, limiter } from './limiter.js';
 import { logger } from './logger.js';
 
 export const sortTransactionsCmp = <
@@ -47,9 +47,7 @@ export const txIdsToTransactions = async (
 
   for (const item of txidsPerAddress) {
     for (const txId of item.txIds) {
-      promises.push(
-        pLimiter.add(() => fetchTxWithUtxo(txId, item.address), { throwOnTimeout: true }),
-      );
+      promises.push(limiter(() => fetchTxWithUtxo(txId, item.address)));
     }
   }
 
@@ -73,25 +71,18 @@ export const getTransactionsWithDetails = async (
 ): Promise<Pick<TxIdsToTransactionsResponse, 'txData' | 'txUtxos' | 'txCbor'>[]> => {
   const txsData = await Promise.all(
     txs.map(({ txId }) =>
-      pLimiter.add(() => blockfrostAPI.txs(txId).then(data => transformTransactionData(data)), {
-        throwOnTimeout: true,
-      }),
+      limiter(() => blockfrostAPI.txs(txId).then(data => transformTransactionData(data))),
     ),
   );
   const txsUtxo = await Promise.all(
     txs.map(({ txId }) =>
-      pLimiter.add(
-        () => blockfrostAPI.txsUtxos(txId).then(data => transformTransactionUtxo(data)),
-        { throwOnTimeout: true },
-      ),
+      limiter(() => blockfrostAPI.txsUtxos(txId).then(data => transformTransactionUtxo(data))),
     ),
   );
   const txsCbors = await Promise.all(
     txs.map(({ txId, cbor }) =>
       cbor
-        ? pLimiter.add(() => blockfrostAPI.txsCbor(txId).then(data => data.cbor), {
-            throwOnTimeout: true,
-          })
+        ? limiter(() => blockfrostAPI.txsCbor(txId).then(data => data.cbor))
         : // eslint-disable-next-line unicorn/no-useless-undefined
           Promise.resolve<undefined>(undefined),
     ),

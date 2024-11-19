@@ -28,3 +28,6 @@ pLimiter.on('error', error => {
 ratesLimiter.on('error', error => {
   logger.warn(`ratesLimiter error`, error);
 });
+
+export const limiter = <T>(task: () => PromiseLike<T>) =>
+  pLimiter.add<T>(task, { throwOnTimeout: true });
