@@ -270,7 +270,7 @@ wss.on('connection', async (ws: Server.Ws) => {
 
       case 'GET_TRANSACTION': {
         validators.GET_TRANSACTION(params);
-        response = await getTransaction(id, clientId, params.txId);
+        response = await getTransaction(id, clientId, params.txId, params.cbor);
 
         break;
       }
