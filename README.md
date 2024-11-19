@@ -337,7 +337,6 @@ Response:
         };
         address: string;
         txHash: string;
-        txCbor?: string;
       }[];
       txids?: string[];            // List of transaction ids, available with details set to "txids"
     };
@@ -832,6 +831,7 @@ Event:
       asset_mint_or_burn_count: number;
       redeemer_count: number;
       valid_contract: boolean;
+      cbor?: string;
     };
     txUtxos: {
       hash: string;
@@ -864,7 +864,6 @@ Event:
         data_hash: string | null;
       }[];
     };
-    txCbor?: string;
   }[];
 }
 ```

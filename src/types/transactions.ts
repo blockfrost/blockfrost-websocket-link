@@ -4,7 +4,6 @@ export interface TxIdsToTransactionsResponse {
   txData: TransformedTransaction;
   address: string;
   txHash: string;
-  txCbor?: string;
 }
 
 export interface TransformedTransactionUtxo {
