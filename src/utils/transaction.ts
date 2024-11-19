@@ -1,10 +1,13 @@
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
-import * as Types from '../types/transactions.js';
-import { TxIdsToTransactionsResponse } from '../types/transactions.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { getAssetData, transformAsset } from './asset.js';
 import { assetMetadataLimiter, limiter } from './limiter.js';
 import { logger } from './logger.js';
+import {
+  TxIdsToTransactionsResponse,
+  TransformedTransaction,
+  TransformedTransactionUtxo,
+} from '../types/transactions.js';
 
 export const sortTransactionsCmp = <
   T extends {
@@ -39,12 +42,12 @@ export const txIdsToTransactions = async (
     address: string;
     txIds: string[];
   }[],
-): Promise<Types.TxIdsToTransactionsResponse[]> => {
+): Promise<TxIdsToTransactionsResponse[]> => {
   if (txIdsPerAddress.length === 0) {
     return [];
   }
 
-  const promises: Promise<Types.TxIdsToTransactionsResponse | undefined>[] = [];
+  const promises: Promise<TxIdsToTransactionsResponse | undefined>[] = [];
 
   for (const item of txIdsPerAddress) {
     for (const txId of item.txIds) {
@@ -55,7 +58,7 @@ export const txIdsToTransactions = async (
   // eslint-disable-next-line unicorn/no-await-expression-member
   const result = (await Promise.all(promises)).filter(
     index => index !== undefined,
-  ) as Types.TxIdsToTransactionsResponse[];
+  ) as TxIdsToTransactionsResponse[];
 
   const sortedTxs = result.sort((a, b) => sortTransactionsCmp(a.txData, b.txData));
 
@@ -94,7 +97,7 @@ export const getTransactionsWithDetails = async (
 
 export const transformTransactionData = async (
   tx: Responses['tx_content'],
-): Promise<Types.TransformedTransaction> => {
+): Promise<TransformedTransaction> => {
   const assetsMetadata = await Promise.all(
     tx.output_amount.map(asset =>
       assetMetadataLimiter.add(() => getAssetData(asset.unit), { throwOnTimeout: true }),
@@ -107,12 +110,21 @@ export const transformTransactionData = async (
   };
 };
 
-export const fetchTransactionData = (txId: string) =>
-  limiter(() => blockfrostAPI.txs(txId)).then(data => transformTransactionData(data));
+export const fetchTransactionData = async (
+  txId: string,
+  cbor?: boolean,
+): Promise<TransformedTransaction> => {
+  const [txData, txCbor] = await Promise.all([
+    limiter(() => blockfrostAPI.txs(txId)).then(data => transformTransactionData(data)),
+    cbor ? limiter(() => blockfrostAPI.txsCbor(txId)) : undefined,
+  ]);
+
+  return { ...txData, ...txCbor };
+};
 
 export const transformTransactionUtxo = async (
   utxo: Responses['tx_content_utxo'],
-): Promise<Types.TransformedTransactionUtxo> => {
+): Promise<TransformedTransactionUtxo> => {
   const assets = new Set<string>();
 
   for (const input of utxo.inputs) {

@@ -78,4 +78,6 @@ export interface TransformedTransaction {
   redeemer_count: number;
   /** True if contract script passed validation */
   valid_contract: boolean;
+  /** The CBOR representation of the transaction */
+  cbor?: string;
 }
