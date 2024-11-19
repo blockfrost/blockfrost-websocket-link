@@ -18,9 +18,8 @@ export const sortTransactionsCmp = <
 
 const fetchTxWithUtxo = async (txHash: string, address: string) => {
   try {
-    const tx = await blockfrostAPI.txs(txHash);
     const txUtxo = await blockfrostAPI.txsUtxos(txHash);
-    const txData = await transformTransactionData(tx);
+    const txData = await fetchTransactionData(txHash);
     const txUtxos = await transformTransactionUtxo(txUtxo);
 
     return { txData, txUtxos, address, txHash };
@@ -49,7 +48,7 @@ export const txIdsToTransactions = async (
 
   for (const item of txIdsPerAddress) {
     for (const txId of item.txIds) {
-      promises.push(limiter(() => fetchTxWithUtxo(txId, item.address)));
+      promises.push(fetchTxWithUtxo(txId, item.address));
     }
   }
 
@@ -71,11 +70,7 @@ export interface GetTransactionsDetails {
 export const getTransactionsWithDetails = async (
   txs: GetTransactionsDetails[],
 ): Promise<Pick<TxIdsToTransactionsResponse, 'txData' | 'txUtxos' | 'txCbor'>[]> => {
-  const txsData = await Promise.all(
-    txs.map(({ txId }) =>
-      limiter(() => blockfrostAPI.txs(txId).then(data => transformTransactionData(data))),
-    ),
-  );
+  const txsData = await Promise.all(txs.map(({ txId }) => fetchTransactionData(txId)));
   const txsUtxo = await Promise.all(
     txs.map(({ txId }) =>
       limiter(() => blockfrostAPI.txsUtxos(txId).then(data => transformTransactionUtxo(data))),
@@ -111,6 +106,9 @@ export const transformTransactionData = async (
     output_amount: tx.output_amount.map((a, index) => transformAsset(a, assetsMetadata[index])),
   };
 };
+
+export const fetchTransactionData = (txId: string) =>
+  limiter(() => blockfrostAPI.txs(txId)).then(data => transformTransactionData(data));
 
 export const transformTransactionUtxo = async (
   utxo: Responses['tx_content_utxo'],
