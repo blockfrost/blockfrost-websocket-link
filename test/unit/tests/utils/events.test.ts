@@ -153,7 +153,7 @@ describe('events', () => {
           return new Promise(resolve => {
             // sanity check that the test really wanted to fetch transactions that we expected
             for (const mockedTx of fixture.mocks.txsWithUtxo) {
-              if (!txs.find(({ txid }) => mockedTx.txData.hash === txid)) {
+              if (!txs.find(({ txId }) => mockedTx.txData.hash === txId)) {
                 throw new Error('Unexpected list of affected addresses');
               }
             }

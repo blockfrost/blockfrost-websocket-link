@@ -136,7 +136,7 @@ export const getAccountBalanceHistory = async (
     await txIdsToTransactions(
       txIds.map(tx => ({
         address: tx.address,
-        data: [tx.tx_hash],
+        txIds: [tx.tx_hash],
       })),
     )
   )
