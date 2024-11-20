@@ -230,6 +230,7 @@ wss.on('connection', async (ws: Server.Ws) => {
           params.details,
           params.page,
           params.pageSize,
+          params.cbor,
         );
 
         break;

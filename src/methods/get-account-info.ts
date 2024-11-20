@@ -21,6 +21,7 @@ export const getAccountInfo = async (
   details: Details,
   page = 1,
   pageSize = 25,
+  cbor?: boolean,
 ): Promise<Responses.AccountInfo> => {
   let _addressesCount = 0;
   const tStart = Date.now();
@@ -117,6 +118,7 @@ export const getAccountInfo = async (
       // fetch full transaction objects and set account.history.transactions
       const txs = await txIdsToTransactions(
         requestedPageTxIds.map(item => ({ address: item.address, txIds: [item.tx_hash] })),
+        cbor,
       );
 
       accountInfo.history.transactions = txs;
@@ -155,8 +157,9 @@ export default async (
   details: Details,
   page = 1,
   pageSize = 25,
+  cbor?: boolean,
 ): Promise<string> => {
-  const data = await getAccountInfo(publicKey, details, page, pageSize);
+  const data = await getAccountInfo(publicKey, details, page, pageSize, cbor);
   const message = prepareMessage({ id, clientId, data });
 
   return message;

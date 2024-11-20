@@ -19,6 +19,7 @@ const schemas: { [k in Validators]: { properties: unknown; required?: string[] }
       details: { type: 'string', enum: Details },
       page: { type: ['number', 'string', 'null'] },
       pageSize: { type: ['number', 'string', 'null'] },
+      cbor: { type: 'boolean' },
     },
     required: ['descriptor', 'details'],
   },

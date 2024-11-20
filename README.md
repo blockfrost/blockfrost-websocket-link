@@ -218,8 +218,9 @@ Input message:
   "params": {
     "descriptor": string; // account public key in hex (eg. 6d17587575a3b4f0f86ebad3977e8f7e4981faa863eccf5c1467065c74fe3435943769446dd290d103fb3d360128e86de4b47faea73ffb0900c94c6a61ef9ea2)
     "details": 'basic' | 'tokens' | 'tokenBalances' |'txids' | 'txs';
-    "page?": number; // optional, default 1
-    "pageSize?": number; // optional, default 20
+    "page"?: number; // optional, default 1
+    "pageSize"?: number; // optional, default 20
+    "cbor"?: boolean; // optional, get CBOR representation of transactions
   }
 }
 ```
@@ -334,6 +335,7 @@ Response:
           asset_mint_or_burn_count: number;
           redeemer_count: number;
           valid_contract: boolean;
+          cbor?: string;
         };
         address: string;
         txHash: string;
