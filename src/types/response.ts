@@ -94,6 +94,7 @@ export type Responses = {
     | { address: string }
     | null
     | Schemas['block_content']
+    | Schemas['epoch_param_content']
     | BalanceHistoryData[]
     | TxIdsToTransactionsResponse[]
     | TransformedTransaction

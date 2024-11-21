@@ -98,11 +98,12 @@ using the same encoding.
 
 Each command message requires:
 
-- `id`: an identifier which is mirrored by the server in the output message; This identifier, while unused by the server, is useful for the client to reconcile output messages to relative input message.
-- `command`: Command to execute (`ESTIMATE_FEE` | `GET_ACCOUNT_INFO` | `GET_ACCOUNT_UTXO` | `GET_BALANCE_HISTORY` | `GET_BLOCK` | `GET_SERVER_INFO` | `GET_TRANSACTION` | `PUSH_TRANSACTION` | `SUBSCRIBE_ADDRESS` | `SUBSCRIBE_BLOCK` | `UNSUBSCRIBE_ADDRESS` | `UNSUBSCRIBE_BLOCK`
-  )
-- `params`: optionally a set of parameters, depending on
-  the command.
+- `id`: an identifier which is mirrored by the server in the output message; This identifier, while unused by the server, is useful for the client to
+reconcile output messages to relative input message.
+- `command`: Command to execute (`ESTIMATE_FEE` | `GET_ACCOUNT_INFO` | `GET_ACCOUNT_UTXO` | `GET_BALANCE_HISTORY` | `GET_BLOCK` |
+`GET_PROTOCOL_PARAMETERS` | `GET_SERVER_INFO` | `GET_TRANSACTION` | `PUSH_TRANSACTION` |
+`SUBSCRIBE_ADDRESS` | `SUBSCRIBE_BLOCK` | `UNSUBSCRIBE_ADDRESS` | `UNSUBSCRIBE_BLOCK`).
+- `params`: optionally a set of parameters, depending on the command.
 
 **The structure of an input message is:**
 
@@ -159,6 +160,7 @@ For each of these commands the client receives an immediate response
 - [`GET_ADA_HANDLE`](#get_ada_handle) - resolves an Ada Handle
 - [`GET_BALANCE_HISTORY`](#get_balance_history) - get balance history of an account
 - [`GET_BLOCK`](#get_block) - get details of a block
+- [`GET_PROTOCOL_PARAMETERS`](#get_protocol_parameters) - get latest epoch protocol parameters
 - [`GET_TRANSACTION`](#get_transaction) - get details of a transaction
 - [`GET_SERVER_INFO`](#get_server_info) - get information about the server
 - [`PUSH_TRANSACTION`](#push_transaction) - submits a transaction to the network
@@ -175,6 +177,8 @@ When an unsubscribe command is sent, the client receives an immediate response c
 - [`UNSUBSCRIBE_BLOCK`](#unsubscribe_block) - cancel new blocks subscription
 
 ### ESTIMATE_FEE
+
+**Note: DEPRECATED** - use `min_fee_a` from [`GET_PROTOCOL_PARAMETERS`](#get_protocol_parameters) instead.
 
 Estimates the minimum fee required for transaction submission based on the linear fee parameters for the current epoch.
 
@@ -545,6 +549,87 @@ Payload contains [block data](https://docs.blockfrost.io/#tag/cardano--blocks/GE
     asset_mint_or_burn_count: number;
     redeemer_count: number;
     valid_contract: boolean;
+  }
+}
+```
+
+### GET_PROTOCOL_PARAMETERS
+
+Gets the protocol parameters relative to the latest epochs.
+
+Input message:
+
+```ts
+{
+  id: number | string;
+  "command": "GET_PROTOCOL_PARAMETERS"
+}
+```
+
+Response:
+Payload contains [protocol parameters](https://docs.blockfrost.io/#tag/cardano--epochs/GET/epochs/latest/parameters).
+
+```TypeScript
+{
+  id: number | string;
+  type: "message";
+  data: { // https://docs.blockfrost.io/#tag/cardano--epochs/GET/epochs/latest/parameters
+    epoch: number;
+    min_fee_a: number;
+    min_fee_b: number;
+    max_block_size: number;
+    max_tx_size: number;
+    max_block_header_size: number;
+    key_deposit: string;
+    pool_deposit: string;
+    e_max: number;
+    n_opt: number;
+    a0: number;
+    rho: number;
+    tau: number;
+    decentralisation_param: number;
+    extra_entropy: string | null;
+    protocol_major_ver: number;
+    protocol_minor_ver: number;
+    min_utxo: string;
+    min_pool_cost: string;
+    nonce: string;
+    cost_models: { [key: string]: unknown } | null;
+    cost_models_raw?: { [key: string]: unknown } | null;
+    price_mem: number | null;
+    price_step: number | null;
+    max_tx_ex_mem: string | null;
+    max_tx_ex_steps: string | null;
+    max_block_ex_mem: string | null;
+    max_block_ex_steps: string | null;
+    max_val_size: string | null;
+    collateral_percent: number | null;
+    max_collateral_inputs: number | null;
+    coins_per_utxo_size: string | null;
+    coins_per_utxo_word: string | null;
+    pvt_motion_no_confidence: number | null;
+    pvt_committee_normal: number | null;
+    pvt_committee_no_confidence: number | null;
+    pvt_hard_fork_initiation: number | null;
+    dvt_motion_no_confidence: number | null;
+    dvt_committee_normal: number | null;
+    dvt_committee_no_confidence: number | null;
+    dvt_update_to_constitution: number | null;
+    dvt_hard_fork_initiation: number | null;
+    dvt_p_p_network_group: number | null;
+    dvt_p_p_economic_group: number | null;
+    dvt_p_p_technical_group: number | null;
+    dvt_p_p_gov_group: number | null;
+    dvt_treasury_withdrawal: number | null;
+    committee_min_size: string | null;
+    committee_max_term_length: string | null;
+    gov_action_lifetime: string | null;
+    gov_action_deposit: string | null;
+    drep_deposit: string | null;
+    drep_activity: string | null;
+    pvtpp_security_group: number | null;
+    pvt_p_p_security_group: number | null;
+    min_fee_ref_script_cost_per_byte: number | null;
   }
 }
 ```
