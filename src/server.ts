@@ -309,9 +309,13 @@ wss.on('connection', async (ws: Server.Ws) => {
             );
 
             // Subscribe to new address...
-            if (subscriptionIndex === -1) addressesSubscribed[clientId].push({ address, cbor });
+            if (subscriptionIndex === -1) {
+              addressesSubscribed[clientId].push({ address, cbor });
+            }
             // ... or update the cbor option
-            else addressesSubscribed[clientId][subscriptionIndex].cbor ||= cbor;
+            else {
+              addressesSubscribed[clientId][subscriptionIndex].cbor ||= cbor;
+            }
           }
 
           const activeAddressSubIndex = activeSubscriptions[clientId].findIndex(
@@ -362,7 +366,9 @@ wss.on('connection', async (ws: Server.Ws) => {
   };
 
   const handleError = (id: MessageId, error: unknown) => {
-    if (!(error instanceof MessageError)) logger.error(error);
+    if (!(error instanceof MessageError)) {
+      logger.error(error);
+    }
 
     const response = prepareErrorMessage(id, clientId, error);
 

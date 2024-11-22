@@ -105,7 +105,9 @@ export const onBlock = async (
   subscribedAddresses: SubscribedAddress[] | undefined,
 ) => {
   // client has no subscription
-  if (!activeSubscriptions) return;
+  if (!activeSubscriptions) {
+    return;
+  }
 
   // block subscription
   const activeBlockSub = activeSubscriptions?.find(index => index.type === 'block');

@@ -142,7 +142,9 @@ export const getAccountBalanceHistory = async (
   )
     // eslint-disable-next-line unicorn/no-await-expression-member
     .filter(tx => {
-      if (typeof from !== 'number' || typeof to !== 'number') return true;
+      if (typeof from !== 'number' || typeof to !== 'number') {
+        return true;
+      }
       return tx.txData.block_time >= from && tx.txData.block_time <= to;
     })
     // txs are sorted from newest to oldest, we need exact opposite

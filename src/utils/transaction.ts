@@ -41,7 +41,9 @@ export const txIdsToTransactions = async (
     txIds: string[];
   }[],
 ): Promise<Types.TxIdsToTransactionsResponse[]> => {
-  if (txIdsPerAddress.length === 0) return [];
+  if (txIdsPerAddress.length === 0) {
+    return [];
+  }
 
   const promises: Promise<Types.TxIdsToTransactionsResponse | undefined>[] = [];
 
@@ -115,8 +117,16 @@ export const transformTransactionUtxo = async (
 ): Promise<Types.TransformedTransactionUtxo> => {
   const assets = new Set<string>();
 
-  for (const input of utxo.inputs) for (const a of input.amount) assets.add(a.unit);
-  for (const output of utxo.outputs) for (const a of output.amount) assets.add(a.unit);
+  for (const input of utxo.inputs) {
+    for (const a of input.amount) {
+      assets.add(a.unit);
+    }
+  }
+  for (const output of utxo.outputs) {
+    for (const a of output.amount) {
+      assets.add(a.unit);
+    }
+  }
 
   const assetsMetadata = await Promise.all(
     [...assets]
