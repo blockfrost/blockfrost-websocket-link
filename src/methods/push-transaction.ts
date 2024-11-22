@@ -42,6 +42,8 @@ export default async (
       );
 
       return message;
-    } else throw error;
+    } else {
+      throw error;
+    }
   }
 };

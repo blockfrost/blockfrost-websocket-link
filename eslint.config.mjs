@@ -51,6 +51,7 @@ export default [
     },
 
     rules: {
+      curly: 'error',
       'no-console': 'off',
       'unicorn/no-negated-condition': 'off',
       'unicorn/no-null': 'off',

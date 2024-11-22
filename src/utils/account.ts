@@ -7,7 +7,9 @@ export const getTxidsFromAccountAddresses = async (addresses: Address[], account
     address: string;
   } & Responses['address_transactions_content'][number])[] = [];
 
-  if (accountEmpty) return [];
+  if (accountEmpty) {
+    return [];
+  }
 
   const transactionsPerAddressList = await addressesToTxIds(addresses);
 

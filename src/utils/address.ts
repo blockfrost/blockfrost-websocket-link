@@ -127,13 +127,15 @@ export const addressesToUtxos = async (
 
   const assets = new Set<string>();
 
-  for (const addressUtxos of allUtxos)
-    for (const utxo of addressUtxos)
+  for (const addressUtxos of allUtxos) {
+    for (const utxo of addressUtxos) {
       for (const a of utxo.amount) {
         if (a.unit !== 'lovelace') {
           assets.add(a.unit);
         }
       }
+    }
+  }
 
   const tokenMetadata = await Promise.all(
     [...assets].map(a => assetMetadataLimiter.add(() => getAssetData(a), { throwOnTimeout: true })),
@@ -160,7 +162,9 @@ export const utxosWithBlocks = async (
   const promisesBundle: Promise<Addresses.UtxosWithBlockResponse>[] = [];
 
   for (const utxo of utxos) {
-    if (utxo.data === 'empty') continue;
+    if (utxo.data === 'empty') {
+      continue;
+    }
 
     for (const utxoData of utxo.data) {
       const promise = limiter(() =>
@@ -190,7 +194,9 @@ export const addressesToTxIds = async (
   }>[] = [];
 
   for (const item of addresses) {
-    if (item.data === 'empty') continue;
+    if (item.data === 'empty') {
+      continue;
+    }
 
     const promise = limiter(() =>
       // 1 page (100 txs) per address at a time should be more efficient default value
@@ -257,7 +263,9 @@ export const getAddressesData = async (
   return addresses.map(addr => {
     const response = responses.find(r => r.address === addr.address);
 
-    if (!response) throw new Error('Failed getAddressData');
+    if (!response) {
+      throw new Error('Failed getAddressData');
+    }
 
     return {
       address: addr.address,

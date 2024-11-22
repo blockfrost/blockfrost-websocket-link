@@ -8,7 +8,9 @@ import { logger } from './logger.js';
 
 export const getAssetData = memoizee(
   async (hex: string) => {
-    if (hex === 'lovelace') return;
+    if (hex === 'lovelace') {
+      return;
+    }
     logger.debug(`Fetching asset metadata for ${hex}`);
     try {
       const response = await blockfrostAPI.assetsById(hex);

@@ -89,7 +89,9 @@ export const validators = Object.fromEntries(
     return [
       title,
       (data: unknown) => {
-        if (!validator(data)) throw new MessageError(JSON.stringify(validator.errors));
+        if (!validator(data)) {
+          throw new MessageError(JSON.stringify(validator.errors));
+        }
       },
     ];
   }),
