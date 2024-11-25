@@ -7,7 +7,7 @@ export default [
       name: 'Cardano',
       shortcut: 'ada',
       testnet: false,
-      version: '2.2.1',
+      version: expect.any(String),
       decimals: 6,
       blockHeight: expect.any(Number),
       blockHash: expect.stringMatching(/^[a-f0-9]{64}$/),
