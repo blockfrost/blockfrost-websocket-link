@@ -16,7 +16,12 @@ export const deriveAddress = (
   addressIndex: number,
   isTestnet: boolean,
 ): { address: string; path: string } => {
-  const { address } = sdkDeriveAddress(publicKey, type, addressIndex, isTestnet);
+  const { address } = sdkDeriveAddress(
+    publicKey,
+    type,
+    addressIndex,
+    isTestnet ? 'preview' : 'mainnet',
+  );
   const purpose = 1852;
 
   return {
