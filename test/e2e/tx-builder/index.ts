@@ -9,13 +9,10 @@ import { deriveAddressPrvKey, mnemonicToPrivateKey } from './helpers/key.js';
 import { blockfrostAPI } from '../../../src/utils/blockfrost-api.js';
 import { UTXO } from './types/index.js';
 
-// BIP39 mnemonic (seed) from which we will generate address to retrieve utxo from and private key used for signing the transaction
-const MNEMONIC =
-  'zone city mean decorate budget gasp furnace extend shrimp promote diary torch quantum album market wheel urge maple above provide stomach suspect depend second';
 
-export const buildTx = async (amountInLovelace: string, receivingAddress: string) => {
+export const buildTx = async (sendingMnemonic: string, amountInLovelace: string, receivingAddress: string) => {
   // Derive an address (this is the address where you need to send ADA in order to have UTXO to actually make the transaction)
-  const bip32PrvKey = mnemonicToPrivateKey(MNEMONIC);
+  const bip32PrvKey = mnemonicToPrivateKey(sendingMnemonic);
   const { signKey, address } = deriveAddressPrvKey(bip32PrvKey, 0);
 
   blockfrostAPI.instance = blockfrostAPI.instance.extend({
