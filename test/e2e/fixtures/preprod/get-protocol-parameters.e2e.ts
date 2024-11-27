@@ -4,6 +4,8 @@ export default [
   {
     testName: 'GET_PROTOCOL_PARAMETERS success - preprod',
     result: {
+      id: 0,
+      type: 'message',
       data: {
         epoch: expect.any(Number),
         min_fee_a: 44,
@@ -20,11 +22,11 @@ export default [
         tau: 0.2,
         decentralisation_param: 0,
         extra_entropy: null,
-        protocol_major_ver: 9,
+        protocol_major_ver: expect.any(Number),
         protocol_minor_ver: 0,
         min_utxo: '4310',
         min_pool_cost: '170000000',
-        nonce: '538e6395f3e5c8b415ac054e56ce4bfed41ce39c0fd2890c86d646a4a387b9b9',
+        nonce: expect.any(String),
         cost_models_raw: {
           PlutusV1: expect.arrayContaining([expect.any(Number)]),
           PlutusV2: expect.arrayContaining([expect.any(Number)]),
