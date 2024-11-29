@@ -181,6 +181,7 @@ export const onBlock = [
             asset_mint_or_burn_count: 1,
             redeemer_count: 4,
             valid_contract: true,
+            cbor: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
           },
           txUtxos: {
             hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
@@ -354,9 +355,6 @@ export const onBlock = [
               },
             ],
           },
-          txCbor: {
-            cbor: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-          },
         },
       ],
     },
@@ -438,6 +436,7 @@ export const onBlock = [
               asset_mint_or_burn_count: 1,
               redeemer_count: 4,
               valid_contract: true,
+              cbor: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
             },
             txUtxos: {
               hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
@@ -612,9 +611,6 @@ export const onBlock = [
               ],
             },
             txHash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',
-            txCbor: {
-              cbor: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-            },
           },
         ],
       },

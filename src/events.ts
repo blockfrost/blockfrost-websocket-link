@@ -166,7 +166,6 @@ export const onBlock = async (
             txData: enhancedTx.txData,
             txUtxos: enhancedTx.txUtxos,
             txHash: enhancedTx.txData.hash,
-            txCbor: enhancedTx.txCbor,
           });
         }
       }

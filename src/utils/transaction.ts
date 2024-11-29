@@ -72,27 +72,15 @@ export interface GetTransactionsDetails {
 
 export const getTransactionsWithDetails = async (
   txs: GetTransactionsDetails[],
-): Promise<Pick<TxIdsToTransactionsResponse, 'txData' | 'txUtxos' | 'txCbor'>[]> => {
-  const txsData = await Promise.all(txs.map(({ txId }) => fetchTransactionData(txId)));
+): Promise<Pick<TxIdsToTransactionsResponse, 'txData' | 'txUtxos'>[]> => {
+  const txsData = await Promise.all(txs.map(({ txId, cbor }) => fetchTransactionData(txId, cbor)));
   const txsUtxo = await Promise.all(
     txs.map(({ txId }) =>
       limiter(() => blockfrostAPI.txsUtxos(txId).then(data => transformTransactionUtxo(data))),
     ),
   );
-  const txsCbors = await Promise.all(
-    txs.map(({ txId, cbor }) =>
-      cbor
-        ? limiter(() => blockfrostAPI.txsCbor(txId).then(data => data.cbor))
-        : // eslint-disable-next-line unicorn/no-useless-undefined
-          Promise.resolve<undefined>(undefined),
-    ),
-  );
 
-  return txs.map((_tx, index) => ({
-    txData: txsData[index],
-    txUtxos: txsUtxo[index],
-    txCbor: txsCbors[index],
-  }));
+  return txs.map((_tx, index) => ({ txData: txsData[index], txUtxos: txsUtxo[index] }));
 };
 
 export const transformTransactionData = async (
