@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws';
 import { healthCheck } from './health.js';
-import { assetMetadataLimiter, pLimiter, ratesLimiter } from './limiter.js';
+import { pLimiter, ratesLimiter } from './limiter.js';
 import { logger } from './logger.js';
 import { getPort } from './server.js';
 import { HEALTHCHECK_FAIL_THRESHOLD_MS } from '../constants/config.js';
@@ -73,8 +73,6 @@ export class MetricsCollector {
       websocket_link_rates_queue_size: ratesLimiter.size,
       websocket_link_rates_queue_pending: ratesLimiter.pending,
       websocket_link_rates_queue_paused: ratesLimiter.isPaused ? 1 : 0,
-      websocket_link_asset_metadata_queue_size: assetMetadataLimiter.size,
-      websocket_link_asset_metadata_queue_pending: assetMetadataLimiter.pending,
     };
   };
 
