@@ -42,17 +42,17 @@ describe('unsubscribe-address', () => {
     });
 
 
-    //Push transaction
+    //Push transaction which will trigger subscription message
     const randomLovelaceValue = (Math.floor(Math.random() * (1500000 - 1000000 + 1)) + 1000000).toString();
     const { transaction } = await buildTx(sendingMnemonic, randomLovelaceValue, receivingAddress);
     await ws1.sendAndWait('PUSH_TRANSACTION', {
       txData: transaction.to_hex(),
     });
 
-    // Wait for a new block
+    // Wait for a new subscription message
     await ws2.waitForSubscriptionMessages(1, 160_000);
 
-    // Ensure the alternative client got the new block while the standard one didn't
+    // Ensure the alternative client got the new subscription while the standard one didn't
     expect(ws1.getSubscriptionMessages().length).equals(0);
     expect(ws2.getSubscriptionMessages().length).equals(1);
   });
