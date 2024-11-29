@@ -44,6 +44,10 @@ export type Messages = BaseMessage &
         };
       }
     | {
+        command: 'GET_PROTOCOL_PARAMETERS';
+        params: null;
+      }
+    | {
         command: 'GET_SERVER_INFO';
         params: null;
       }

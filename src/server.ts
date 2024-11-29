@@ -25,6 +25,7 @@ import getAccountInfo from './methods/get-account-info.js';
 import getAccountUtxo from './methods/get-account-utxo.js';
 import getAdaHandle from './methods/get-ada-handle.js';
 import getBlock from './methods/get-block.js';
+import getProtocolParameters from './methods/get-protocols-parameters.js';
 import getTransaction from './methods/get-transaction.js';
 import submitTransaction from './methods/push-transaction.js';
 import estimateFee from './methods/estimate-fee.js';
@@ -200,19 +201,6 @@ wss.on('connection', async (ws: Server.Ws) => {
     );
 
     switch (command) {
-      case 'GET_SERVER_INFO': {
-        response = await getServerInfo(id, clientId);
-
-        break;
-      }
-
-      case 'GET_TRANSACTION': {
-        validators.GET_TRANSACTION(params);
-        response = await getTransaction(id, clientId, params.txId);
-
-        break;
-      }
-
       case 'GET_BLOCK': {
         validators.GET_BLOCK(params);
         response = await getBlock(id, clientId, params.hashOrNumber);
@@ -264,6 +252,32 @@ wss.on('connection', async (ws: Server.Ws) => {
           params.from,
           params.to,
         );
+
+        break;
+      }
+
+      case 'GET_PROTOCOL_PARAMETERS': {
+        response = await getProtocolParameters(id, clientId);
+
+        break;
+      }
+
+      case 'GET_SERVER_INFO': {
+        response = await getServerInfo(id, clientId);
+
+        break;
+      }
+
+      case 'GET_TRANSACTION': {
+        validators.GET_TRANSACTION(params);
+        response = await getTransaction(id, clientId, params.txId);
+
+        break;
+      }
+
+      case 'PUSH_TRANSACTION': {
+        validators.PUSH_TRANSACTION(params);
+        response = await submitTransaction(id, clientId, params.txData);
 
         break;
       }
@@ -346,13 +360,6 @@ wss.on('connection', async (ws: Server.Ws) => {
         response = prepareMessage({ id, clientId, data: { subscribed: false } });
 
         addressesSubscribed[clientId] = [];
-
-        break;
-      }
-
-      case 'PUSH_TRANSACTION': {
-        validators.PUSH_TRANSACTION(params);
-        response = await submitTransaction(id, clientId, params.txData);
 
         break;
       }
