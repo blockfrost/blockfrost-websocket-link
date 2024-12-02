@@ -277,9 +277,10 @@ export const getAddressesData = async (
 
 export const getStakingData = async (stakeAddress: string): Promise<Addresses.StakingData> => {
   try {
-    const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
-    const drepData = stakeAddressData.drep_id
-      ? await blockfrostAPI.governance.drepsById(stakeAddressData.drep_id)
+    const stakeAddressData = await limiter(() => blockfrostAPI.accounts(stakeAddress));
+    const { drep_id } = stakeAddressData;
+    const drepData = drep_id
+      ? await limiter(() => blockfrostAPI.governance.drepsById(drep_id))
       : null;
 
     return {
@@ -306,7 +307,7 @@ export const getStakingAccountTotal = async (
   stakeAddress: string,
 ): Promise<Responses['account_addresses_total']> => {
   try {
-    const total = await blockfrostAPI.accountsAddressesTotal(stakeAddress);
+    const total = await limiter(() => blockfrostAPI.accountsAddressesTotal(stakeAddress));
 
     return total;
   } catch (error) {

@@ -21,9 +21,12 @@ export const sortTransactionsCmp = <
 
 const fetchTxWithUtxo = async (txHash: string, address: string, cbor?: boolean) => {
   try {
-    const txUtxo = await limiter(() => blockfrostAPI.txsUtxos(txHash));
-    const txData = await fetchTransactionData(txHash, cbor);
-    const txUtxos = await transformTransactionUtxo(txUtxo);
+    const [txUtxos, txData] = await Promise.all([
+      limiter(() => blockfrostAPI.txsUtxos(txHash)).then(txUtxo =>
+        transformTransactionUtxo(txUtxo),
+      ),
+      fetchTransactionData(txHash, cbor),
+    ]);
 
     return { txData, txUtxos, address, txHash };
   } catch (error) {
