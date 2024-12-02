@@ -53,6 +53,8 @@
     "@types/ws": "^8.5.4",
     "@typescript-eslint/eslint-plugin": "^8.11.0",
     "@typescript-eslint/parser": "^8.11.0",
+    "@vitest/runner": "2.1.4",
+    "allure-vitest": "3.0.6",
     "c8": "^7.13.0",
     "eslint": "^9.13.0",
     "eslint-config-prettier": "^9.1.0",

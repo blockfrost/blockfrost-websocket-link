@@ -21,12 +21,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      RUN: ${{ github.run_number }}
       BLOCKFROST_PROJECT_ID: ${{
         github.event.inputs.network == 'mainnet' && secrets.BLOCKFROST_MAINNET_PROJECT_ID ||
         github.event.inputs.network == 'preprod' && secrets.BLOCKFROST_PREPROD_PROJECT_ID ||
         'preprod1abiUKhLuQ3Ic1n6ctxilFMtlGNozC5h'
         }}
       BLOCKFROST_NETWORK: ${{ github.event.inputs.network || 'preprod' }}
+      TEST: ${{ vars.S3_ENDPOINT }}
+
     strategy:
       matrix:
         node-version: [20.x]
@@ -44,3 +47,33 @@ jobs:
           yarn start &
           npx wait-on http://localhost:3005
       - run: yarn run test:e2e
+
+      - name: Publish test artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-artifacts
+          path: |
+            ./allure-test-reports
+
+      - name: Publish allure report to S3
+        uses: andrcuns/allure-publish-action@v2.6.0
+        if: always()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEYS3_ACCESS_KEY }}
+          AWS_ENDPOINT: 'https://${{vars.S3_ENDPOINT}}'
+        with:
+          storageType: s3
+          resultsGlob: './allure-test-reports/allure-results'
+          bucket: tests-results
+          prefix: '/websocket-link/${RUN}'
+          copyLatest: true
+          ignoreMissingResults: true
+      - name: Debug AWS configuration
+        if: always()
+        run: |
+          echo ${{ secrets.S3_ACCESS_KEY}}
+          echo ${{ secrets.S3_SECRET_KEY}}
+          echo ${{ vars.S3_SECRET_KEY}}
+          echo ${{ vars.S3_ACCESS_KEY}}
