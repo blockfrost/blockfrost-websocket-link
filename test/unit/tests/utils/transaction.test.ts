@@ -77,7 +77,8 @@ describe('transaction utils', () => {
   }
 
   test(
-    'no deadlock in fetchTransactionData (BUG)',
+    'no deadlock in fetchTransactionData',
+    { timeout: 30000 },
     async () => {
       // Mock /txs/:txHash responses
       nock(/.+blockfrost.io/)
@@ -162,13 +163,22 @@ describe('transaction utils', () => {
           });
         });
 
+      // Mock txs/:id/cbor responses
+      nock(/.+blockfrost.io/)
+        .persist()
+        .get(/api\/v0\/txs\/.*\/cbor/)
+        .delay(1000)
+        .reply(200, (_uri, _body, cb) => {
+          cb(null, { cbor: '0123456789abcdef0123456789abcdef0123456789abcdef' });
+        });
+
       let promises = [];
 
       // run thousands of fetchTransactionData
       // (promise limiter concurrency set to 500 by default)
       for (let i = 0; i < 5000; i++) {
         promises.push(
-          transactionUtils.fetchTransactionData(`txHash-${i}`).then(data => {
+          transactionUtils.fetchTransactionData(`txHash-${i}`, true).then(data => {
             // console.log(`Fetched txHash-${i}`);
             return data;
           }),
@@ -194,7 +204,6 @@ describe('transaction utils', () => {
         expect(txs[i].hash).toBe(`txHash-${i}`);
       }
     },
-    { timeout: 15000 },
   );
 
   test(

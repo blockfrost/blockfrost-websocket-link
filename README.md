@@ -635,7 +635,7 @@ Payload contains [protocol parameters](https://docs.blockfrost.io/#tag/cardano--
 
 ### GET_TRANSACTION
 
-Returns information about a specified transaction.
+Returns information about a specified transaction, optionally with CBOR representation.
 
 Input message:
 
@@ -645,6 +645,7 @@ Input message:
   "command": "GET_TRANSACTION";
   "params": {
     "txId": string; // transaction id
+    "cbor":? boolean;
   }
 }
 ```
@@ -686,6 +687,7 @@ Payload contains [transaction data](https://docs.blockfrost.io/#tag/cardano--tra
     asset_mint_or_burn_count: number;
     redeemer_count: number;
     valid_contract: boolean;
+    cbor?: string;
   };
 }
 ```

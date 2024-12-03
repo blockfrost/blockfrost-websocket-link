@@ -52,6 +52,7 @@ const schemas: { [k in Validators]: { properties: unknown; required?: string[] }
   GET_TRANSACTION: {
     properties: {
       txId: { type: 'string' },
+      cbor: { type: 'boolean' },
     },
     required: ['txId'],
   },

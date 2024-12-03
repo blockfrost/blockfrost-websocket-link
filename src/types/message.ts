@@ -41,6 +41,7 @@ export type Messages = BaseMessage &
         command: 'GET_TRANSACTION';
         params: {
           txId: string;
+          cbor?: boolean;
         };
       }
     | {
