@@ -14,6 +14,7 @@ export type Messages = BaseMessage &
           details: Details;
           page?: number;
           pageSize?: number;
+          cbor?: boolean;
         };
       }
     | {

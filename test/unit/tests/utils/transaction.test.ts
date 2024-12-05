@@ -208,6 +208,7 @@ describe('transaction utils', () => {
 
   test(
     'no deadlock in fetchTxWithUtxo',
+    { timeout: 20000 },
     async () => {
       // Mock /txs/:txHash responses
       nock(/.+blockfrost.io/)
@@ -443,6 +444,15 @@ describe('transaction utils', () => {
           });
         });
 
+      // Mock txs/:id/cbor responses
+      nock(/.+blockfrost.io/)
+        .persist()
+        .get(/api\/v0\/txs\/.*\/cbor/)
+        .delay(1000)
+        .reply(200, (_uri, _body, cb) => {
+          cb(null, { cbor: '0123456789abcdef0123456789abcdef0123456789abcdef' });
+        });
+
       // Uncomment for debug prints
       const printQueueData = () => {
         console.log('pLimiter.pending', pLimiter.pending);
@@ -461,7 +471,7 @@ describe('transaction utils', () => {
           // adding more txs than the maximum number of concurrent request for the limiter causes deadlock
           txIds: Array.from({ length: 2000 }, (_, i) => `txHash-${i}`),
         },
-      ]);
+      ], true);
 
       // Make sure all promises were resolved and the correct data fetched
       expect(pLimiter.size).toBe(0);
@@ -470,6 +480,5 @@ describe('transaction utils', () => {
         expect(txs[i].txHash).toBe(`txHash-${i}`);
       }
     },
-    { timeout: 120000 },
   );
 });

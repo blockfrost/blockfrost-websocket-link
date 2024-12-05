@@ -19,10 +19,10 @@ export const sortTransactionsCmp = <
   b: T,
 ): number => b.block_height - a.block_height || b.index - a.index;
 
-const fetchTxWithUtxo = async (txHash: string, address: string) => {
+const fetchTxWithUtxo = async (txHash: string, address: string, cbor?: boolean) => {
   try {
-    const txUtxo = await blockfrostAPI.txsUtxos(txHash);
-    const txData = await fetchTransactionData(txHash);
+    const txUtxo = await limiter(() => blockfrostAPI.txsUtxos(txHash));
+    const txData = await fetchTransactionData(txHash, cbor);
     const txUtxos = await transformTransactionUtxo(txUtxo);
 
     return { txData, txUtxos, address, txHash };
@@ -42,6 +42,7 @@ export const txIdsToTransactions = async (
     address: string;
     txIds: string[];
   }[],
+  cbor?: boolean,
 ): Promise<TxIdsToTransactionsResponse[]> => {
   if (txIdsPerAddress.length === 0) {
     return [];
@@ -51,7 +52,7 @@ export const txIdsToTransactions = async (
 
   for (const item of txIdsPerAddress) {
     for (const txId of item.txIds) {
-      promises.push(fetchTxWithUtxo(txId, item.address));
+      promises.push(fetchTxWithUtxo(txId, item.address, cbor));
     }
   }
 
