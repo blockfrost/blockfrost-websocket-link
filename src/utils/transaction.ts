@@ -1,7 +1,7 @@
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { getAssetData, transformAsset } from './asset.js';
-import { assetMetadataLimiter, limiter } from './limiter.js';
+import { limiter } from './limiter.js';
 import { logger } from './logger.js';
 import {
   TxIdsToTransactionsResponse,
@@ -21,9 +21,12 @@ export const sortTransactionsCmp = <
 
 const fetchTxWithUtxo = async (txHash: string, address: string, cbor?: boolean) => {
   try {
-    const txUtxo = await limiter(() => blockfrostAPI.txsUtxos(txHash));
-    const txData = await fetchTransactionData(txHash, cbor);
-    const txUtxos = await transformTransactionUtxo(txUtxo);
+    const [txUtxos, txData] = await Promise.all([
+      limiter(() => blockfrostAPI.txsUtxos(txHash)).then(txUtxo =>
+        transformTransactionUtxo(txUtxo),
+      ),
+      fetchTransactionData(txHash, cbor),
+    ]);
 
     return { txData, txUtxos, address, txHash };
   } catch (error) {
@@ -87,11 +90,7 @@ export const getTransactionsWithDetails = async (
 export const transformTransactionData = async (
   tx: Responses['tx_content'],
 ): Promise<TransformedTransaction> => {
-  const assetsMetadata = await Promise.all(
-    tx.output_amount.map(asset =>
-      assetMetadataLimiter.add(() => getAssetData(asset.unit), { throwOnTimeout: true }),
-    ),
-  );
+  const assetsMetadata = await Promise.all(tx.output_amount.map(asset => getAssetData(asset.unit)));
 
   return {
     ...tx,
@@ -128,9 +127,7 @@ export const transformTransactionUtxo = async (
   }
 
   const assetsMetadata = await Promise.all(
-    [...assets]
-      .filter(asset => asset !== 'lovelace')
-      .map(asset => assetMetadataLimiter.add(() => getAssetData(asset), { throwOnTimeout: true })),
+    [...assets].filter(asset => asset !== 'lovelace').map(asset => getAssetData(asset)),
   );
 
   return {

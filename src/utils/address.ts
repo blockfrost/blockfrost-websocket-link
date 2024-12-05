@@ -8,7 +8,7 @@ import {
 } from '@blockfrost/blockfrost-js';
 import memoizee from 'memoizee';
 import { getAssetData, transformAsset } from './asset.js';
-import { assetMetadataLimiter, limiter } from './limiter.js';
+import { limiter } from './limiter.js';
 
 export const deriveAddress = (
   publicKey: string,
@@ -137,9 +137,7 @@ export const addressesToUtxos = async (
     }
   }
 
-  const tokenMetadata = await Promise.all(
-    [...assets].map(a => assetMetadataLimiter.add(() => getAssetData(a), { throwOnTimeout: true })),
-  );
+  const tokenMetadata = await Promise.all([...assets].map(a => getAssetData(a)));
 
   return addresses.map((addr, index) => ({
     address: addr.address,
@@ -279,9 +277,10 @@ export const getAddressesData = async (
 
 export const getStakingData = async (stakeAddress: string): Promise<Addresses.StakingData> => {
   try {
-    const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
-    const drepData = stakeAddressData.drep_id
-      ? await blockfrostAPI.governance.drepsById(stakeAddressData.drep_id)
+    const stakeAddressData = await limiter(() => blockfrostAPI.accounts(stakeAddress));
+    const { drep_id } = stakeAddressData;
+    const drepData = drep_id
+      ? await limiter(() => blockfrostAPI.governance.drepsById(drep_id))
       : null;
 
     return {
@@ -308,7 +307,7 @@ export const getStakingAccountTotal = async (
   stakeAddress: string,
 ): Promise<Responses['account_addresses_total']> => {
   try {
-    const total = await blockfrostAPI.accountsAddressesTotal(stakeAddress);
+    const total = await limiter(() => blockfrostAPI.accountsAddressesTotal(stakeAddress));
 
     return total;
   } catch (error) {

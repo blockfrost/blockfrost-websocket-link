@@ -57,6 +57,7 @@ In order to start the server, you need to configure some environment variables.
 - `BLOCKFROST_BLOCK_LISTEN_INTERVAL`: how often should be the server pulling the backend for new data (in milliseconds,
   default `5000`)
 - `BLOCKFROST_FIAT_RATES_PROXY`: the proxy used to fetch fiat rates
+- `BLOCKFROST_REQUEST_CONCURRENCY`: the **Blockfrost.io** HTTP API requests limit (default `500`)
 - `BLOCKFROST_SENTRY_DSN`: the **Sentry** data source name to optionally monitor the service
 - `BLOCKFROST_WSLINK_DEBUG`: enables `debug` logging level
 - `BUILD_COMMIT`: provided by `/status` endpoint

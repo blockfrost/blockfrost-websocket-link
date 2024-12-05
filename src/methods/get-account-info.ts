@@ -14,7 +14,6 @@ import { paginate } from '../utils/common.js';
 import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { logger } from '../utils/logger.js';
-import { assetMetadataLimiter } from '../utils/limiter.js';
 
 export const getAccountInfo = async (
   publicKey: string,
@@ -63,9 +62,7 @@ export const getAccountInfo = async (
     })
     .filter(b => b.quantity !== '0' && b.unit !== 'lovelace');
 
-  const tokenMetadataPromises = tokensBalances.map(token =>
-    assetMetadataLimiter.add(() => getAssetData(token.unit), { throwOnTimeout: true }),
-  );
+  const tokenMetadataPromises = tokensBalances.map(token => getAssetData(token.unit));
   const tokenMetadata = await Promise.all(tokenMetadataPromises);
 
   const totalPages = Math.ceil(txCount / pageSize);

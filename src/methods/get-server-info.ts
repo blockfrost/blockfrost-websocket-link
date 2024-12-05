@@ -2,11 +2,16 @@ import * as os from 'os';
 import { prepareMessage } from '../utils/message.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { MessageId } from '../types/message.js';
+import { limiter } from '../utils/limiter.js';
 
 export const getServerInfo = async () => {
   const isTestnet = blockfrostAPI.options.network !== 'mainnet';
-  const info = await blockfrostAPI.root();
-  const latestBlock = await blockfrostAPI.blocksLatest();
+
+  const [info, latestBlock] = await Promise.all([
+    limiter(() => blockfrostAPI.root()),
+    limiter(() => blockfrostAPI.blocksLatest()),
+  ]);
+
   const serverInfo = {
     hostname: os.hostname(),
     name: 'Cardano',

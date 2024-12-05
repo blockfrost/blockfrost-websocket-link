@@ -19,7 +19,9 @@ export const FIAT_RATES_REQUESTS_TIMEOUT = 1000;
 export const FIAT_RATES_ENABLE_ON_TESTNET = false;
 
 // Global requests concurrency limit
-export const BLOCKFROST_REQUEST_CONCURRENCY = 500;
+export const BLOCKFROST_REQUEST_CONCURRENCY = Number(
+  process.env.BLOCKFROST_REQUEST_CONCURRENCY ?? 500,
+);
 
 // How often should metrics be updated
 export const METRICS_COLLECTOR_INTERVAL_MS = Number(
