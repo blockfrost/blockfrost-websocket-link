@@ -28,7 +28,7 @@ rec {
         mkdir -p $out/bin
         cat <<EOF > $out/bin/${name}
         #!${pkgs.runtimeShell}
-        ${pkgs.nodejs_20}/bin/node $out/libexec/${name}/dist/server.js
+        ${pkgs.nodejs_20}/bin/node $out/libexec/${name}/dist/src/server.js
         EOF
         chmod +x $out/bin/${name}
       '';
