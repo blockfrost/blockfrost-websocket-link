@@ -7,18 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2024-12-05
+
 ### Added
 
+- `GET_ADA_HANDLE`, `GET_PROTOCOL_PARAMETERS` method
 - DRep data in `GET_ACCOUNT_INFO` method
+- control metric/healthcheck interval with env variable `METRICS_COLLECTOR_INTERVAL_MS`
+- Transaction CBOR in `SUBSCRIBE_ADDRESS`, `GET_TRANSACTION` and `GET_ACCOUNT_INFO`
+- Message validation
 
 ### Changed
 
-- more verbose healthcheck error log
+- More verbose healthcheck error log
+- Improved rate limiter
 
 ### Fixed
 
-- crash while fetching affected addresses for a block undergoing a rollback
-- emit block event only after all data are retrieved making address subscriptions more reliable
+- Crash while fetching affected addresses for a block undergoing a rollback
+- Emit block event only after all data are retrieved making address subscriptions more reliable
 
 ## [2.1.0] - 2023-06-10
 
