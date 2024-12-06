@@ -92,7 +92,7 @@ __metadata:
   resolution: "@blockfrost/blockfrost-websocket-link@workspace:."
   dependencies:
     "@blockfrost/blockfrost-js": "npm:5.7.0"
-    "@emurgo/cardano-serialization-lib-nodejs": "npm:^12.1.1"
+    "@emurgo/cardano-serialization-lib-nodejs": "npm:^13.2.0"
     "@esbuild/darwin-arm64": "npm:0.19.8"
     "@esbuild/linux-x64": "npm:0.19.8"
     "@eslint/compat": "npm:^1.2.1"
@@ -161,10 +161,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emurgo/cardano-serialization-lib-nodejs@npm:^12.1.1":
-  version: 12.1.1
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:12.1.1"
-  checksum: a165613d695b9c10084be2784cdcdebc26ac7415025497f9c17ef08f7d7f786cb7b8318b32a0282261683b240e162c4916ec7a1470590265b2aad8b7d4ea2e5e
+"@emurgo/cardano-serialization-lib-nodejs@npm:^13.2.0":
+  version: 13.2.0
+  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:13.2.0"
+  checksum: b8483dd74ec902da607f0ee00259674ba1794784fafd322948043dd4dfdbddecc81f6546fc98c9a57810639f91110cf76be7755a138a3506af6233954cfe449e
   languageName: node
   linkType: hard
 
