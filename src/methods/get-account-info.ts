@@ -94,7 +94,7 @@ export const getAccountInfo = async (
     },
   };
 
-  if (details === 'txs' || details === 'txids') {
+  if (['tokenBalances', 'txids', 'txs'].includes(details)) {
     const [externalAddresses, internalAddresses] = await Promise.all([
       discoverAddresses(publicKey, 0, accountEmpty),
       discoverAddresses(publicKey, 1, accountEmpty),
@@ -111,14 +111,16 @@ export const getAccountInfo = async (
     if (details === 'txids') {
       // set only txids
       accountInfo.history.txids = requestedPageTxIds.map(t => t.tx_hash);
-    } else if (details === 'txs') {
-      // fetch full transaction objects and set account.history.transactions
-      const txs = await txIdsToTransactions(
-        requestedPageTxIds.map(item => ({ address: item.address, txIds: [item.tx_hash] })),
-        cbor,
-      );
+    } else {
+      if (details === 'txs') {
+        // fetch full transaction objects and set account.history.transactions
+        const txs = await txIdsToTransactions(
+          requestedPageTxIds.map(item => ({ address: item.address, txIds: [item.tx_hash] })),
+          cbor,
+        );
 
-      accountInfo.history.transactions = txs;
+        accountInfo.history.transactions = txs;
+      }
 
       // fetch data for each address and set account.addresses
       const accountAddresses = await getAccountAddressesData(

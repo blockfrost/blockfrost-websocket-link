@@ -5,7 +5,6 @@ import { getWebSocketClient } from '../utils/setup-websocket-client.js';
 const fixtures = await getFixtures('get-account-info');
 
 describe('get-account-info', () => {
-
   for (const fixture of fixtures) {
     test(fixture.testName, async () => {
       const ws = getWebSocketClient();
@@ -16,7 +15,7 @@ describe('get-account-info', () => {
         pageSize: fixture.pageSize,
       });
 
-      expect(data).toMatchObject(fixture.result);
+      expect(data).toEqual(fixture.result);
     });
   }
 });
