@@ -191,8 +191,8 @@ export const addressesToTxIds = async (
     data: Responses['address_transactions_content'];
   }>[] = [];
 
-  for (const item of addresses) {
-    if (item.data === 'empty') {
+  for (const { address, data: status } of addresses) {
+    if (status === 'empty') {
       continue;
     }
 
@@ -200,17 +200,11 @@ export const addressesToTxIds = async (
       // 1 page (100 txs) per address at a time should be more efficient default value
       // compared to fetching 10 pages (1000 txs) per address
       blockfrostAPI
-        .addressesTransactionsAll(item.address, { batchSize: 1 })
-        .then(data => ({
-          address: item.address,
-          data,
-        }))
+        .addressesTransactionsAll(address, { batchSize: 1 })
+        .then(data => ({ address, data }))
         .catch(error => {
           if (error instanceof BlockfrostServerError && error.status_code === 404) {
-            return {
-              address: item.address,
-              data: [],
-            };
+            return { address, data: [] };
           } else {
             throw error;
           }
