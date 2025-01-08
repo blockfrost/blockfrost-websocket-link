@@ -183,40 +183,72 @@ export const utxosWithBlocks = async (
   return result;
 };
 
+export type AddressesToTxIds = {
+  address: string;
+  data: (
+    | (Responses['address_transactions_content'][number] & { mempool?: boolean })
+    | { tx_hash: string; mempool: true }
+  )[];
+}[];
+
 export const addressesToTxIds = async (
   addresses: Addresses.Address[],
-): Promise<{ address: string; data: Responses['address_transactions_content'] }[]> => {
-  const promisesBundle: Promise<{
-    address: string;
-    data: Responses['address_transactions_content'];
-  }>[] = [];
+  mempool?: boolean,
+): Promise<AddressesToTxIds> => {
+  const result = await Promise.all(
+    addresses
+      .filter(({ data }) => data !== 'empty')
+      .map(({ address }) =>
+        limiter(() =>
+          // 1 page (100 txs) per address at a time should be more efficient default value
+          // compared to fetching 10 pages (1000 txs) per address
+          blockfrostAPI
+            .addressesTransactionsAll(address, { batchSize: 1 })
+            .then(data => ({ address, data }))
+            .catch(error => {
+              if (error instanceof BlockfrostServerError && error.status_code === 404) {
+                return { address, data: [] };
+              } else {
+                throw error;
+              }
+            }),
+        ),
+      ),
+  );
 
-  for (const { address, data: status } of addresses) {
-    if (status === 'empty') {
-      continue;
-    }
-
-    const promise = limiter(() =>
-      // 1 page (100 txs) per address at a time should be more efficient default value
-      // compared to fetching 10 pages (1000 txs) per address
-      blockfrostAPI
-        .addressesTransactionsAll(address, { batchSize: 1 })
-        .then(data => ({ address, data }))
-        .catch(error => {
-          if (error instanceof BlockfrostServerError && error.status_code === 404) {
-            return { address, data: [] };
-          } else {
-            throw error;
-          }
-        }),
-    );
-
-    promisesBundle.push(promise);
+  if (!mempool) {
+    return result;
   }
 
-  const result = await Promise.all(promisesBundle);
+  // Fetch the txids list from mempool
+  const mempoolResult = (await Promise.all(
+    addresses.map(({ address }) =>
+      limiter(() =>
+        blockfrostAPI
+          .mempoolByAddress(address)
+          .then(data => ({ address, data: data.map(element => ({ ...element, mempool: true })) }))
+          .catch(error => {
+            if (error instanceof BlockfrostServerError && error.status_code === 404) {
+              return { address, data: [] };
+            } else {
+              throw error;
+            }
+          }),
+      ),
+    ),
+  )) as AddressesToTxIds;
 
-  return result;
+  let resultIdx = 0;
+
+  for (const element of mempoolResult) {
+    // If the address is empty, result do not contains an entry for it
+    if (result[resultIdx].address === element.address) {
+      element.data = [...element.data, ...result[resultIdx].data];
+      resultIdx++;
+    }
+  }
+
+  return mempoolResult;
 };
 
 export const getAddressesData = async (

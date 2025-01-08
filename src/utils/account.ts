@@ -1,17 +1,25 @@
 import { Address } from '../types/address.js';
-import { Responses } from '@blockfrost/blockfrost-js';
-import { addressesToTxIds, discoverAddresses, getAddressesData } from './address.js';
+import {
+  AddressesToTxIds,
+  addressesToTxIds,
+  discoverAddresses,
+  getAddressesData,
+} from './address.js';
 
-export const getTxidsFromAccountAddresses = async (addresses: Address[], accountEmpty: boolean) => {
+export const getTxidsFromAccountAddresses = async (
+  addresses: Address[],
+  accountEmpty: boolean,
+  mempool?: boolean,
+) => {
   const uniqueTxIds: ({
     address: string;
-  } & Responses['address_transactions_content'][number])[] = [];
+  } & AddressesToTxIds[number]['data'][number])[] = [];
 
   if (accountEmpty) {
     return [];
   }
 
-  const transactionsPerAddressList = await addressesToTxIds(addresses);
+  const transactionsPerAddressList = await addressesToTxIds(addresses, mempool);
 
   // filter only unique txs to prevent counting a transaction that was sent from and to the same account twice
   for (const txsPerAddress of transactionsPerAddressList) {
@@ -22,9 +30,17 @@ export const getTxidsFromAccountAddresses = async (addresses: Address[], account
     }
   }
 
-  const sortedTxIds = uniqueTxIds.sort(
-    (first, second) => second.block_height - first.block_height || second.tx_index - first.tx_index,
-  );
+  const sortedTxIds = uniqueTxIds.sort((first, second) => {
+    if (first.mempool) {
+      return -1;
+    }
+
+    if (second.mempool) {
+      return 1;
+    }
+
+    return second.block_height - first.block_height || second.tx_index - first.tx_index;
+  });
 
   return sortedTxIds;
 };

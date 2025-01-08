@@ -21,6 +21,7 @@ export const getAccountInfo = async (
   page = 1,
   pageSize = 25,
   cbor?: boolean,
+  mempool?: boolean,
 ): Promise<Responses.AccountInfo> => {
   let _addressesCount = 0;
   const tStart = Date.now();
@@ -104,7 +105,7 @@ export const getAccountInfo = async (
 
     _addressesCount = addresses.length; // just a debug helper
 
-    const txids = await getTxidsFromAccountAddresses(addresses, accountEmpty);
+    const txids = await getTxidsFromAccountAddresses(addresses, accountEmpty, mempool);
     const paginatedTxsIds = paginate(txids, pageSizeNumber);
     const requestedPageTxIds = paginatedTxsIds[pageIndex] ?? [];
 
@@ -157,8 +158,9 @@ export default async (
   page = 1,
   pageSize = 25,
   cbor?: boolean,
+  mempool?: boolean,
 ): Promise<string> => {
-  const data = await getAccountInfo(publicKey, details, page, pageSize, cbor);
+  const data = await getAccountInfo(publicKey, details, page, pageSize, cbor, mempool);
   const message = prepareMessage({ id, clientId, data });
 
   return message;
