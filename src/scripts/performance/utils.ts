@@ -38,8 +38,8 @@ export const deriveAddressesForXpub = (xpub: string, count = 20) => {
   const addresses: string[] = [];
 
   for (let index = 0; index < count; index++) {
-    const addr = deriveAddress(xpub, 0, index, true);
-    const change = deriveAddress(xpub, 1, index, true);
+    const addr = deriveAddress(xpub, 0, index, 'preview');
+    const change = deriveAddress(xpub, 1, index, 'preview');
 
     addresses.push(addr.address, change.address);
   }

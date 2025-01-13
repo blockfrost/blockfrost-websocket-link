@@ -72,18 +72,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockfrost/blockfrost-js@npm:5.7.0":
-  version: 5.7.0
-  resolution: "@blockfrost/blockfrost-js@npm:5.7.0"
+"@blockfrost/blockfrost-js@npm:6.0.0-beta.2":
+  version: 6.0.0-beta.2
+  resolution: "@blockfrost/blockfrost-js@npm:6.0.0-beta.2"
   dependencies:
-    "@blockfrost/openapi": "npm:0.1.70-beta.0"
-    "@emurgo/cardano-serialization-lib-nodejs": "npm:^11.5.0"
+    "@blockfrost/openapi": "npm:0.1.71"
+    "@emurgo/cardano-serialization-lib-nodejs": "npm:^13.2.1"
     "@emurgo/cip14-js": "npm:3.0.1"
     bottleneck: "npm:^2.19.5"
     form-data: "npm:^4.0.0"
     got: "npm:^11.8.6"
     json-bigint: "npm:^1.0.0"
-  checksum: 9e960ca8ee332350008da94b6d5eadc6fd80c468c34086bc9e2872561cc5191b365eb5517655548512801a8e44809d687acbdc778be21018341525bffc12a47e
+  checksum: 407b8712a86a450499b803d73319a1306f42cceb9b488df6959c93e2341aa8c1240324fc1b57100788d6ab9565fd76eb23f00ebfe4632975beca3e95ef4e6f3f
   languageName: node
   linkType: hard
 
@@ -91,8 +91,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blockfrost/blockfrost-websocket-link@workspace:."
   dependencies:
-    "@blockfrost/blockfrost-js": "npm:5.7.0"
-    "@emurgo/cardano-serialization-lib-nodejs": "npm:^12.1.1"
+    "@blockfrost/blockfrost-js": "npm:6.0.0-beta.2"
+    "@emurgo/cardano-serialization-lib-nodejs": "npm:^13.2.1"
     "@esbuild/darwin-arm64": "npm:0.19.8"
     "@esbuild/linux-x64": "npm:0.19.8"
     "@eslint/compat": "npm:^1.2.1"
@@ -142,29 +142,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blockfrost/openapi@npm:0.1.70-beta.0":
-  version: 0.1.70-beta.0
-  resolution: "@blockfrost/openapi@npm:0.1.70-beta.0"
+"@blockfrost/openapi@npm:0.1.71":
+  version: 0.1.71
+  resolution: "@blockfrost/openapi@npm:0.1.71"
   dependencies:
     ajv: "npm:^8.12.0"
     cbor: "npm:^9.0.1"
     rimraf: "npm:6.0.1"
     yaml: "npm:^2.3.4"
-  checksum: 4171f7c75f08763d03f67c5fac38e8dcb93e569ef72718afd4025f7a201e456a8a0ef732262ee6ae9d26596536d2037ecec92c9906894589211f06019a798563
+  checksum: 34c7c79aad3302e8d6f434020a9e574c05cb1929b8c48efe04b297c55ef61f7ed3316a587dcd1af7818a0b154998e3afd8677da17b97676f19144de103c4a4ed
   languageName: node
   linkType: hard
 
-"@emurgo/cardano-serialization-lib-nodejs@npm:^11.5.0":
-  version: 11.5.0
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:11.5.0"
-  checksum: 3fff8448001c6d70807ef8e1a80a663ef60381e55bfd26c0f1b644e096895da7298fb991ac86670d4c5aee2e3e417e44ac80ab59080f7af107d8fa89906f9075
-  languageName: node
-  linkType: hard
-
-"@emurgo/cardano-serialization-lib-nodejs@npm:^12.1.1":
-  version: 12.1.1
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:12.1.1"
-  checksum: a165613d695b9c10084be2784cdcdebc26ac7415025497f9c17ef08f7d7f786cb7b8318b32a0282261683b240e162c4916ec7a1470590265b2aad8b7d4ea2e5e
+"@emurgo/cardano-serialization-lib-nodejs@npm:^13.2.1":
+  version: 13.2.1
+  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:13.2.1"
+  checksum: 6572ac1baebe1032a0e1ba701e8be0dc74d00ff332f1b58622851532d9bded9d89b797d862551842fce420ece05b67ced94c9edad33e7f124e48d74c28b0ac4e
   languageName: node
   linkType: hard
 

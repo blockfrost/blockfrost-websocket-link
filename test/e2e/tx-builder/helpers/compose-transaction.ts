@@ -85,7 +85,9 @@ export const composeTransaction = (
 
   // Build transaction
   const txBody = txBuilder.build();
-  const txHash = Buffer.from(CardanoWasm.hash_transaction(txBody).to_bytes()).toString('hex');
+  const txHash = CardanoWasm.FixedTransaction.new_from_body_bytes(txBody.to_bytes())
+    .transaction_hash()
+    .to_hex();
 
   return {
     txHash,
