@@ -15,6 +15,7 @@ export type Messages = BaseMessage &
           page?: number;
           pageSize?: number;
           cbor?: boolean;
+          mempool?: boolean;
         };
       }
     | {

@@ -218,10 +218,11 @@ Input message:
   "command": "GET_ACCOUNT_INFO";
   "params": {
     "descriptor": string; // account public key in hex (eg. 6d17587575a3b4f0f86ebad3977e8f7e4981faa863eccf5c1467065c74fe3435943769446dd290d103fb3d360128e86de4b47faea73ffb0900c94c6a61ef9ea2)
-    "details": 'basic' | 'tokens' | 'tokenBalances' |'txids' | 'txs';
+    "details": 'basic' | 'tokens' | 'tokenBalances' | 'txids' | 'txs';
     "page"?: number; // optional, default 1
     "pageSize"?: number; // optional, default 20
     "cbor"?: boolean; // optional, get CBOR representation of transactions
+    "mempool"?: boolean; // optional, get info from mempool as well - WIP - works only with details 'txids'
   }
 }
 ```
