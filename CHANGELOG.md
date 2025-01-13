@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2025-01-13
+
+### Changed
+
+- deps update: cardano-serialization-lib v13, blockfrost-js v6
+
+### Fixed
+
+- `GET_ACCOUNT_INFO` with details set to `tokenBalances` now also returns `addresses`
+
 ## [2.2.0] - 2024-12-05
 
 ### Added
