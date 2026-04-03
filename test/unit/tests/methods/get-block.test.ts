@@ -9,9 +9,9 @@ describe('getBlock', () => {
     test(fixture.testName, async () => {
       const mock1 = sinon.stub(blockfrostAPI, 'blocks').resolves(fixture.blocks);
       // @ts-ignore
-      const result = await getBlock(1, 'jesus');
+      const result = await getBlock('jesus');
 
-      expect(result).toBe(JSON.stringify(fixture.result));
+      expect(result).toEqual(fixture.result);
 
       mock1.restore();
     });

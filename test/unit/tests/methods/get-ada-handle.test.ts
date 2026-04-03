@@ -7,17 +7,16 @@ import getAdaHandle from '../../../../src/methods/get-ada-handle.js';
 describe('getAdaHandle', () => {
   for (const fixture of fixtures) {
     test(fixture.testName, async () => {
-      const mock1 = fixture.assets ?
-        sinon.stub(blockfrostAPI, 'assetsAddresses').resolves(fixture.assets) :
-        sinon.stub(blockfrostAPI, 'assetsAddresses').rejects(fixture.error);
+      const mock1 = fixture.assets
+        ? sinon.stub(blockfrostAPI, 'assetsAddresses').resolves(fixture.assets)
+        : sinon.stub(blockfrostAPI, 'assetsAddresses').rejects(fixture.error);
 
-      if(fixture.result) {
-        const result = await getAdaHandle(1, 'test', 'test');
+      if (!fixture.thrown) {
+        const result = await getAdaHandle('test');
 
-        expect(result).toBe(JSON.stringify(fixture.result));
-      }
-      else {
-        await expect(getAdaHandle(1, 'test', 'test')).rejects.toEqual(fixture.thrown);
+        expect(result).toEqual(fixture.result);
+      } else {
+        await expect(getAdaHandle('test')).rejects.toEqual(fixture.thrown);
       }
 
       mock1.restore();

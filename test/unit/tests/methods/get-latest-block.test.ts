@@ -7,11 +7,11 @@ import getLatestBlock from '../../../../src/methods/get-latest-block.js';
 describe('getLatestBlock', () => {
   for (const fixture of fixtures) {
     test(fixture.testName, async () => {
-      const mock1 = sinon.stub(blockfrostAPI, 'blocksLatest').resolves(fixture.blocksLatest);
+      const mock1 = sinon.stub(blockfrostAPI, 'blocksLatest').resolves(fixture.result);
       // @ts-ignore
-      const result = await getLatestBlock(1);
+      const result = await getLatestBlock();
 
-      expect(result).toBe(JSON.stringify(fixture.result));
+      expect(result).toEqual(fixture.result);
 
       mock1.restore();
     });

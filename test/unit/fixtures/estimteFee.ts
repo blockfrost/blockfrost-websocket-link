@@ -34,9 +34,7 @@ export default [
       max_collateral_inputs: 3,
       coins_per_utxo_word: '4310',
       coins_per_utxo_size: '4310',
-      cost_models: {
-        
-      }
+      cost_models: {},
     },
     epochLatest: {
       epoch: 298,
@@ -51,11 +49,7 @@ export default [
       active_stake: '23511990337865722',
     },
     result: {
-      id: 1,
-      type: 'message',
-      data: {
-        lovelacePerByte: 44,
-      },
+      lovelacePerByte: 44,
     },
   },
 ] as const;

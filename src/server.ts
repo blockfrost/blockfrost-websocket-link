@@ -192,9 +192,8 @@ wss.on('connection', async (ws: Server.Ws) => {
   logger.info(`[${clientId}] Client connected. Total clients connected: ${wss.clients.size}.`);
 
   // general messages
-  const onMessage = async (data: Messages) => {
-    const { command, id, params } = data;
-    let response: string;
+  const onMessage = async (received: Messages) => {
+    const { command, id, params } = received;
 
     logger.debug(
       `[${clientId}] RECV MSG ID ${id} "${command}" with params: ${JSON.stringify(params)}`,
@@ -203,84 +202,67 @@ wss.on('connection', async (ws: Server.Ws) => {
     switch (command) {
       case 'GET_BLOCK': {
         validators.GET_BLOCK(params);
-        response = await getBlock(id, clientId, params.hashOrNumber);
-
-        break;
+        return getBlock(params.hashOrNumber);
       }
 
       case 'GET_ACCOUNT_UTXO': {
         validators.GET_ACCOUNT_UTXO(params);
-        response = await getAccountUtxo(id, clientId, params.descriptor);
-
-        break;
+        return getAccountUtxo(params.descriptor);
       }
 
       case 'ESTIMATE_FEE': {
-        response = await estimateFee(id, clientId);
-
-        break;
+        return estimateFee();
       }
 
       case 'GET_ACCOUNT_INFO': {
         validators.GET_ACCOUNT_INFO(params);
-        response = await getAccountInfo(
-          id,
-          clientId,
+        return getAccountInfo(
           params.descriptor,
           params.details,
           params.page,
           params.pageSize,
           params.cbor,
         );
-
-        break;
       }
 
       case 'GET_ADA_HANDLE': {
         validators.GET_ADA_HANDLE(params);
-        response = await getAdaHandle(id, clientId, params.name);
-
-        break;
+        return getAdaHandle(params.name);
       }
 
       case 'GET_BALANCE_HISTORY': {
         validators.GET_BALANCE_HISTORY(params);
-        response = await getBalanceHistory(
-          id,
-          clientId,
-          params.descriptor,
-          params.groupBy,
-          params.from,
-          params.to,
-        );
 
-        break;
+        const t1 = Date.now();
+
+        return getBalanceHistory(params.descriptor, params.groupBy, params.from, params.to).finally(
+          () => {
+            const t2 = Date.now();
+            const diff = t2 - t1;
+
+            logger.debug(
+              `[${clientId}] getBalanceHistory for public key ${params.descriptor} took ${diff} ms`,
+            );
+          },
+        );
       }
 
       case 'GET_PROTOCOL_PARAMETERS': {
-        response = await getProtocolParameters(id, clientId);
-
-        break;
+        return getProtocolParameters();
       }
 
       case 'GET_SERVER_INFO': {
-        response = await getServerInfo(id, clientId);
-
-        break;
+        return getServerInfo();
       }
 
       case 'GET_TRANSACTION': {
         validators.GET_TRANSACTION(params);
-        response = await getTransaction(id, clientId, params.txId, params.cbor);
-
-        break;
+        return getTransaction(params.txId, params.cbor);
       }
 
       case 'PUSH_TRANSACTION': {
         validators.PUSH_TRANSACTION(params);
-        response = await submitTransaction(id, clientId, params.txData);
-
-        break;
+        return submitTransaction(params.txData);
       }
 
       case 'SUBSCRIBE_BLOCK': {
@@ -294,9 +276,7 @@ wss.on('connection', async (ws: Server.Ws) => {
 
         activeSubscriptions[clientId].push({ id, type: 'block' });
 
-        response = prepareMessage({ id, clientId, data: { subscribed: true } });
-
-        break;
+        return Promise.resolve({ subscribed: true });
       }
 
       case 'UNSUBSCRIBE_BLOCK': {
@@ -308,9 +288,7 @@ wss.on('connection', async (ws: Server.Ws) => {
           activeSubscriptions[clientId].splice(activeBlockSubIndex);
         }
 
-        response = prepareMessage({ id, clientId, data: { subscribed: false } });
-
-        break;
+        return Promise.resolve({ subscribed: false });
       }
 
       case 'SUBSCRIBE_ADDRESS': {
@@ -344,9 +322,7 @@ wss.on('connection', async (ws: Server.Ws) => {
           activeSubscriptions[clientId].push({ id, type: 'addresses' });
         }
 
-        response = prepareMessage({ id, clientId, data: { subscribed: true } });
-
-        break;
+        return Promise.resolve({ subscribed: true });
       }
 
       case 'UNSUBSCRIBE_ADDRESS': {
@@ -358,19 +334,14 @@ wss.on('connection', async (ws: Server.Ws) => {
           activeSubscriptions[clientId].splice(activeAddressSubIndex);
         }
 
-        response = prepareMessage({ id, clientId, data: { subscribed: false } });
-
         addressesSubscribed[clientId] = [];
-
-        break;
+        return Promise.resolve({ subscribed: false });
       }
 
       default: {
-        response = prepareErrorMessage(id, clientId, `Unknown command: ${command}`);
+        throw new Error(`Unknown command: ${command}`);
       }
     }
-
-    ws.send(response);
   };
 
   const handleError = (id: MessageId, error: unknown) => {
@@ -378,16 +349,17 @@ wss.on('connection', async (ws: Server.Ws) => {
       logger.error(error);
     }
 
-    const response = prepareErrorMessage(id, clientId, error);
-
-    ws.send(response);
+    return prepareErrorMessage(id, clientId, error);
   };
 
   ws.on('message', (message: string) => {
     try {
-      const data = getMessage(message);
+      const received = getMessage(message);
 
-      onMessage(data).catch(error => handleError(data.id, error));
+      onMessage(received)
+        .then(data => prepareMessage({ id: received.id, clientId, data }))
+        .catch(error => handleError(received.id, error))
+        .then(response => ws.send(response));
     } catch (error) {
       handleError(-1, error);
     }

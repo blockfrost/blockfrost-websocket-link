@@ -1,10 +1,8 @@
 import * as os from 'os';
-import { prepareMessage } from '../utils/message.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
-import { MessageId } from '../types/message.js';
 import { limiter } from '../utils/limiter.js';
 
-export const getServerInfo = async () => {
+export default async () => {
   const isTestnet = blockfrostAPI.options.network !== 'mainnet';
 
   const [info, latestBlock] = await Promise.all([
@@ -24,11 +22,4 @@ export const getServerInfo = async () => {
   };
 
   return serverInfo;
-};
-
-export default async (id: MessageId, clientId: string): Promise<string> => {
-  const data = await getServerInfo();
-  const message = prepareMessage({ id, clientId, data });
-
-  return message;
 };

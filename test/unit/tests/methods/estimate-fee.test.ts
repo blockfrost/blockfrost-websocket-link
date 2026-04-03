@@ -14,9 +14,9 @@ describe('estimateFee', () => {
         .resolves(fixture.epochsParameters);
 
       // @ts-ignore
-      const result = await estimateFee(1);
+      const result = await estimateFee();
 
-      expect(result).toBe(JSON.stringify(fixture.result));
+      expect(result).toEqual(fixture.result);
 
       mock1.restore();
       mock2.restore();

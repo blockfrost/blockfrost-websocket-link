@@ -1,6 +1,6 @@
 import * as Responses from '../types/response.js';
 import { BigNumber } from 'bignumber.js';
-import { Details, MessageId } from '../types/message.js';
+import { Details } from '../types/message.js';
 import {
   discoverAddresses,
   getStakingData,
@@ -9,7 +9,7 @@ import {
 } from '../utils/address.js';
 import { getTxidsFromAccountAddresses, getAccountAddressesData } from '../utils/account.js';
 import { txIdsToTransactions } from '../utils/transaction.js';
-import { MessageError, prepareMessage } from '../utils/message.js';
+import { MessageError } from '../utils/message.js';
 import { paginate } from '../utils/common.js';
 import { getAssetBalance, getAssetData, transformAsset } from '../utils/asset.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
@@ -149,17 +149,5 @@ export const getAccountInfo = async (
   return accountInfo;
 };
 
-export default async (
-  id: MessageId,
-  clientId: string,
-  publicKey: string,
-  details: Details,
-  page = 1,
-  pageSize = 25,
-  cbor?: boolean,
-): Promise<string> => {
-  const data = await getAccountInfo(publicKey, details, page, pageSize, cbor);
-  const message = prepareMessage({ id, clientId, data });
-
-  return message;
-};
+export default (publicKey: string, details: Details, page = 1, pageSize = 25, cbor?: boolean) =>
+  getAccountInfo(publicKey, details, page, pageSize, cbor);

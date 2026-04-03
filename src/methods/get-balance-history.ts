@@ -5,12 +5,9 @@ import { TxIdsToTransactionsResponse } from '../types/transactions.js';
 import { getAccountTransactionHistory } from '../utils/account.js';
 import { sumAssetBalances } from '../utils/asset.js';
 import { getRatesForDate } from '../utils/rates.js';
-import { prepareMessage } from '../utils/message.js';
 import { txIdsToTransactions } from '../utils/transaction.js';
 import { FIAT_RATES_ENABLE_ON_TESTNET } from '../constants/config.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
-import { logger } from '../utils/logger.js';
-import { MessageId } from '../types/message.js';
 
 interface BalanceHistoryBin {
   from: number;
@@ -173,25 +170,5 @@ export const getAccountBalanceHistory = async (
   return binsWithRates;
 };
 
-export default async (
-  id: MessageId,
-  clientId: string,
-  publicKey: string,
-  groupBy: number,
-  from?: number,
-  to?: number,
-): Promise<string> => {
-  const t1 = Date.now();
-
-  try {
-    const data = await getAccountBalanceHistory(publicKey, groupBy, from, to);
-    const message = prepareMessage({ id, clientId, data });
-
-    return message;
-  } finally {
-    const t2 = Date.now();
-    const diff = t2 - t1;
-
-    logger.debug(`[${clientId}] getBalanceHistory for public key ${publicKey} took ${diff} ms`);
-  }
-};
+export default (publicKey: string, groupBy: number, from?: number, to?: number) =>
+  getAccountBalanceHistory(publicKey, groupBy, from, to);

@@ -1,17 +1,17 @@
-import { BlockfrostServerError } from "@blockfrost/blockfrost-js";
+import { BlockfrostServerError } from '@blockfrost/blockfrost-js';
 
 export default [
   {
     testName: 'getAdaHandle success',
     id: 1,
-    assets: [{
-      address: 'address',
-      quantity: '1',
-    }],
+    assets: [
+      {
+        address: 'address',
+        quantity: '1',
+      },
+    ],
     result: {
-      id: 1,
-      type: 'message',
-      data: { address: 'address' },
+      address: 'address',
     },
   },
   {
@@ -23,21 +23,13 @@ export default [
       status_code: 404,
       url: 'url',
     }),
-    result: {
-      id: 1,
-      type: 'message',
-      data: null,
-    },
+    result: null,
   },
   {
     testName: 'getAdaHandle empty result',
     id: 1,
     assets: [],
-    result: {
-      id: 1,
-      type: 'message',
-      data: null,
-    },
+    result: null,
   },
   {
     testName: 'getAdaHandle double minted',
@@ -50,7 +42,7 @@ export default [
       {
         address: 'address2',
         quantity: '1',
-      }
+      },
     ],
     thrown: new Error('Double minted Ada Handle detected'),
   },

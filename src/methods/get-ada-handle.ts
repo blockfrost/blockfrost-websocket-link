@@ -1,12 +1,10 @@
-import { prepareMessage } from '../utils/message.js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
-import { MessageId } from '../types/message.js';
 import { BlockfrostServerError } from '@blockfrost/blockfrost-js';
 import { limiter } from '../utils/limiter.js';
 
 const policyID = 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a';
 
-export default async (id: MessageId, clientId: string, name: string): Promise<string> => {
+export default async (name: string) => {
   let data: { address: string } | null;
 
   try {
@@ -33,5 +31,5 @@ export default async (id: MessageId, clientId: string, name: string): Promise<st
     }
   }
 
-  return prepareMessage({ id, clientId, data });
+  return data;
 };
