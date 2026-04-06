@@ -65,7 +65,7 @@ export const discoverAddresses = async (
   while (lastEmptyCount < ADDRESS_GAP_LIMIT) {
     const promisesBundle: Addresses.Bundle = [];
 
-    for (let index = 0; index < ADDRESS_GAP_LIMIT; index++) {
+    for (let index = 0; index < ADDRESS_GAP_LIMIT - lastEmptyCount; index++) {
       const { address, path } = memoizedDeriveAddress(
         publicKey,
         type,
@@ -79,23 +79,25 @@ export const discoverAddresses = async (
       promisesBundle.push({ address, promise, path });
     }
 
-    await Promise.all(
+    const resultBatch = await Promise.all(
       promisesBundle.map(p =>
         p.promise
-          .then(data => {
-            result.push({ address: p.address, path: p.path, data });
-            lastEmptyCount = 0;
-          })
+          .then(data => ({ address: p.address, path: p.path, data }))
           .catch(error => {
-            lastEmptyCount++;
             if (error.status_code === 404) {
-              result.push({ address: p.address, data: 'empty', path: p.path });
+              return { address: p.address, data: 'empty' as const, path: p.path };
             } else {
               throw error;
             }
           }),
       ),
     );
+
+    result.push(...resultBatch);
+
+    const lastNonEmpty = [...result].reverse().findIndex(({ data }) => data !== 'empty');
+
+    lastEmptyCount = lastNonEmpty < 0 ? result.length : lastNonEmpty;
   }
 
   const sortedResult = result.sort((item1, item2) => {
