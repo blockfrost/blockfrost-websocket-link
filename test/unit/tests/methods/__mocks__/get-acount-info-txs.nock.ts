@@ -5042,44 +5042,6 @@ export const loadRecord = () => {
     );
   nock('https://cardano-mainnet.blockfrost.io:443', { encodedQueryParams: true })
     .get(
-      '/api/v0/addresses/addr1q99ts5lj5wnx4lxh6varz0z2j705zwq8tpdwscjsqx9yvtu9ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6uskfn7lw/total',
-    )
-    .reply(
-      404,
-      [
-        '1f8b080000000000000314cb310e84300c04c0af585b2344419507505e457f0a64391aec23762ac4df11d3cf058f1ccdbfab15228dc3d881b55a45c2c742266b5ad0e1a07bfe1109f34ea93c1b3d5864b5e36f4a0dd9b38b5ac842aa6c6feb713f000000ffff0300b450fe7b5f000000',
-      ],
-      [
-        'Date',
-        'Thu, 16 Dec 2021 16:03:05 GMT',
-        'Content-Type',
-        'application/json; charset=utf-8',
-        'Transfer-Encoding',
-        'chunked',
-        'Connection',
-        'close',
-        'vary',
-        'Origin',
-        'access-control-allow-origin',
-        '*',
-        'CF-Cache-Status',
-        'DYNAMIC',
-        'Expect-CT',
-        'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
-        'Report-To',
-        '{"endpoints":[{"url":"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=ZkyihLE%2B8dxxqrhiAmZTvMZ%2Bt2j3RprXnInvhkG1N6pQeFqMBSglz2aVBl5MB2NCau6O0HsDPCXQF96hbxsRpuPzsl9GuocfBS%2Bipwe86TfcJuIcgxEfu0DT5Jfm2i%2B5B5VIz28HnVeUCKXuNjlz"}],"group":"cf-nel","max_age":604800}',
-        'NEL',
-        '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}',
-        'Server',
-        'cloudflare',
-        'CF-RAY',
-        '6be923c6ec7c277c-PRG',
-        'Content-Encoding',
-        'gzip',
-      ],
-    );
-  nock('https://cardano-mainnet.blockfrost.io:443', { encodedQueryParams: true })
-    .get(
       '/api/v0/addresses/addr1q9f9jr6e48u63ym65esmrwgle84zspnrsew37gwe88e0zfy9ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usxwwdwc/total',
     )
     .reply(
@@ -5112,44 +5074,6 @@ export const loadRecord = () => {
         'cloudflare',
         'CF-RAY',
         '6be923c6ee8e27c0-PRG',
-        'Content-Encoding',
-        'gzip',
-      ],
-    );
-  nock('https://cardano-mainnet.blockfrost.io:443', { encodedQueryParams: true })
-    .get(
-      '/api/v0/addresses/addr1q93el09nevlnzm2td5e3g508lv9axhn2xzxevc9m6khfqny9ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6usq4u26u/total',
-    )
-    .reply(
-      404,
-      [
-        '1f8b080000000000000314cb310e84300c04c0af585b2344419507505e457f0a64391aec23762ac4df11d3cf058f1ccdbfab15228dc3d881b55a45c2c742266b5ad0e1a07bfe1109f34ea93c1b3d5864b5e36f4a0dd9b38b5ac842aa6c6feb713f000000ffff0300b450fe7b5f000000',
-      ],
-      [
-        'Date',
-        'Thu, 16 Dec 2021 16:03:05 GMT',
-        'Content-Type',
-        'application/json; charset=utf-8',
-        'Transfer-Encoding',
-        'chunked',
-        'Connection',
-        'close',
-        'vary',
-        'Origin',
-        'access-control-allow-origin',
-        '*',
-        'CF-Cache-Status',
-        'DYNAMIC',
-        'Expect-CT',
-        'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
-        'Report-To',
-        '{"endpoints":[{"url":"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=JnTo00EOqDX5vzzVL4yxU6cmEhOwAT86zAUNHkXkCaSbRS6VN2xDlWq9mMalLGjl%2F39tewNL3h6QLAVfwkNkOKyfpURTb5n2Rc574RLIpONvjkuhj74vNCIUVEqK5E4Yu0tC974vnf8ocep6Layp"}],"group":"cf-nel","max_age":604800}',
-        'NEL',
-        '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}',
-        'Server',
-        'cloudflare',
-        'CF-RAY',
-        '6be923c6efda4132-PRG',
         'Content-Encoding',
         'gzip',
       ],
@@ -5530,44 +5454,6 @@ export const loadRecord = () => {
         'cloudflare',
         'CF-RAY',
         '6be923c719c82778-PRG',
-        'Content-Encoding',
-        'gzip',
-      ],
-    );
-  nock('https://cardano-mainnet.blockfrost.io:443', { encodedQueryParams: true })
-    .get(
-      '/api/v0/addresses/addr1q8gs22r0m9se5zedcchgwu0udtakd9eh5m4fn54hte6wu0y9ckxhkvuc5xj49rw6zrp443wlygmhv8gwcu38jk6ms6us7v0s48/total',
-    )
-    .reply(
-      404,
-      [
-        '1f8b080000000000000314cb310e84300c04c0af585b2344419507505e457f0a64391aec23762ac4df11d3cf058f1ccdbfab15228dc3d881b55a45c2c742266b5ad0e1a07bfe1109f34ea93c1b3d5864b5e36f4a0dd9b38b5ac842aa6c6feb713f000000ffff0300b450fe7b5f000000',
-      ],
-      [
-        'Date',
-        'Thu, 16 Dec 2021 16:03:05 GMT',
-        'Content-Type',
-        'application/json; charset=utf-8',
-        'Transfer-Encoding',
-        'chunked',
-        'Connection',
-        'close',
-        'vary',
-        'Origin',
-        'access-control-allow-origin',
-        '*',
-        'CF-Cache-Status',
-        'DYNAMIC',
-        'Expect-CT',
-        'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
-        'Report-To',
-        '{"endpoints":[{"url":"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=B3V%2B%2F9NVYHyZfGihFdVLDHlWO4lYbfcsiJnpp6srr7pSsYvISvU5Ow1PColvJUmTg36EOMvZWx2OwM50K%2B%2FFYoJQEDmv9gtwZSKUVJpA8Bqsjtfk%2Ft07PFE%2FDuj0WKw8ZVY%2FhUGybSt9s0NuXwxA"}],"group":"cf-nel","max_age":604800}',
-        'NEL',
-        '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}',
-        'Server',
-        'cloudflare',
-        'CF-RAY',
-        '6be923c71b68f9d2-PRG',
         'Content-Encoding',
         'gzip',
       ],

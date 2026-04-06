@@ -230,50 +230,29 @@ export const getAddressesData = async (
   addresses: Addresses.Address[],
   emptyAccount?: boolean,
 ): Promise<Addresses.AddressData[]> => {
-  if (emptyAccount) {
-    return addresses.map(addr => ({
-      address: addr.address,
-      path: addr.path,
-      transfers: 0,
-      received: '0',
-      sum: '0',
-    }));
-  }
+  const result = emptyAccount
+    ? addresses.map(addr => ({ addr, data: undefined }))
+    : await Promise.all(
+        addresses.map(addr =>
+          addr.data === 'empty'
+            ? { addr, data: undefined }
+            : limiter(() =>
+                blockfrostAPI.addressesTotal(addr.address).catch(error => {
+                  if (error.status_code !== 404) {
+                    throw new Error(error);
+                  }
+                }),
+              ).then(data => ({ addr, data })),
+        ),
+      );
 
-  const promises = addresses.map(addr =>
-    limiter(() =>
-      blockfrostAPI.addressesTotal(addr.address).catch(error => {
-        if (error.status_code === 404) {
-          return {
-            address: addr.address,
-            path: addr.path,
-            tx_count: 0,
-            received_sum: [{ unit: 'lovelace', quantity: '0' }],
-            sent_sum: [{ unit: 'lovelace', quantity: '0' }],
-          };
-        } else {
-          throw new Error(error);
-        }
-      }),
-    ),
-  );
-  const responses = await Promise.all(promises);
-
-  return addresses.map(addr => {
-    const response = responses.find(r => r.address === addr.address);
-
-    if (!response) {
-      throw new Error('Failed getAddressData');
-    }
-
-    return {
-      address: addr.address,
-      path: addr.path,
-      transfers: response.tx_count,
-      received: response.received_sum.find(b => b.unit === 'lovelace')?.quantity ?? '0',
-      sent: response.sent_sum.find(b => b.unit === 'lovelace')?.quantity ?? '0',
-    };
-  });
+  return result.map(({ addr, data }) => ({
+    address: addr.address,
+    path: addr.path,
+    transfers: data?.tx_count ?? 0,
+    received: data?.received_sum.find(b => b.unit === 'lovelace')?.quantity ?? '0',
+    sent: data?.sent_sum.find(b => b.unit === 'lovelace')?.quantity ?? '0',
+  }));
 };
 
 export const getStakingData = async (stakeAddress: string): Promise<Addresses.StakingData> => {
