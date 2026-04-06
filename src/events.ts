@@ -1,13 +1,14 @@
 import EventEmitter from 'events';
 import * as Server from './types/server.js';
 import { prepareMessage } from './utils/message.js';
-import { getBlockData } from './utils/blockfrost-api.js';
+import { blockfrostAPI, getBlockData } from './utils/blockfrost-api.js';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { promiseTimeout } from './utils/common.js';
 import { getTransactionsWithDetails } from './utils/transaction.js';
 import { TxNotification } from './types/response.js';
 import { EMIT_MAX_MISSED_BLOCKS } from './constants/config.js';
 import { logger } from './utils/logger.js';
+import { limiter } from './utils/limiter.js';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;
@@ -30,7 +31,7 @@ export const _resetPreviousBlock = () => {
 
 export const emitBlock = async (options?: EmitBlockOptions) => {
   try {
-    const { latestBlock, affectedAddresses } = await getBlockData();
+    const latestBlock = await limiter(() => blockfrostAPI.blocksLatest());
 
     if ((latestBlock.height ?? 0) < (previousBlock?.height ?? 0)) {
       // rollback
@@ -62,7 +63,13 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
             // emit previously missed blocks
             try {
               const missedBlockData = await promiseTimeout(
-                getBlockData({ block: index }),
+                limiter(() => blockfrostAPI.blocks(index)).then(block =>
+                  getBlockData({ block }).then(addresses => ({
+                    latestBlock: block,
+                    affectedAddresses: addresses,
+                  })),
+                ),
+
                 options?.fetchTimeoutMs ?? 8000,
               );
 
@@ -86,6 +93,8 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
           }
         }
       }
+
+      const affectedAddresses = await getBlockData({ block: latestBlock });
 
       logger.info(`[BLOCK EMITTER] Emitting new block ${latestBlock.hash} (${latestBlock.height})`);
       // emit latest block

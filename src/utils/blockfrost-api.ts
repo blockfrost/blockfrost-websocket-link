@@ -5,6 +5,7 @@ import { BLOCKFROST_REQUEST_TIMEOUT } from '../constants/config.js';
 import { logger } from './logger.js';
 import { AffectedAddressesInBlock } from '../types/events.js';
 import { limiter } from './limiter.js';
+
 const require = createRequire(import.meta.url);
 const packageJson = require('../../package.json');
 
@@ -21,19 +22,14 @@ export const getBlockfrostClient = (options?: Partial<Options>) => {
   });
 };
 
-export const getBlockData = async (options?: {
-  block?: number | string;
+export const getBlockData = async (options: {
+  block: Responses['block_content'];
   attempt?: number;
-}): Promise<{
-  latestBlock: Responses['block_content'];
-  affectedAddresses: AffectedAddressesInBlock;
-}> => {
+}): Promise<AffectedAddressesInBlock> => {
   // Fetch latest block and all addresses affected in the block
   // Fetching of affected addresses may fail, there are 3 retry attempts before throwing an error
   const MAX_ATTEMPTS = 3;
-  const latestBlock = await limiter(() =>
-    options?.block ? blockfrostAPI.blocks(options.block) : blockfrostAPI.blocksLatest(),
-  );
+  const latestBlock = options.block;
   let affectedAddresses: AffectedAddressesInBlock = [];
 
   try {
@@ -60,10 +56,7 @@ export const getBlockData = async (options?: {
     }
   }
 
-  return {
-    latestBlock,
-    affectedAddresses,
-  };
+  return affectedAddresses;
 };
 
 export const blockfrostAPI = getBlockfrostClient();
