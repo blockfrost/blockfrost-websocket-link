@@ -11,7 +11,7 @@ export const paginate = <T>(items: T[], pageSize: number): T[][] => {
 
 export const promiseTimeout = <T>(promise: T, ms: number) => {
   // Create a promise that rejects in <ms> milliseconds
-  const timeout = new Promise((_resolve, reject) => {
+  const timeout = new Promise<never>((_resolve, reject) => {
     const id = setTimeout(() => {
       clearTimeout(id);
       reject(new Error('PROMISE_TIMEOUT'));

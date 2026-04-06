@@ -61,10 +61,10 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
           for (let index = currentPreviousBlock.height + 1; index < latestBlock.height; index++) {
             // emit previously missed blocks
             try {
-              const missedBlockData = (await promiseTimeout(
+              const missedBlockData = await promiseTimeout(
                 getBlockData({ block: index }),
                 options?.fetchTimeoutMs ?? 8000,
-              )) as Awaited<ReturnType<typeof getBlockData>>;
+              );
 
               logger.warn(
                 `[BLOCK EMITTER] Emitting missed block: ${index} (current block: ${latestBlock.height})`,
