@@ -2,8 +2,6 @@ import { BlockFrostAPI, BlockfrostServerError, Responses } from '@blockfrost/blo
 import { Options } from '@blockfrost/blockfrost-js/lib/types/index.js';
 import { createRequire } from 'module';
 import { BLOCKFROST_REQUEST_TIMEOUT } from '../constants/config.js';
-import { logger } from './logger.js';
-import { AffectedAddressesInBlock } from '../types/events.js';
 import { limiter } from './limiter.js';
 
 const require = createRequire(import.meta.url);
@@ -22,41 +20,27 @@ export const getBlockfrostClient = (options?: Partial<Options>) => {
   });
 };
 
-export const getBlockData = async (options: {
-  block: Responses['block_content'];
-  attempt?: number;
-}): Promise<AffectedAddressesInBlock> => {
-  // Fetch latest block and all addresses affected in the block
-  // Fetching of affected addresses may fail, there are 3 retry attempts before throwing an error
-  const MAX_ATTEMPTS = 3;
-  const latestBlock = options.block;
-  let affectedAddresses: AffectedAddressesInBlock = [];
+const assertRepeatableError = (error: unknown) => {
+  if (!(error instanceof BlockfrostServerError) || error.status_code !== 404) {
+    throw error;
+  }
+};
+
+export const getBlockData = async (block: Responses['block_content']) => {
+  const tryFetch = () =>
+    limiter(() => blockfrostAPI.blocksAddressesAll(block.hash, { batchSize: 2 }));
 
   try {
-    affectedAddresses = await limiter(() =>
-      blockfrostAPI.blocksAddressesAll(latestBlock.hash, { batchSize: 2 }),
-    );
+    return await tryFetch();
   } catch (error) {
-    if (
-      error instanceof BlockfrostServerError &&
-      error.status_code === 404 // Backend lagging, block rollback
-    ) {
-      const attempt = options?.attempt ?? 0;
-
-      if (attempt < MAX_ATTEMPTS - 1) {
-        logger.warn(
-          `Unable to fetch addresses for block ${latestBlock.height} ${latestBlock.hash}. Block no longer on chain.`,
-        );
-        return getBlockData({ ...options, attempt: attempt + 1 });
-      } else {
-        throw error;
-      }
-    } else {
-      throw error;
-    }
+    assertRepeatableError(error);
   }
-
-  return affectedAddresses;
+  try {
+    return await tryFetch();
+  } catch (error) {
+    assertRepeatableError(error);
+  }
+  return await tryFetch();
 };
 
 export const blockfrostAPI = getBlockfrostClient();

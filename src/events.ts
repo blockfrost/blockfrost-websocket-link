@@ -64,7 +64,7 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
             try {
               const missedBlockData = await promiseTimeout(
                 limiter(() => blockfrostAPI.blocks(index)).then(block =>
-                  getBlockData({ block }).then(addresses => ({
+                  getBlockData(block).then(addresses => ({
                     latestBlock: block,
                     affectedAddresses: addresses,
                   })),
@@ -94,7 +94,7 @@ export const emitBlock = async (options?: EmitBlockOptions) => {
         }
       }
 
-      const affectedAddresses = await getBlockData({ block: latestBlock });
+      const affectedAddresses = await getBlockData(latestBlock);
 
       logger.info(`[BLOCK EMITTER] Emitting new block ${latestBlock.hash} (${latestBlock.height})`);
       // emit latest block
