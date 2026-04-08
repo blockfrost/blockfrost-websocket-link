@@ -36,101 +36,35 @@ describe('events', () => {
 
   for (const fixture of fixtures.emitMissedBlock) {
     test(fixture.description, async () => {
-      const mock1 = sinon.stub(blockfrostAPI, 'blocks');
       const mockBlockAddresses = sinon.stub(blockfrostAPI, 'blocksAddressesAll').resolves([]);
-      mock1
+      const mockBlocks = sinon
+        .stub(blockfrostAPI, 'blocks')
+        // @ts-ignore
+        .callsFake(hash => Promise.resolve(fixture.blocks.find(b => b.hash === hash)));
+      const mockBlocksLatest = sinon
+        .stub(blockfrostAPI, 'blocksLatest')
         .onCall(0)
         // @ts-ignore
-        .resolves(fixture.missedBlocks[0]);
-      mock1
+        .resolves(fixture.blocks[0])
         .onCall(1)
         // @ts-ignore
-        .resolves(fixture.missedBlocks[1]);
-      const mock2 = sinon.stub(blockfrostAPI, 'blocksLatest');
+        .resolves(fixture.blocks[3]);
 
-      mock2
-        .onCall(0)
-        // @ts-ignore
-        .resolves(fixture.latestBlocks[0]);
-      mock2
-        .onCall(1)
-        // @ts-ignore
-        .resolves(fixture.latestBlocks[1]);
       const callback = vi.fn();
 
       events.on('newBlock', callback);
 
       await emitBlock();
       expect(callback).toBeCalledTimes(1);
-      expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0], []);
+      expect(callback).toHaveBeenNthCalledWith(1, fixture.blocks[0], []);
 
       await emitBlock({ maxMissedBlocks: 10 });
       expect(callback).toBeCalledTimes(4); // one time from the first emit, 3 times from 2nd emit (2 missed blocks + latest)
-      expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0], []);
-      expect(callback).toHaveBeenNthCalledWith(3, fixture.missedBlocks[1], []);
-      expect(callback).toHaveBeenNthCalledWith(4, fixture.latestBlocks[1], []);
-      mock1.restore();
-      mock2.restore();
-      mockBlockAddresses.restore();
-      events.removeAllListeners();
-      _resetPreviousBlock();
-    });
-
-    test(`${fixture.description} - timeout test`, async () => {
-      const blockLatestMock = sinon.stub(blockfrostAPI, 'blocksLatest');
-      const mockBlockAddresses = sinon.stub(blockfrostAPI, 'blocksAddressesAll').resolves([]);
-
-      blockLatestMock
-        .onCall(0)
-        // @ts-ignore
-        .resolves(fixture.latestBlocks[0]);
-      blockLatestMock
-        .onCall(1)
-        // @ts-ignore
-        .resolves(fixture.latestBlocks[1]);
-      const callback = vi.fn();
-
-      events.on('newBlock', callback);
-
-      const blockMock = sinon.stub(blockfrostAPI, 'blocks');
-
-      blockMock
-        .onCall(0)
-        // @ts-ignore
-        .resolves(fixture.missedBlocks[0]);
-      blockMock.onCall(1).returns(
-        new Promise(resolve => {
-          setTimeout(() => {
-            // @ts-ignore
-            resolve(fixture.missedBlocks[1]);
-          }, 10000);
-        }),
-      ); // delay 2nd response by 5s, which should trigger timeout
-
-      await emitBlock();
-      expect(callback).toBeCalledTimes(1);
-      expect(callback).toHaveBeenNthCalledWith(1, fixture.latestBlocks[0], []);
-
-      await emitBlock({ fetchTimeoutMs: 3000, maxMissedBlocks: 10 });
-
-      // Following warning is kinda legit:
-      // "A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown."
-      // We are simulating network timeout by returning a value too late (after 5s)
-      // but we will received it in the end. What's important is that such a block wont be emitted.
-      // TODO: it would be super cool to abort the promise so we can stop fetching
-
-      // with additional wait we can be sure that the failed block wont be emitted later
-      await new Promise(resolve => {
-        setTimeout(() => {
-          resolve(true);
-        }, 1500);
-      });
-
-      expect(callback).toBeCalledTimes(3); // one time from the first emit, 2 times from 2nd emit (just 1 missed block (because 2nd block will timeout) + latest block)
-      expect(callback).toHaveBeenNthCalledWith(2, fixture.missedBlocks[0], []);
-      expect(callback).toHaveBeenNthCalledWith(3, fixture.latestBlocks[1], []);
-      blockLatestMock.restore();
-      blockMock.restore();
+      expect(callback).toHaveBeenNthCalledWith(2, fixture.blocks[1], []);
+      expect(callback).toHaveBeenNthCalledWith(3, fixture.blocks[2], []);
+      expect(callback).toHaveBeenNthCalledWith(4, fixture.blocks[3], []);
+      mockBlocks.restore();
+      mockBlocksLatest.restore();
       mockBlockAddresses.restore();
       events.removeAllListeners();
       _resetPreviousBlock();

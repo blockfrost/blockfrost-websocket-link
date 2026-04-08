@@ -29,7 +29,7 @@ export const emitBlock = [
 export const emitMissedBlock = [
   {
     description: 'missed 2 blocks',
-    latestBlocks: [
+    blocks: [
       {
         time: 1506203091,
         height: 1,
@@ -37,20 +37,21 @@ export const emitMissedBlock = [
       },
       {
         time: 1506203091,
-        height: 4,
-        hash: 'd',
-      },
-    ],
-    missedBlocks: [
-      {
-        time: 1506203091,
         height: 2,
         hash: 'b',
+        previous_block: 'a',
       },
       {
         time: 1506203091,
         height: 3,
         hash: 'c',
+        previous_block: 'b',
+      },
+      {
+        time: 1506203091,
+        height: 4,
+        hash: 'd',
+        previous_block: 'c',
       },
     ],
   },
@@ -181,7 +182,7 @@ export const onBlock = [
             asset_mint_or_burn_count: 1,
             redeemer_count: 4,
             valid_contract: true,
-            cbor: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            cbor: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
           },
           txUtxos: {
             hash: '4d5beb45fe37b44b46f839811a3d3a1ac4a20911850740867a64f77d09372d0b',

@@ -3,7 +3,6 @@ import * as Server from './types/server.js';
 import { prepareMessage } from './utils/message.js';
 import { blockfrostAPI, getBlockData } from './utils/blockfrost-api.js';
 import { Responses } from '@blockfrost/blockfrost-js';
-import { promiseTimeout } from './utils/common.js';
 import { getTransactionsWithDetails } from './utils/transaction.js';
 import { TxNotification } from './types/response.js';
 import { EMIT_MAX_MISSED_BLOCKS } from './constants/config.js';
@@ -32,86 +31,72 @@ interface Events {
 // eslint-disable-next-line unicorn/prefer-event-target
 const events: Events = new EventEmitter();
 
-let previousBlock: undefined | Responses['block_content'];
+const latestBlocks: Block[] = [];
 
 export const _resetPreviousBlock = () => {
-  previousBlock = undefined;
+  latestBlocks.splice(0);
 };
 
-export const emitBlock = async (options?: EmitBlockOptions) => {
-  try {
-    const latestBlock = await limiter(() => blockfrostAPI.blocksLatest());
+export const emitBlock = async ({
+  maxMissedBlocks = EMIT_MAX_MISSED_BLOCKS,
+}: EmitBlockOptions = {}) => {
+  const latest = await limiter(() => blockfrostAPI.blocksLatest());
 
-    if ((latestBlock.height ?? 0) < (previousBlock?.height ?? 0)) {
-      // rollback
-      logger.warn(
-        `[BLOCK EMITTER] Rollback detected. Previous block height: ${previousBlock?.height}, current block height: ${latestBlock.height}`,
-      );
-      previousBlock = undefined;
+  logger.info(`[BLOCK EMITTER] Latest block ${latest.height} (${latest.hash})`);
+
+  const add = [latest]; // Ascending by height, adding to/removing from start
+  const known = latestBlocks; // Descending by height, adding to/removing from start
+  const remove: Block[] = []; // Descending by height, adding to end
+
+  while (
+    known.length > 0 && // There is at least one known, non-reorged block, and
+    add.length > 0 && // there is at least one block to be added, but
+    add.length < maxMissedBlocks && // there is at most maxMissedBlocks of them, and
+    add[0].previous_block !== known[0].hash // known blocks are not directly followed by blocks to be added
+  ) {
+    if (known[0].height! < add[0].height!) {
+      // Latest known block is lower than earliest block to be added -> fetch and add even earlier block
+      const previous = await limiter(() => blockfrostAPI.blocks(add[0].previous_block!));
+
+      add.unshift(previous);
+    } else if (known[0].height! > add[0].height!) {
+      // Latest known block is higher than earliest block to be added -> remove latest known block (reorg)
+      remove.push(known.shift()!);
+    } else if (known[0].hash !== add[0].hash) {
+      // Latest known block has same height but different hash than earliest block to be added -> remove latest known block (reorg)
+      remove.push(known.shift()!);
+    } else {
+      // Latest known block is identical to earliest block to be added -> remove earliest block to be added
+      add.shift();
     }
-
-    const currentPreviousBlock = previousBlock;
-
-    previousBlock = latestBlock;
-
-    if (!currentPreviousBlock || currentPreviousBlock.hash !== latestBlock.hash) {
-      if (currentPreviousBlock && latestBlock.height && currentPreviousBlock.height) {
-        // check if we missed more blocks since the last emit
-
-        const missedBlocks = latestBlock.height - currentPreviousBlock.height;
-
-        if (missedBlocks > (options?.maxMissedBlocks ?? EMIT_MAX_MISSED_BLOCKS)) {
-          // too many missed blocks, skip emitting
-          logger.warn(
-            `[BLOCK EMITTER] Emitting skipped. Too many missed blocks: ${
-              currentPreviousBlock.height + 1
-            }-${latestBlock.height - 1}`,
-          );
-        } else {
-          for (let index = currentPreviousBlock.height + 1; index < latestBlock.height; index++) {
-            // emit previously missed blocks
-            try {
-              const missedBlockData = await promiseTimeout(
-                limiter(() => blockfrostAPI.blocks(index)).then(block =>
-                  getBlockData(block).then(addresses => ({
-                    latestBlock: block,
-                    affectedAddresses: addresses,
-                  })),
-                ),
-
-                options?.fetchTimeoutMs ?? 8000,
-              );
-
-              logger.warn(
-                `[BLOCK EMITTER] Emitting missed block: ${index} (current block: ${latestBlock.height})`,
-              );
-              events.emit(
-                'newBlock',
-                missedBlockData.latestBlock,
-                missedBlockData.affectedAddresses,
-              );
-            } catch (error) {
-              if (error instanceof Error && error.message === 'PROMISE_TIMEOUT') {
-                logger.warn(`[BLOCK EMITTER] Skipping block ${index}. Fetch takes too long.`);
-              } else {
-                logger.warn(`[BLOCK EMITTER] Skipping block ${index}.`);
-
-                logger.warn(error);
-              }
-            }
-          }
-        }
-      }
-
-      const affectedAddresses = await getBlockData(latestBlock);
-
-      logger.info(`[BLOCK EMITTER] Emitting new block ${latestBlock.hash} (${latestBlock.height})`);
-      // emit latest block
-      events.emit('newBlock', latestBlock, affectedAddresses);
-    }
-  } catch (error) {
-    logger.error('[BLOCK EMITTER] error', error);
   }
+
+  if (remove.length > 0 && known.length === 0) {
+    logger.warn(`[BLOCK EMITTER] Complete rollback, rollbacking ${remove.length} known blocks`);
+    remove.splice(0);
+  }
+
+  for (const removed of remove) {
+    logger.warn(`[BLOCK EMITTER] Rollbacked block ${removed.height} (${removed.hash})`);
+  }
+
+  for (const added of add) {
+    try {
+      const addresses = await getBlockData(added);
+
+      logger.info(`[BLOCK EMITTER] Emit block ${added.height} (${added.hash})`);
+      events.emit('newBlock', added, addresses);
+      known.unshift(added);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'PROMISE_TIMEOUT') {
+        logger.warn(`[BLOCK EMITTER] Skipping block ${added.height}. Fetch takes too long.`);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  known.splice(maxMissedBlocks);
 };
 
 export const onBlock = async (
@@ -203,7 +188,10 @@ export const startEmitter = async () => {
 
   const t0 = Date.now();
 
-  await emitBlock();
+  await emitBlock().catch(error => {
+    logger.error('[BLOCK EMITTER] Error', error);
+  });
+
   const t1 = Date.now();
   const durationMs = t1 - t0;
 
