@@ -20,8 +20,17 @@ export interface SubscribedAddress {
   cbor?: boolean;
 }
 
+type Block = Responses['block_content'];
+type BlockAddresses = Responses['block_content_addresses'];
+
+interface Events {
+  on(event: 'newBlock', listener: (block: Block, addresses: BlockAddresses) => void): this;
+  emit(event: 'newBlock', block: Block, addresses: BlockAddresses): boolean;
+  removeAllListeners(): this;
+}
+
 // eslint-disable-next-line unicorn/prefer-event-target
-const events = new EventEmitter();
+const events: Events = new EventEmitter();
 
 let previousBlock: undefined | Responses['block_content'];
 
