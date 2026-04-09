@@ -24,14 +24,18 @@ type BlockAddresses = Responses['block_content_addresses'];
 
 interface Events {
   on(event: 'newBlock', listener: (block: Block, addresses: BlockAddresses) => void): this;
+  on(event: 'reorgBlock', listener: (block: Block, addresses: BlockAddresses) => void): this;
+  on(event: 'reorgAll', listener: () => void): this;
   emit(event: 'newBlock', block: Block, addresses: BlockAddresses): boolean;
+  emit(event: 'reorgBlock', block: Block, addresses: BlockAddresses): boolean;
+  emit(event: 'reorgAll'): boolean;
   removeAllListeners(): this;
 }
 
 // eslint-disable-next-line unicorn/prefer-event-target
 const events: Events = new EventEmitter();
 
-const latestBlocks: Block[] = [];
+const latestBlocks: (Block & { addresses: BlockAddresses })[] = [];
 
 export const _resetPreviousBlock = () => {
   latestBlocks.splice(0);
@@ -46,7 +50,7 @@ export const emitBlock = async ({
 
   const add = [latest]; // Ascending by height, adding to/removing from start
   const known = latestBlocks; // Descending by height, adding to/removing from start
-  const remove: Block[] = []; // Descending by height, adding to end
+  const remove: typeof latestBlocks = []; // Descending by height, adding to end
 
   while (
     known.length > 0 && // There is at least one known, non-reorged block, and
@@ -73,11 +77,13 @@ export const emitBlock = async ({
 
   if (remove.length > 0 && known.length === 0) {
     logger.warn(`[BLOCK EMITTER] Complete rollback, rollbacking ${remove.length} known blocks`);
+    events.emit('reorgAll');
     remove.splice(0);
   }
 
-  for (const removed of remove) {
+  for (const { addresses, ...removed } of remove) {
     logger.warn(`[BLOCK EMITTER] Rollbacked block ${removed.height} (${removed.hash})`);
+    events.emit('reorgBlock', removed, addresses);
   }
 
   for (const added of add) {
@@ -86,7 +92,7 @@ export const emitBlock = async ({
 
       logger.info(`[BLOCK EMITTER] Emit block ${added.height} (${added.hash})`);
       events.emit('newBlock', added, addresses);
-      known.unshift(added);
+      known.unshift({ ...added, addresses });
     } catch (error) {
       if (error instanceof Error && error.message === 'PROMISE_TIMEOUT') {
         logger.warn(`[BLOCK EMITTER] Skipping block ${added.height}. Fetch takes too long.`);
