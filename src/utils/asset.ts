@@ -4,7 +4,6 @@ import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { Balance } from '../types/address.js';
 import { AssetBalance } from '../types/response.js';
 import { logger } from './logger.js';
-import { limiter } from './limiter.js';
 
 export const getAssetData = async (hex: string) => {
   if (hex === 'lovelace') {
@@ -12,7 +11,7 @@ export const getAssetData = async (hex: string) => {
   }
   logger.debug(`Fetching asset metadata for ${hex}`);
   try {
-    const response = await limiter(() => blockfrostAPI.assetsById(hex));
+    const response = await blockfrostAPI.assetsById(hex);
 
     return response;
   } catch (error) {

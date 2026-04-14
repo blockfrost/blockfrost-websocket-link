@@ -2,7 +2,6 @@ import { BlockFrostAPI, BlockfrostServerError, Responses } from '@blockfrost/blo
 import { Options } from '@blockfrost/blockfrost-js/lib/types/index.js';
 import { createRequire } from 'module';
 import { BLOCKFROST_REQUEST_TIMEOUT } from '../constants/config.js';
-import { limiter } from './limiter.js';
 
 const require = createRequire(import.meta.url);
 const packageJson = require('../../package.json');
@@ -27,8 +26,7 @@ const assertRepeatableError = (error: unknown) => {
 };
 
 export const getBlockData = async (block: Responses['block_content']) => {
-  const tryFetch = () =>
-    limiter(() => blockfrostAPI.blocksAddressesAll(block.hash, { batchSize: 2 }));
+  const tryFetch = () => blockfrostAPI.blocksAddressesAll(block.hash, { batchSize: 2 });
 
   try {
     return await tryFetch();

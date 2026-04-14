@@ -7,7 +7,6 @@ import { getTransactionsWithDetails } from './utils/transaction.js';
 import { TxNotification } from './types/response.js';
 import { EMIT_MAX_MISSED_BLOCKS } from './constants/config.js';
 import { logger } from './utils/logger.js';
-import { limiter } from './utils/limiter.js';
 
 interface EmitBlockOptions {
   fetchTimeoutMs?: number;
@@ -44,7 +43,7 @@ export const _resetPreviousBlock = () => {
 export const emitBlock = async ({
   maxMissedBlocks = EMIT_MAX_MISSED_BLOCKS,
 }: EmitBlockOptions = {}) => {
-  const latest = await limiter(() => blockfrostAPI.blocksLatest());
+  const latest = await blockfrostAPI.blocksLatest();
 
   logger.info(`[BLOCK EMITTER] Latest block ${latest.height} (${latest.hash})`);
 
@@ -60,7 +59,7 @@ export const emitBlock = async ({
   ) {
     if (known[0].height! < add[0].height!) {
       // Latest known block is lower than earliest block to be added -> fetch and add even earlier block
-      const previous = await limiter(() => blockfrostAPI.blocks(add[0].previous_block!));
+      const previous = await blockfrostAPI.blocks(add[0].previous_block!);
 
       add.unshift(previous);
     } else if (known[0].height! > add[0].height!) {

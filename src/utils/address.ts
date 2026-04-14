@@ -8,7 +8,6 @@ import {
 } from '@blockfrost/blockfrost-js';
 import memoizee from 'memoizee';
 import { getAssetData, transformAsset } from './asset.js';
-import { limiter } from './limiter.js';
 
 export const deriveAddress = (
   publicKey: string,
@@ -75,7 +74,7 @@ export const discoverAddresses = async (
       );
 
       addressCount++;
-      const promise = limiter(() => blockfrostAPI.addresses(address));
+      const promise = blockfrostAPI.addresses(address);
 
       promisesBundle.push({ address, promise, path });
     }
@@ -119,16 +118,14 @@ export const addressesToUtxos = async (
   const promises = addresses.map(item =>
     item.data === 'empty'
       ? []
-      : limiter(() =>
-          // change batchSize to fetch only 1 page at a time (each page has 100 utxos)
-          blockfrostAPI.addressesUtxosAll(item.address, { batchSize: 1 }).catch(error => {
-            if (error instanceof BlockfrostServerError && error.status_code === 404) {
-              return [];
-            } else {
-              throw error;
-            }
-          }),
-        ),
+      : // change batchSize to fetch only 1 page at a time (each page has 100 utxos)
+        blockfrostAPI.addressesUtxosAll(item.address, { batchSize: 1 }).catch(error => {
+          if (error instanceof BlockfrostServerError && error.status_code === 404) {
+            return [];
+          } else {
+            throw error;
+          }
+        }),
   );
 
   const allUtxos = await Promise.all(promises);
@@ -173,14 +170,12 @@ export const utxosWithBlocks = async (
     }
 
     for (const utxoData of utxo.data) {
-      const promise = limiter(() =>
-        blockfrostAPI.blocks(utxoData.block).then(blockData => ({
-          address: utxo.address,
-          path: utxo.path,
-          utxoData: utxoData,
-          blockInfo: blockData,
-        })),
-      );
+      const promise = blockfrostAPI.blocks(utxoData.block).then(blockData => ({
+        address: utxo.address,
+        path: utxo.path,
+        utxoData: utxoData,
+        blockInfo: blockData,
+      }));
 
       promisesBundle.push(promise);
     }
@@ -204,7 +199,7 @@ export const addressesToTxIds = async (
       continue;
     }
 
-    const promise = limiter(() =>
+    const promise =
       // 1 page (100 txs) per address at a time should be more efficient default value
       // compared to fetching 10 pages (1000 txs) per address
       blockfrostAPI
@@ -216,8 +211,7 @@ export const addressesToTxIds = async (
           } else {
             throw error;
           }
-        }),
-    );
+        });
 
     promisesBundle.push(promise);
   }
@@ -237,13 +231,14 @@ export const getAddressesData = async (
         addresses.map(addr =>
           addr.data === 'empty'
             ? { addr, data: undefined }
-            : limiter(() =>
-                blockfrostAPI.addressesTotal(addr.address).catch(error => {
+            : blockfrostAPI
+                .addressesTotal(addr.address)
+                .catch(error => {
                   if (error.status_code !== 404) {
                     throw new Error(error);
                   }
-                }),
-              ).then(data => ({ addr, data })),
+                })
+                .then(data => ({ addr, data })),
         ),
       );
 
@@ -258,11 +253,9 @@ export const getAddressesData = async (
 
 export const getStakingData = async (stakeAddress: string): Promise<Addresses.StakingData> => {
   try {
-    const stakeAddressData = await limiter(() => blockfrostAPI.accounts(stakeAddress));
+    const stakeAddressData = await blockfrostAPI.accounts(stakeAddress);
     const { drep_id } = stakeAddressData;
-    const drepData = drep_id
-      ? await limiter(() => blockfrostAPI.governance.drepsById(drep_id))
-      : null;
+    const drepData = drep_id ? await blockfrostAPI.governance.drepsById(drep_id) : null;
 
     return {
       rewards: stakeAddressData.withdrawable_amount,
@@ -288,7 +281,7 @@ export const getStakingAccountTotal = async (
   stakeAddress: string,
 ): Promise<Responses['account_addresses_total']> => {
   try {
-    const total = await limiter(() => blockfrostAPI.accountsAddressesTotal(stakeAddress));
+    const total = await blockfrostAPI.accountsAddressesTotal(stakeAddress);
 
     return total;
   } catch (error) {

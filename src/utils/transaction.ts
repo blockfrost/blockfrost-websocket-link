@@ -1,7 +1,6 @@
 import { BlockfrostServerError, Responses } from '@blockfrost/blockfrost-js';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { getAssetData, transformAsset } from './asset.js';
-import { limiter } from './limiter.js';
 import { logger } from './logger.js';
 import {
   TxIdsToTransactionsResponse,
@@ -22,9 +21,7 @@ export const sortTransactionsCmp = <
 const fetchTxWithUtxo = async (txHash: string, address: string, cbor?: boolean) => {
   try {
     const [txUtxos, txData] = await Promise.all([
-      limiter(() => blockfrostAPI.txsUtxos(txHash)).then(txUtxo =>
-        transformTransactionUtxo(txUtxo),
-      ),
+      blockfrostAPI.txsUtxos(txHash).then(transformTransactionUtxo),
       fetchTransactionData(txHash, cbor),
     ]);
 
@@ -79,9 +76,7 @@ export const getTransactionsWithDetails = async (
 ): Promise<Pick<TxIdsToTransactionsResponse, 'txData' | 'txUtxos'>[]> => {
   const txsData = await Promise.all(txs.map(({ txId, cbor }) => fetchTransactionData(txId, cbor)));
   const txsUtxo = await Promise.all(
-    txs.map(({ txId }) =>
-      limiter(() => blockfrostAPI.txsUtxos(txId).then(data => transformTransactionUtxo(data))),
-    ),
+    txs.map(({ txId }) => blockfrostAPI.txsUtxos(txId).then(transformTransactionUtxo)),
   );
 
   return txs.map((_tx, index) => ({ txData: txsData[index], txUtxos: txsUtxo[index] }));
@@ -103,8 +98,8 @@ export const fetchTransactionData = async (
   cbor?: boolean,
 ): Promise<TransformedTransaction> => {
   const [txData, txCbor] = await Promise.all([
-    limiter(() => blockfrostAPI.txs(txId)).then(data => transformTransactionData(data)),
-    cbor ? limiter(() => blockfrostAPI.txsCbor(txId)) : undefined,
+    blockfrostAPI.txs(txId).then(transformTransactionData),
+    cbor ? blockfrostAPI.txsCbor(txId) : undefined,
   ]);
 
   return { ...txData, ...txCbor };

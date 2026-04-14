@@ -1,6 +1,5 @@
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { BlockfrostServerError } from '@blockfrost/blockfrost-js';
-import { limiter } from '../utils/limiter.js';
 
 const policyID = 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a';
 
@@ -8,8 +7,8 @@ export default async (name: string) => {
   let data: { address: string } | null;
 
   try {
-    const result = await limiter(() =>
-      blockfrostAPI.assetsAddresses(policyID + Buffer.from(name, 'utf8').toString('hex')),
+    const result = await blockfrostAPI.assetsAddresses(
+      policyID + Buffer.from(name, 'utf8').toString('hex'),
     );
 
     if (result.length > 1) {

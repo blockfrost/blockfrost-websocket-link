@@ -1,13 +1,12 @@
 import * as os from 'os';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
-import { limiter } from '../utils/limiter.js';
 
 export default async () => {
   const isTestnet = blockfrostAPI.options.network !== 'mainnet';
 
   const [info, latestBlock] = await Promise.all([
-    limiter(() => blockfrostAPI.root()),
-    limiter(() => blockfrostAPI.blocksLatest()),
+    blockfrostAPI.root(),
+    blockfrostAPI.blocksLatest(),
   ]);
 
   const serverInfo = {

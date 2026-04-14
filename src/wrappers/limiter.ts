@@ -1,15 +1,11 @@
-import PQueue from 'p-queue';
-
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
-import { BLOCKFROST_REQUEST_CONCURRENCY } from '../constants/config.js';
-
-const limiter = new PQueue({ concurrency: BLOCKFROST_REQUEST_CONCURRENCY });
+import { pLimiter } from '../utils/limiter.js';
 
 const log = () => {
   return `Rate limiter:
 
-Tasks in queue: ${limiter.size}
-Tasks running: ${limiter.pending}
+Tasks in queue: ${pLimiter.size}
+Tasks running: ${pLimiter.pending}
 ${'-'.repeat(60)}
 `;
 };
@@ -19,7 +15,7 @@ const withLimiter = <Params extends unknown[], Response>(
   thisObj: unknown = blockfrostAPI,
 ) => {
   const wrapped = (...params: Params) =>
-    limiter.add<Response>(() => func.apply(thisObj, params), {
+    pLimiter.add<Response>(() => func.apply(thisObj, params), {
       throwOnTimeout: true,
     });
 
