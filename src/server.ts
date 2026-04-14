@@ -41,6 +41,8 @@ import { MessageId, Messages } from './types/message.js';
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
+// Order matters!
+import './wrappers/statistics.js';
 import './wrappers/memoization.js';
 
 const app = express();
