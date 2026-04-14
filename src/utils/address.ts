@@ -33,6 +33,7 @@ export const deriveAddress = (
 export const memoizedDeriveAddress = memoizee(deriveAddress, {
   maxAge: 30 * 60 * 1000, // 30 mins
   primitive: true,
+  profileName: '__address derivation__',
 });
 
 export const discoverAddresses = async (

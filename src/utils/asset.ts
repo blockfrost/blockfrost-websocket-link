@@ -1,37 +1,29 @@
 import { BlockfrostServerError, parseAsset, Responses } from '@blockfrost/blockfrost-js';
 import { BigNumber } from 'bignumber.js';
-import memoizee from 'memoizee';
 import { blockfrostAPI } from '../utils/blockfrost-api.js';
 import { Balance } from '../types/address.js';
 import { AssetBalance } from '../types/response.js';
 import { logger } from './logger.js';
 import { limiter } from './limiter.js';
 
-export const getAssetData = memoizee(
-  async (hex: string) => {
-    if (hex === 'lovelace') {
-      return;
-    }
-    logger.debug(`Fetching asset metadata for ${hex}`);
-    try {
-      const response = await limiter(() => blockfrostAPI.assetsById(hex));
+export const getAssetData = async (hex: string) => {
+  if (hex === 'lovelace') {
+    return;
+  }
+  logger.debug(`Fetching asset metadata for ${hex}`);
+  try {
+    const response = await limiter(() => blockfrostAPI.assetsById(hex));
 
-      return response;
-    } catch (error) {
-      if (error instanceof BlockfrostServerError && error.status_code === 404) {
-        logger.warn(`Fetching asset ${hex} failed. Asset not found.`);
-      } else {
-        logger.error(error);
-      }
-      throw error;
+    return response;
+  } catch (error) {
+    if (error instanceof BlockfrostServerError && error.status_code === 404) {
+      logger.warn(`Fetching asset ${hex} failed. Asset not found.`);
+    } else {
+      logger.error(error);
     }
-  },
-  {
-    maxAge: 30 * 60 * 1000, // each asset is cached in-memory for 30 mins
-    primitive: true,
-    promise: true,
-  },
-);
+    throw error;
+  }
+};
 
 export const transformAsset = (
   token: Balance,
