@@ -42,8 +42,9 @@ const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
 // Order matters!
-import './wrappers/statistics.js';
-import './wrappers/limiter.js';
+import memoize from 'memoizee/profile.js';
+import statistics from './wrappers/statistics.js';
+import limiter from './wrappers/limiter.js';
 import './wrappers/memoization.js';
 
 const app = express();
@@ -112,6 +113,11 @@ const metricsCollector = new MetricsCollector(wss, METRICS_COLLECTOR_INTERVAL_MS
 app.get('/metrics', (_request, response) => {
   response.setHeader('Content-Type', 'text/plain');
   response.send(metricsCollector.toJson());
+});
+
+app.get('/monitor', (_request, response) => {
+  response.setHeader('Content-Type', 'text/plain');
+  response.send(`${memoize.log()}${statistics.log()}${limiter.log()}`);
 });
 
 const heartbeat = (ws: Server.Ws) => {
